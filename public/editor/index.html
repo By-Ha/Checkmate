@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Checkmate! Editor</title>
+    <script src="https://cdn.bootcss.com/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.bootcss.com/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.16.1/umd/popper.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.13.0/js/md5.min.js"></script>
+    <link href="index.css?ver=1.2.0b2" rel="stylesheet">
+</head>
+<body>
+    <div style="position: fixed;width: 100%;height: 100%;" id="main">
+    <div id="l" style="overflow: auto;">
+        <h1 id="l-title">Checkmate!</h1>
+        <h2 id="l-subtitle">Editor</h2>
+        <br/>
+        <div class="btn-group" style="width: 100%; text-align: center; display: block;">
+            <div class="alert alert-info" id="size">
+                地图边长:
+                <button type="button" class="btn btn-outline-primary">10</button>
+                <button type="button" class="btn btn-outline-primary">20</button>
+                <button type="button" class="btn btn-outline-primary">30</button>
+            </div>
+            <div class="alert alert-info" id="select-color" style="text-align: center;">
+                <div id="color-visible" style="border-radius: 100%; height: 20px; width: 20px; margin-left: auto; margin-right: auto;background: blue;"></div>
+                <br/>
+                <button type="button" id="color-1" class="btn btn-outline-primary" style="color: blue">蓝</button>
+                <button type="button" id="color-2" class="btn btn-outline-primary" style="color: red">红</button>
+                <button type="button" id="color-3" class="btn btn-outline-primary" style="color: green">绿</button>
+                <button type="button" id="color-4" data-toggle="tooltip" title="10*10下无效." class="btn btn-outline-primary" style="color: orange">橙</button>
+                <br/>
+                <button type="button" id="color-5" data-toggle="tooltip" title="10*10下无效." class="btn btn-outline-primary" style="color: pink">粉</button>
+                <button type="button" id="color-6" data-toggle="tooltip" title="10*10下无效." class="btn btn-outline-primary" style="color: purple">紫</button>
+                <button type="button" id="color-7" data-toggle="tooltip" title="10*10下无效." class="btn btn-outline-primary" style="color: chocolate">棕</button>
+                <button type="button" id="color-8" data-toggle="tooltip" title="10*10下无效." class="btn btn-outline-primary" style="color: maroon">褐</button>
+            </div>
+            <div class="alert alert-info" id="type">
+                <div id="type-visible" style="height: 30px; width: 30px; margin-left: auto; margin-right: auto;background: url('/img/none.png'); background-size: 100% 100%;"></div>
+                <br/>
+                <button type="button" id="type-0" data-toggle="tooltip" class="btn btn-outline-primary" title="显然是什么都没有的意思.">空白</button>
+                <button type="button" id="type-1" data-toggle="tooltip" class="btn btn-outline-primary" title="同一颜色多个基地将随机选择.">基地</button>
+                <button type="button" id="type-2" data-toggle="tooltip" class="btn btn-outline-primary" title="几厘米啊几厘米~">山峰</button>
+                <button type="button" id="type-3" data-toggle="tooltip" class="btn btn-outline-primary" title="不如使一发空城计.">城市</button>
+            </div>
+        </div>
+        <div class="btn-group" style="width: 100%; text-align: center;">
+            <button type="button" id="reset" class="btn btn-danger">重置地图</button>
+            <button type="button" id="export" class="btn btn-primary">导出地图</button>
+        </div>
+        <br/>
+        <br/>
+        <!--  -->
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="导出的文本文件的内容" id="import">
+            <div class="input-group-append">
+                <button type="submit" id="import-submit" class="btn btn-primary">导入地图</button>
+            </div>
+        </div>
+        <br/>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Name" id="store-name">
+            <div class="input-group-append">
+                <button type="submit" id="store" class="btn btn-primary">存入列表</button>
+            </div>
+        </div>
+    </div>
+    <table id="m" style="table-layout: fixed;">
+    </table>
+    </div>
+    <style id="font-size-control">
+        #m td{
+            width: 30px;
+            max-width: 30px;
+            height: 30px;
+            max-height: 30px;
+        }
+    </style>
+    <script src="index.js?ver=1.2.0b2"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+body{
+    background: rgb(34,34,34);
+}
+#main{
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+}
+#m{
+    position: fixed;
+    /* width: 90vh;
+    height: 90%; */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    border: black 1px;
+    border-spacing: 0px !important;
+    z-index: -5;
+}
+#m td{
+    overflow: hidden;
+    border: 1px solid black;
+    text-align: center;
+    padding: 0;
+    background: #dcdcdc;
+}
+#m .shown{
+    border: 1px solid black;/*transparent*/
+}
+#m .unshown{
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid transparent;/**/
+}
+#m .selected{
+    filter: opacity(0.8);
+}
+#m .own{
+    cursor: pointer;
+}
+#m td{
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    user-select:none;    
+    border-spacing: 0px;
+    background-size: 100% 100%;
+}
+#l{
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    user-select:none;  
+    position: fixed;
+    height: 100%;
+    width: 15%;
+    background: grey;
+    color: white;
+    z-index: 10;
+}
+#l-title{
+    overflow: hidden;
+    color: white;
+    width: 100%;
+    text-align: center;
+    font-family: cursive;
+}
+#r{
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    user-select:none;  
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: 10;
+}
+#info{
+    color: aliceblue;
+}
+.blue{
+    background-color: blue !important;
+    color: white;
+}
+.red{
+    background-color: red !important;
+    color: white;
+}
+.green{
+    background-color: green !important;
+    color: white;
+}
+.orange{
+    background-color: orange !important;
+    color: white;
+}
+.pink{
+    background-color: pink !important;
+    color: black;
+}
+.purple{
+    background-color: purple !important;
+    color: white;
+}
+.chocolate{
+    background-color: chocolate !important;
+    color: white;
+}
+.maroon{
+    background-color: maroon !important;
+    color: white;
+}
+.maroon{
+    background-color: grey !important;
+    color: white;
+}
+*{
+    padding: 0px;
+    margin: 0px;
+}

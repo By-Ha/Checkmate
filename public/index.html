@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkmate!</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" name="viewport">
+    <script src="https://cdn.bootcss.com/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.bootcss.com/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="index.css?ver=2.0.0b1">
+</head>
+<body>
+    <div id="main">
+    <div id="l">
+        <h1 id="l-title">Checkmate!</h1>
+        <br/>
+        <div>左键:选中;WASD:移动兵力;↑↓←→:移动选择;Q:清除所有移动;Z:清除上一次移动;空格:切换半兵/全兵;滚轮:缩放;左键拖动:移动视图;</div>
+        <br/>
+        <div>总人数:<span id="total-user"></span></div>
+        <div>准备人数:<span id="ready-user"></span></div>
+        <button id="ready" class="btn btn-primary" type="button">准备</button>
+        <br/>
+        <div class="input-group input-group-sm" style="margin-top: 5px">
+            <input type="text" class="form-control" id="changeUserName" placeholder="输入新的用户名">
+        </div>
+        <button id="changeUserNameSubmit" class="btn btn-primary" type="button" style="margin-top: 5px">更改</button>
+        <br/>
+        <button id="third" class="btn btn-primary" type="button" style="margin-top: 5px">旁观</button>
+        <br/>
+        <div id="half">全部派兵</div>
+    </div>
+    <table id="m">
+    </table>
+    <div id="r">
+        <table id="info" class="table">
+            <thead>
+                <tr>
+                    <th>玩家昵称</th>
+                    <th>领地数</th>
+                    <th>兵力数</th>
+                </tr>
+            </thead>
+            <tbody id="info-content">
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <style id="font-size-control">
+        #m td{
+            width: 30px;
+            max-width: 30px;
+            height: 30px;
+            max-height: 30px;
+        }
+    </style>
+    <script src="index.js?ver=2.0.0b4"></script>
+    <script src="client.js?ver=2.0.0b4"></script>
+</body>
+</html>
