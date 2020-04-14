@@ -120,6 +120,10 @@ s.on('swal', function(dat, func){
 s.on('execute', (cmd)=>{
     eval(cmd);
 })
+s.on('WorldMessage', (msg) => {
+    $("#msg-container").append("<p>&nbsp&nbsp&nbsp&nbsp"+msg+"</p>");
+    $("#msg-container")[0].scrollTop = 99999999;
+})
 if ($.cookie("third") == "0") {
     $("#third")[0].innerHTML = "进入旁观";
 } else {

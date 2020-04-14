@@ -456,6 +456,22 @@ function run() {
             s.emit('UpdateUser', User);
         })
 
+        /**
+         * 聊天内容
+         * @function SendWorldMessage
+         */
+        s.on('SendWorldMessage', (dat)=>{
+            if(User[s.id] == undefined) {
+                s.emit('swal', makeSwal('请登录', 1, 3000));
+                return ;
+            }
+            if(dat.toLowerCase().indexOf("script") != -1 && User[s.id].id != 1){
+                s.emit('swal', makeSwal('你想干啥?', 1, 3000));
+                return ;
+            }
+            s.emit('WorldMessage', dat);
+        })
+
         // Admin events
         /**
          * @function ft force third

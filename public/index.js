@@ -101,6 +101,7 @@ function showSymbol() {
         }
     }
     for (var i = 1; i <= size; ++i) {
+        if(gm[i] == undefined) continue;
         for (var j = 1; j <= size; ++j) {
             var c = $("#td-" + String((i - 1) * size + j)).css('background-image');
             if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
@@ -176,20 +177,17 @@ function logged(){
 }
 document.onkeydown = function (event) {
     var e = event || window.event || arguments.callee.caller.arguments[0];
-    if (selectNode[0] == 0 || selectNode[1] == 0 || !e) return;
+    if (!e) return;
     if (e.keyCode == 87) { // W
         addMovement(-1, 0);
         showSymbol();
-    }
-    else if (e.keyCode == 65) { // A
+    } else if (e.keyCode == 65) { // A
         addMovement(0, -1);
         showSymbol();
-    }
-    else if (e.keyCode == 83) { // S
+    } else if (e.keyCode == 83) { // S
         addMovement(1, 0);
         showSymbol();
-    }
-    else if (e.keyCode == 68) { // D
+    } else if (e.keyCode == 68) { // D
         addMovement(0, 1);
         showSymbol();
     } else if (e.keyCode == 81) { // Q
@@ -215,6 +213,14 @@ document.onkeydown = function (event) {
             movement = movement.slice(0, -1);
         }
         showSymbol();
+    } else if (e.keyCode == 13) { // Enter
+        if(document.activeElement.id == "msg-sender"){
+            s.emit('SendWorldMessage', $.cookie('checkmate-login-username') + ":" +  $("#msg-sender")[0].value);
+            $("#msg-sender")[0].value = "";
+            $("#msg-sender").blur();
+        } else {
+            $("#msg-sender").focus();
+        }
     }
 };
 $(document).ready(() => {
