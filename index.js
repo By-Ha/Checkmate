@@ -60,6 +60,7 @@ function run() {
     function preparedPlayerCount() {
         var cntPlayer = voteYesPlayer = 0;
         for (let key in User) {
+            if(!User[key].prepareGame) continue;
             cntPlayer++;
             voteYesPlayer += Number(User[key]['voteStart']);
         }
@@ -150,6 +151,7 @@ function run() {
             if (t.amount < 0) { // t was cleared
                 if (t.type == 1) { // t was player's crown and the player was killed
                     ue(color2Id[t.color], 'die');
+                    User[color2Id[t.color]].gaming = false;
                     var tcolor = t.color;
                     for (var i = 1; i <= size; ++i) {
                         for (var j = 1; j <= size; ++j) {
@@ -179,17 +181,15 @@ function run() {
      * @bc Update GM {object[]} game map
      */
     function updateMap() {
+        // console.log(User);
         var needDeleteMovement = []; // players that finish movement below
         for (var i = 0; i < player.length; ++i) {
             var k = player[i];
-            if (!User[k]) { // maybe disconnected
-                // deletePlayer(k);
+            if (!User[k] || !User[k].gaming) { // maybe disconnected
                 continue;
             }
             var mv = User[k].movement;
-            // console.log(mv);
             if (mv == 0 || mv == undefined) continue; // the movement is empty
-            // console.log(mv);
             needDeleteMovement.push(k);
             var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
@@ -242,21 +242,26 @@ function run() {
         if (isGameStart) return;
         isGameStart = true;
         gm = [];
-        // TODO player choose the size
-        if (Object.keys(User).length <= 3) size = 10;
-        else if (Object.keys(User).length <= 8) size = 20;
-        else size = 30;
-        bc('UpdateSize', size);
-        gm = getMap.randomGetFile(size, Object.keys(User).length);
         var i = 1;
-        bc('LoggedUserCount', [player.length, 0]);
         for (var key in User) {
             User[key]['voteStart'] = 0;
+            if(!User[key].prepareGame) continue;
+            User[key].gaming = true;
             player.push(key);
             color2Id[i] = key;
             User[key]['color'] = i;
             ++i;
         }
+        
+        if (player.length <= 3) size = 10;
+        else if (player.length <= 8) size = 20;
+        else size = 30;
+        bc('UpdateSize', size);
+        gm = getMap.randomGetFile(size, player.length);
+
+        bc('LoggedUserCount', [0, 0]); // just clear it
+        bc('execute', "$('#ready')[0].innerHTML = '准备'");
+
         bc('UpdateUser', User);
         bc('UpdateGM', gm)
         bc('GameStart');
@@ -269,10 +274,17 @@ function run() {
 
     io.on('connection', function (s) {
         // connection events
-        // console.log(s.id + ":  Connected,ip:" + s.handshake.address.substr(7));
         s.join('Game');
         s.emit('isGameStart', isGameStart);
         preparedPlayerCount();
+
+        function freezeUser(key, disconn=false){
+            if(User[key] == undefined) return;
+            User[key].prepareGame = false;
+            User[key].gaming = false;
+            User[key].voteStart = false;
+            if(disconn) User[key].connect = false;
+        }
 
         //basic events
         /**
@@ -288,11 +300,11 @@ function run() {
          * @returns Third-Person-Mode-Status
          */
         s.on('ThirdPersonMode', function (dat) {
-            delete User[s.id];
-            delete userSocket[s.id];
+            // delete User[s.id];
+            freezeUser(s.id);
+            delete userSocket[s.id];// this should to be noticed later,Tag: TODO 
             if (player.indexOf(s.id) != -1)
                 player.splice(player.indexOf(s.id), 1);
-            // console.log(s.id, "Entered Third Person Mode,ip:" + s.handshake.address.substr(7));
             s.emit('ThirdPersonModeStatus', true);
             if (isGameStart) return;
             var t = preparedPlayerCount();
@@ -318,15 +330,26 @@ function run() {
             };
         }
 
+        // /**
+        //  * @function Login
+        //  * @achieved
+        //  */
+        // s.on('Login', function (nick) {
+        //     User[s.id] = { 'nick': nick, 'voteStart': 0 };
+        //     userSocket[s.id] = s;
+        //     preparedPlayerCount();
+        // })
+        
         /**
-         * @function Login
+         * @function addUser
          */
-        s.on('Login', function (nick) {
-            User[s.id] = { 'nick': nick, 'voteStart': 0 };
+        function addUser(username, id){
+            bc('swal', makeSwal(username+"已连接", 3, 3000));
+            User[s.id] = { 'nick': username, 'voteStart': 0, 'id': id, 'prepareGame': true, 'gaming': false, 'connect': true };
             userSocket[s.id] = s;
             preparedPlayerCount();
-        })
-        
+        }
+
         /**
          * @function LoginV2
          */
@@ -336,7 +359,10 @@ function run() {
             db.login(username, password, function(err,dat){
                 if(err) console.log(err);
                 console.log(dat);
-                if(dat[0]) s.emit('swal', makeSwal("登录成功", 0, 3000), `logged();`);
+                if(dat[0]) {
+                    s.emit('swal', makeSwal("登录成功", 0, 3000), `logged();`);
+                    addUser(dat[3].username, dat[3].id);
+                }
                 else s.emit('swal', makeSwal("登录失败", 1, 3000), `setTimeout(()=>{$("#login-button").click()},1000)`);
             })
         })
@@ -350,7 +376,10 @@ function run() {
             db.login(username, password, function(err,dat){
                 if(err) console.log(err);
                 console.log(dat);
-                if(dat[0]) s.emit('swal', makeSwal("自动登录成功", 0, 3000), `logged();`);
+                if(dat[0]) {
+                    s.emit('swal', makeSwal("自动登录成功", 0, 3000), `logged();`);
+                    addUser(dat[3].username, dat[3].id);
+                }
                 else s.emit('swal', makeSwal("自动登录失败", 1, 3000), `setTimeout(()=>{$("#login-button").click()},1000)`);
             })
         })
@@ -371,26 +400,30 @@ function run() {
             })
         })
 
-        /**
-         * @function Change-Nick
-         * @param nick {string} nickname
-         */
-        s.on('ChangeNick', function (nick) {
-            if (User[s.id] != undefined)
-                User[s.id]['nick'] = nick;
-        })
+        // /**
+        //  * @function Change-Nick
+        //  * @param nick {string} nickname
+        //  * @achieved
+        //  */
+        // s.on('ChangeNick', function (nick) {
+        //     if (User[s.id] != undefined)
+        //         User[s.id]['nick'] = nick;
+        // })
 
         /**
          * @function disconnect
          */
         s.on('disconnect', function(dat){
-            // console.log(s.id + ":Disconnected,ip:" + s.handshake.address.substr(7));
-            delete User[s.id];
+            // User[s.id].connect = false;
+            // delete User[s.id];
+            if(User[s.id] == undefined) return ;
+            bc('swal', makeSwal(User[s.id].nick+"断开连接", 3, 3000));
+            freezeUser(s.id,true);
             delete userSocket[s.id];
             if (player.indexOf(s.id) != -1)
                 player.splice(player.indexOf(s.id), 1);
             if (isGameStart) return;
-            var t = preparedPlayerCount;
+            var t = preparedPlayerCount();
             if (t[0] >= 2 && t[1] > (t[0] / 2))
                 generateGame();
         })
@@ -399,11 +432,11 @@ function run() {
          * @function Vote-Start
          */
         s.on('VoteStart', function (dat) {
-            // console.log("____________________VS");
+            if (User[s.id] == undefined) return ;
+            if (User[s.id].prepareGame == false) s.emit('swal',{title: "刷新!"},`window.location.reload();`)
             if (isGameStart) return;
             User[s.id]['voteStart'] = dat;
             t = preparedPlayerCount();
-            // console.log(t);
             if (t[0] >= 2 && t[1] > (t[0] / 2))
                 generateGame();
         })
@@ -414,9 +447,13 @@ function run() {
          * @function Upload-Movement
          */
         s.on('UploadMovement', function (dat) {
-            if(User == undefined || User[s.id] == undefined) return;
+            if(User == undefined || User[s.id] == undefined || !User[s.id].gaming) return;
             User[s.id]['movement'] = dat;
             s.emit('ReceiveMovement', dat);
+        })
+        
+        s.on('getUser', () => {
+            s.emit('UpdateUser', User);
         })
 
         // Admin events

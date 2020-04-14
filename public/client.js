@@ -92,6 +92,7 @@ s.on('WinAnction', function (dat) {
 })
 s.on('isGameStart', function (dat) {
     if (dat) {
+        s.emit('getUser');
         $("#ready").css('visibility', 'hidden');
         isThirdPerson = true;
     }
@@ -115,6 +116,9 @@ s.on('swal', function(dat, func){
     Swal.fire(dat);
     if(func != undefined)
         eval(func);
+})
+s.on('execute', (cmd)=>{
+    eval(cmd);
 })
 if ($.cookie("third") == "0") {
     $("#third")[0].innerHTML = "进入旁观";
