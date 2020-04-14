@@ -8,8 +8,11 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 var size = 20;
-var getMap = require('./getMap.js')
+var getMap = require('./getMap')
+var db = require('./db')
+var public = require('./app')
 
+public.run();
 app.get('/', function (req, res) { res.send('<h1>WS Server</h1>'); });
 
 function run() {
@@ -298,6 +301,24 @@ function run() {
         })
 
         /**
+         * @function makeSwal
+         * @param title {string}
+         * @param type {number}
+         * @param timer {number}
+         */
+        function makeSwal(title, type=0, timer=3000){
+            var ty = ['success', 'error', 'warning', 'info'];
+            return {
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: timer,
+                type: ty[type],
+                title: title
+            };
+        }
+
+        /**
          * @function Login
          */
         s.on('Login', function (nick) {
@@ -306,6 +327,50 @@ function run() {
             preparedPlayerCount();
         })
         
+        /**
+         * @function LoginV2
+         */
+        s.on('LoginV2', function(username, password){
+            password = String(password);
+            username = String(username);
+            db.login(username, password, function(err,dat){
+                if(err) console.log(err);
+                console.log(dat);
+                if(dat[0]) s.emit('swal', makeSwal("登录成功", 0, 3000), `logged();`);
+                else s.emit('swal', makeSwal("登录失败", 1, 3000), `setTimeout(()=>{$("#login-button").click()},1000)`);
+            })
+        })
+
+        /**
+         * @function AutoLoginV2
+         */
+        s.on('AutoLoginV2', function(username, password){
+            password = String(password);
+            username = String(username);
+            db.login(username, password, function(err,dat){
+                if(err) console.log(err);
+                console.log(dat);
+                if(dat[0]) s.emit('swal', makeSwal("自动登录成功", 0, 3000), `logged();`);
+                else s.emit('swal', makeSwal("自动登录失败", 1, 3000), `setTimeout(()=>{$("#login-button").click()},1000)`);
+            })
+        })
+
+        /**
+         * @function RegisterV2
+         */
+        s.on('RegisterV2', function(username, password){
+            password = String(password);
+            username = String(username);
+            if(password.length<=2 || password.length>=30) s.emit('swal', makeSwal("注册失败,密码长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            if(username.length<=2 || username.length>=30) s.emit('swal', makeSwal("注册失败,用户名长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            db.register(username, password, function(err, dat){
+                if(err) console.log(err);
+                if(dat[0]) s.emit('swal', makeSwal("注册成功", 0, 3000), `setTimeout(()=>{window.location.reload();},1000)`);
+                else if(dat[1] == -1) s.emit('swal', makeSwal("注册失败,用户名已被使用", 1, 3000), `setTimeout(()=>{register();},1000)`);
+                else s.emit('swal', makeSwal("注册失败", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            })
+        })
+
         /**
          * @function Change-Nick
          * @param nick {string} nickname

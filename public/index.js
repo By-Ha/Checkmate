@@ -16,7 +16,6 @@ function changeHalf() {
         $("#half")[0].innerHTML = "一半派兵";
     else $("#half")[0].innerHTML = "全部派兵";
 }
-
 function makeSelect(ln, col) {
     if (ln > size || col > size || ln <= 0 || col <= 0) return;
     $("td").removeClass("selected");
@@ -27,16 +26,13 @@ function makeSelect(ln, col) {
     $("#td-" + Number(((ln - 2) * size + col))).addClass("selected");
     $("#td-" + Number(((ln) * size + col))).addClass("selected");
 }
-
 function clearSelect() {
     $("td").removeClass("selected");
     selectNode[0] = selectNode[1] = 0;
 }
-
 function clearMomement() {
     movement = [];
 }
-
 function addMovement(x, y) {
     var t1 = selectNode[0] + x, t2 = selectNode[1] + y;
     if (t1 > size || t1 <= 0 || t2 > size || t2 <= 0) return;
@@ -48,7 +44,6 @@ function addMovement(x, y) {
     clearSelect();
     makeSelect(t1, t2);
 }
-
 function makeBoard() {
     m = document.getElementById("m");
     m.innerHTML = "";
@@ -76,7 +71,6 @@ function makeBoard() {
         }
     }
 }
-
 function judgeShown(i, j) {
     if (gm[i][j].color == myColor) return true;
     if (i - 1 >= 1 && gm[i - 1][j].color == myColor) return true;
@@ -85,7 +79,6 @@ function judgeShown(i, j) {
     if (j + 1 <= size && gm[i][j + 1].color == myColor) return true;
     return false;
 }
-
 function showSymbol() {
     $("#m td").css('background-image', "");
     for (var i = 0; i < movement.length; ++i) {
@@ -135,7 +128,6 @@ function showSymbol() {
         }
     }
 }
-
 function illu() {
     playerInfo = [];
     for (var i = 1; i <= size; ++i) {
@@ -177,7 +169,11 @@ function illu() {
         $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>"+colorNick[playerInfo[i][2]]+"</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
     }
 }
-
+function logged(){
+    $("#login-button").css("display", "none");
+    $("#user-info")[0].innerHTML = "您的用户名:" + $.cookie("checkmate-login-username");
+    $("#user-info").css("display", "unset");
+}
 document.onkeydown = function (event) {
     var e = event || window.event || arguments.callee.caller.arguments[0];
     if (selectNode[0] == 0 || selectNode[1] == 0 || !e) return;
@@ -221,7 +217,6 @@ document.onkeydown = function (event) {
         showSymbol();
     }
 };
-
 $(document).ready(() => {
     //兼容性写法，该函数也是网上别人写的，不过找不到出处了，蛮好的，所有我也没有必要修改了
     //判断鼠标滚轮滚动方向
@@ -257,7 +252,6 @@ $(document).ready(() => {
         $(m).css('margin-top', t2 + "px");
     }
 })
-
 $("#changeUserName")[0].placeholder = $.cookie("UserNick");
 $("#changeUserNameSubmit")[0].onclick = function () {
     var n = $("#changeUserName")[0].value;
@@ -269,7 +263,6 @@ $("#changeUserNameSubmit")[0].onclick = function () {
     console.log($.cookie("UserNick"));
     s.emit('Change Nick', n);
 }
-
 $("#third")[0].onclick = function () {
     if ($.cookie("third") == "0" && $("#third")[0].innerHTML == "进入旁观") {
         $.cookie("third", "1", { expires: 1 });
@@ -279,7 +272,6 @@ $("#third")[0].onclick = function () {
         location.reload();
     }
 }
-
 $(document).ready(() => {
     var box = document.getElementById('m');
     document.onmousedown = function (e) {
@@ -296,4 +288,115 @@ $(document).ready(() => {
             document.onmousemove = document.onmouseup = null;
         }
     }
+})
+function encrypt(dat){
+    for(var i = 1;i<=10;++i){
+        dat = md5("as2khdk143diucx1908" + dat + "Checkmate!");
+    }
+    return dat;
+}
+function register(){
+    Swal.close();
+    setTimeout(() => {
+        Swal.fire({
+            title: '登录帐号', //标题
+            footer: '没有账号?<a href="#" onclick="register()">注册</a>',
+            html: `
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Username</span>
+                </div>
+                <input type="text" class="form-control" placeholder="输入您的用户名" id="register-username" name="username">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Password</span>
+                </div>
+                <input type="password" class="form-control" placeholder="输入您的密码" id="register-password" name="password">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Repasswd</span>
+                </div>
+                <input type="password" class="form-control" placeholder="再次输入您的密码" id="register-repassword" name="password">
+            </div>
+            `,
+    
+            confirmButtonColor: '#6cf',// 确定按钮的 颜色
+            confirmButtonText: '确定',// 确定按钮的 文字
+            showCancelButton: true, // 是否显示取消按钮
+            cancelButtonText: "取消", // 取消按钮的 文字
+        }).then((isConfirm) => {
+            try {
+                if (isConfirm.value) {
+                    var u = $("#register-username")[0].value;
+                    var p1 = $("#register-password")[0].value;
+                    var p2 = $("#register-repassword")[0].value;
+                    if(p1 != p2) {
+                        Swal.fire('两次输入密码不同','','error');
+                        setTimeout(()=>{
+                            register();
+                        }, 1000);
+                        return ;
+                    }
+                    if(p1.length <= 2 || p1.length >= 30) {
+                        Swal.fire('密码长度不正确','','error');
+                        setTimeout(()=>{
+                            register();
+                        }, 1000);
+                        return ;
+                    }
+                    if(u.length <= 2 || u.length >= 50) {
+                        Swal.fire('用户名长度不正确','','error');
+                        setTimeout(()=>{
+                            register();
+                        }, 1000);
+                        return ;
+                    }
+                    $.cookie("checkmate-login-username", u, { expires: 7 });
+                    $.cookie("checkmate-login-password", encrypt(p1), { expires: 7 });
+                    s.emit('RegisterV2', u , encrypt(p1));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }, 100);
+}
+$("#login-button").click(() => {
+    Swal.fire({
+        title: '登录帐号', //标题
+        footer: '没有账号?<a href="#" onclick="register()">注册</a>',
+        html: `
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Username</span>
+            </div>
+            <input type="text" class="form-control" placeholder="输入您的用户名" id="login-username" name="username">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Password</span>
+            </div>
+            <input type="password" class="form-control" placeholder="输入您的密码" id="login-password" name="password">
+        </div>
+        `,
+
+        confirmButtonColor: '#6cf',// 确定按钮的 颜色
+        confirmButtonText: '确定',// 确定按钮的 文字
+        showCancelButton: true, // 是否显示取消按钮
+        cancelButtonText: "取消", // 取消按钮的 文字
+    }).then((isConfirm) => {
+        try {
+            if (isConfirm.value) {
+                var u = $("#login-username")[0].value;
+                var p = $("#login-password")[0].value;
+                $.cookie("checkmate-login-username", u, { expires: 7 });
+                $.cookie("checkmate-login-password", encrypt(p), { expires: 7 });
+                s.emit("LoginV2", u, encrypt(p));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
 })

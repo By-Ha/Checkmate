@@ -7,9 +7,10 @@
     <script src="https://cdn.bootcss.com/socket.io/2.3.0/socket.io.js"></script>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script src="https://cdn.bootcss.com/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="https://cdn.bootcss.com/limonte-sweetalert2/8.11.8/sweetalert2.all.min.js"></script>
     <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.13.0/js/md5.min.js"></script>
     <link rel="stylesheet" href="index.css?ver=2.0.0b1">
 </head>
 <body>
@@ -35,6 +36,11 @@
     <table id="m">
     </table>
     <div id="r">
+        <div id="user-control">
+            <button id="login-button" class="btn btn-primary" type="button" style="margin-top: 5px;float: right;">登录</button>
+            <p id='user-info' style="display: none"></p>
+        </div>
+        <br/>
         <table id="info" class="table">
             <thead>
                 <tr>
@@ -47,15 +53,12 @@
             </tbody>
         </table>
     </div>
+    <!-- <div id="message-box">
+        <div></div>
+        <input type="text" class="form-control" placeholder="输入聊天内容" id="msg-sender">
+    </div> -->
     </div>
-    <style id="font-size-control">
-        #m td{
-            width: 30px;
-            max-width: 30px;
-            height: 30px;
-            max-height: 30px;
-        }
-    </style>
+    <style id="font-size-control">#m td{width: 30px;max-width: 30px;height: 30px;max-height: 30px;}</style>
     <script src="index.js?ver=2.0.0b4"></script>
     <script src="client.js?ver=2.0.0b4"></script>
 </body>

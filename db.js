@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var fs = require('fs');
+var crypto = require('crypto');
 
 const connection = eval(fs.readFileSync('db_data.js').toString());
 
@@ -9,8 +10,12 @@ const connection = eval(fs.readFileSync('db_data.js').toString());
  * @param password {string} encrypted password
  * @param callback {function} callback
  */
+connection.connect();
 function login(username, password, callback) {
-    connection.connect();
+    password = String(password);
+    username = String(username);
+    for(var i = 1;i<=10;++i)
+        password = crypto.createHash('md5').update("sdjajhdjka" + password + 'encryptionCheckmate').digest("hex");
     var SQL = 'SELECT * FROM `user` WHERE BINARY username=? AND BINARY password=?';
     var SQLDATA = [username, password];
     connection.query(SQL, SQLDATA, function (error, results) {
@@ -18,7 +23,6 @@ function login(username, password, callback) {
         if (results == 0) callback(null, [false, -1, '错误的用户名或密码', { username: "ERRUSER", id: -1 }]);
         else callback(null, [true, 0, '成功登录', { username: results[0].username, id: results[0].id }])
     });
-    connection.end();
 }
 
 /**
@@ -27,11 +31,13 @@ function login(username, password, callback) {
  * @param password {string}
  */
 function register(username, password, callback) {
-    connection.connect();
+    password = String(password);
+    username = String(username);
+    for(var i = 1;i<=10;++i)
+        password = crypto.createHash('md5').update("sdjajhdjka" + password + 'encryptionCheckmate').digest("hex")
     username = String(username), password = String(password);
     var SQL = 'SELECT * FROM `user` WHERE BINARY username=?';
     var SQLDATA = [username];
-
     var p = new Promise(function (resolve, reject) {
         connection.query(SQL, SQLDATA, function (error, results) {
             if (error) reject(-1);
@@ -40,23 +46,18 @@ function register(username, password, callback) {
         });
     });
     p.then(function(data){
+        if(data == -1)  callback(null, [false, -1, {  }]);
         SQL = "INSERT INTO user (`username`, `password`) VALUES (?, ?)";
         SQLDATA = [username, password];
         connection.query(SQL, SQLDATA, function(error, results){
             if (error) callback(error);
             callback(null, [true, 0, {  }]);
         });
-        connection.end();
     },function(reason){
         callback(reason);
-        connection.end();
     });
     
 }
-
-login('1','1',function(err,dat){
-    console.log(dat);
-})
 
 module.exports = {
     login,

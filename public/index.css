@@ -74,8 +74,28 @@ body{
     background: rgba(255, 255, 255, 0.3);
     z-index: 10;
 }
+#user-control{
+    width: 100%;
+    text-align: center;
+}
+#user-info{
+    width: 100%;
+    text-align: center;
+    color: white;
+    float: right;
+    margin-bottom: 0px;
+}
 #info{
     color: aliceblue;
+}
+#message-box{
+    position: fixed;
+    right: 0px;
+    bottom: 0px;
+    width: 20%;
+}
+#msg-sender{
+    width: 100%;
 }
 .blue{
     background-color: blue !important;

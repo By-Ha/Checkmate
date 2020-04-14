@@ -12,36 +12,26 @@ var init = false;
 function voteStart(i) {
     s.emit('VoteStart', i);
 }
-$("#ready")[0].onclick = function () {
-    if (this.innerHTML == "准备") {
-        voteStart(1);
-        this.innerHTML = "取消准备";
-    } else {
-        voteStart(0);
-        this.innerHTML = "准备";
-    }
-}
 s.on('connect', function () {
     console.log("Connected:", s.id);
-    var nick = "";
-    if ($.cookie("UserNick") != undefined) {
-        nick = $.cookie("UserNick");
-    } else {
-        while (nick == "") {
-            nick = prompt("请输入您的昵称", "匿名玩家");
-        }
-        $.cookie("UserNick", nick, { expires: 1 });
-    }
-    s.emit('Login', nick);
-    voteStart(0);
-});
-
+    // var nick = "";
+    // if ($.cookie("UserNick") != undefined) {
+    //     nick = $.cookie("UserNick");
+    // } else {
+    //     while (nick == "") {
+    //         nick = prompt("请输入您的昵称", "匿名玩家");
+    //     }
+    //     $.cookie("UserNick", nick, { expires: 1 });
+    // }
+    // s.emit('Login', nick);
+    // voteStart(0);
+    s.emit('AutoLoginV2', $.cookie("checkmate-login-username"), $.cookie("checkmate-login-password"))
+})
 s.on('LoggedUserCount', function (dat) {
     $("#total-user")[0].innerHTML = dat[0];
     $("#ready-user")[0].innerHTML = dat[1];
     console.log("Connected:", dat[0], ",Ready:", dat[1]);
 })
-
 s.on('UpdateGM', function (dat) {
     gm = dat;
     if (!init) s.emit('AskSize', null);
@@ -77,7 +67,9 @@ s.on('ReceiveMovement', function(dat){
             movement[0][0] ++;
     }
 })
-s.on('UpdateRound', function (dat) { round = dat; })
+s.on('UpdateRound', function (dat) {
+    round = dat; 
+})
 s.on('ClearMovement', function () {
     while (movement.length) {
         if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) movement = movement.slice(1);
@@ -93,7 +85,7 @@ s.on('DeleteMovement', function () {
     }
 })
 s.on('WinAnction', function (dat) {
-    swal("欢呼", dat + "赢了", "success");
+    Swal.fire("欢呼", dat + "赢了", "success");
     isThirdPerson = false;
     if ($.cookie("third") != "1")
         $("#ready")[0].innerHTML = "准备", $("#ready").css('visibility', 'unset');
@@ -104,7 +96,26 @@ s.on('isGameStart', function (dat) {
         isThirdPerson = true;
     }
 })
-
+s.on('ThirdPersonModeStatus', function (dat) {
+    if (dat) Swal.fire("进入旁观模式成功", "", 'success');
+    else Swal.fire("进入旁观模式失败", "", 'error');
+});
+s.on('ForceThird', function () {
+    $.cookie("third", "1", { expires: 1 });
+    location.reload();
+});
+s.on('die', function () {
+    Swal.fire("您死了!", "", 'warning');
+    setTimeout(() => {
+        // $.cookie("third", "1", { expires: 1 });
+        location.reload();
+    }, 500);
+});
+s.on('swal', function(dat, func){
+    Swal.fire(dat);
+    if(func != undefined)
+        eval(func);
+})
 if ($.cookie("third") == "0") {
     $("#third")[0].innerHTML = "进入旁观";
 } else {
@@ -112,20 +123,12 @@ if ($.cookie("third") == "0") {
     $("#ready").css('visibility', 'hidden');
     s.emit('ThirdPersonMode');
 }
-s.on('ThirdPersonModeStatus', function (dat) {
-    if (dat) swal("进入旁观模式成功", "", 'success');
-    else swal("进入旁观模式失败", "", 'error');
-});
-s.on('ForceThird', function () {
-    $.cookie("third", "1", { expires: 1 });
-    location.reload();
-});
-s.on('die', function () {
-    swal("您死了!", "", 'warning');
-    setTimeout(() => {
-        // $.cookie("third", "1", { expires: 1 });
-        location.reload();
-    }, 500);
-});
-
-s.on('dbg', function (dat) { console.log(dat) });
+$("#ready")[0].onclick = function () {
+    if (this.innerHTML == "准备") {
+        voteStart(1);
+        this.innerHTML = "取消准备";
+    } else {
+        voteStart(0);
+        this.innerHTML = "准备";
+    }
+}
