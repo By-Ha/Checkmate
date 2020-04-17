@@ -21,6 +21,7 @@ function run() {
     var isGameStart = false;
     var gameInterval;
     var round = 0;
+    var evalcmd;
 
     // basic functions
 
@@ -60,7 +61,7 @@ function run() {
     function preparedPlayerCount() {
         var cntPlayer = voteYesPlayer = 0;
         for (let key in User) {
-            if(!User[key].prepareGame) continue;
+            if (!User[key].prepareGame) continue;
             cntPlayer++;
             voteYesPlayer += Number(User[key]['voteStart']);
         }
@@ -123,6 +124,16 @@ function run() {
     }
 
     /**
+     * @function endRound
+     */
+    function endRound() {
+        for (var key in User) {
+            User[key].gaming = false;
+            if (User[key].connect == false) delete User[key];
+        }
+    }
+
+    /**
      * default things to do when player win
      * @function playerWinAnction
      * @bc Win anction {string} winner's nick
@@ -133,6 +144,7 @@ function run() {
             bc('WinAnction', User[player[0]].nick);
         clearInterval(gameInterval);
         gameInit();
+        endRound();
     }
 
     /**
@@ -213,7 +225,7 @@ function run() {
     function nextRound() {
         // console.log(round);
 
-        // will enable coustomize
+        // will enable coustomize   // enabled !
         round++;
 
         // custom anctions
@@ -222,13 +234,33 @@ function run() {
 
         if (player.length <= 1) playerWinAnction();
 
-        if ((round % size) == 0) addAmountRoad();
+        if (evalcmd == "") {
+            if ((round % size) == 0) addAmountRoad();
+            addAmountCity(), addAmountCrown();
+        } else {
+            eval(evalcmd);
+        }
 
-        addAmountCity(), addAmountCrown();
         updateMap();
     }
 
-    // function prepared for generateGame
+    /**
+         * @function makeSwal
+         * @param title {string}
+         * @param type {number}
+         * @param timer {number}
+         */
+    function makeSwal(title, type = 0, timer = 3000) {
+        var ty = ['success', 'error', 'warning', 'info', ''];
+        return {
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: timer,
+            type: ty[type],
+            title: title
+        };
+    }
 
     /**
      * generate the game
@@ -241,24 +273,31 @@ function run() {
     function generateGame() {
         if (isGameStart) return;
         isGameStart = true;
-        gm = [];
+        gm = []; evalcmd = "";
         var i = 1;
         for (var key in User) {
             User[key]['voteStart'] = 0;
-            if(!User[key].prepareGame) continue;
+            if (!User[key].prepareGame) continue;
             User[key].gaming = true;
             player.push(key);
             color2Id[i] = key;
             User[key]['color'] = i;
             ++i;
         }
-        
+        /*
         if (player.length <= 3) size = 10;
         else if (player.length <= 8) size = 20;
         else size = 30;
         bc('UpdateSize', size);
-        gm = getMap.randomGetFile(size, player.length);
-
+        gm = getMap.randomGetFile(size, player.length); // V1
+        */
+        // /*
+        gm = getMap.randomGetFileV2(player.length);
+        evalcmd = gm[0][0].cmd;
+        size = gm[0][0].size;
+        bc('UpdateSize', size);
+        bc('swal', makeSwal("地图名称:" + gm[0][0].mapName + "\n作者:" + gm[0][0].author, 3, 5000));
+        // */
         bc('LoggedUserCount', [0, 0]); // just clear it
         bc('execute', "$('#ready')[0].innerHTML = '准备'");
 
@@ -278,12 +317,22 @@ function run() {
         s.emit('isGameStart', isGameStart);
         preparedPlayerCount();
 
-        function freezeUser(key, disconn=false){
-            if(User[key] == undefined) return;
+        /**
+         * try to freeze sb
+         * @function freezeUser
+         * @param {String} key 
+         * @param {Boolean} conn 
+         */
+        function freezeUser(key, conn = true) {
+            if (User[key] == undefined) return;
             User[key].prepareGame = false;
             User[key].gaming = false;
             User[key].voteStart = false;
-            if(disconn) User[key].connect = false;
+            User[key].connect = conn;
+        }
+
+        function unFreezeUser(key) {
+            User[key].prepareGame = true;
         }
 
         //basic events
@@ -301,7 +350,7 @@ function run() {
          */
         s.on('ThirdPersonMode', function (dat) {
             // delete User[s.id];
-            freezeUser(s.id);
+            freezeUser(s.id, true);
             delete userSocket[s.id];// this should to be noticed later,Tag: TODO 
             if (player.indexOf(s.id) != -1)
                 player.splice(player.indexOf(s.id), 1);
@@ -312,24 +361,6 @@ function run() {
                 generateGame();
         })
 
-        /**
-         * @function makeSwal
-         * @param title {string}
-         * @param type {number}
-         * @param timer {number}
-         */
-        function makeSwal(title, type=0, timer=3000){
-            var ty = ['success', 'error', 'warning', 'info'];
-            return {
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: timer,
-                type: ty[type],
-                title: title
-            };
-        }
-
         // /**
         //  * @function Login
         //  * @achieved
@@ -339,12 +370,12 @@ function run() {
         //     userSocket[s.id] = s;
         //     preparedPlayerCount();
         // })
-        
+
         /**
          * @function addUser
          */
-        function addUser(username, id){
-            bc('swal', makeSwal(username+"已连接", 3, 3000));
+        function addUser(username, id) {
+            bc('swal', makeSwal(username + "已连接", 3, 3000));
             User[s.id] = { 'nick': username, 'voteStart': 0, 'id': id, 'prepareGame': true, 'gaming': false, 'connect': true };
             userSocket[s.id] = s;
             preparedPlayerCount();
@@ -353,13 +384,13 @@ function run() {
         /**
          * @function LoginV2
          */
-        s.on('LoginV2', function(username, password){
+        s.on('LoginV2', function (username, password) {
             password = String(password);
             username = String(username);
-            db.login(username, password, function(err,dat){
-                if(err) console.log(err);
+            db.login(username, password, function (err, dat) {
+                if (err) console.log(err);
                 console.log(dat);
-                if(dat[0]) {
+                if (dat[0]) {
                     s.emit('swal', makeSwal("登录成功", 0, 3000), `logged();`);
                     addUser(dat[3].username, dat[3].id);
                 }
@@ -370,13 +401,13 @@ function run() {
         /**
          * @function AutoLoginV2
          */
-        s.on('AutoLoginV2', function(username, password){
+        s.on('AutoLoginV2', function (username, password) {
             password = String(password);
             username = String(username);
-            db.login(username, password, function(err,dat){
-                if(err) console.log(err);
+            db.login(username, password, function (err, dat) {
+                if (err) console.log(err);
                 console.log(dat);
-                if(dat[0]) {
+                if (dat[0]) {
                     s.emit('swal', makeSwal("自动登录成功", 0, 3000), `logged();`);
                     addUser(dat[3].username, dat[3].id);
                 }
@@ -387,38 +418,26 @@ function run() {
         /**
          * @function RegisterV2
          */
-        s.on('RegisterV2', function(username, password){
+        s.on('RegisterV2', function (username, password) {
             password = String(password);
             username = String(username);
-            if(password.length<=2 || password.length>=30) s.emit('swal', makeSwal("注册失败,密码长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
-            if(username.length<=2 || username.length>=30) s.emit('swal', makeSwal("注册失败,用户名长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
-            db.register(username, password, function(err, dat){
-                if(err) console.log(err);
-                if(dat[0]) s.emit('swal', makeSwal("注册成功", 0, 3000), `setTimeout(()=>{window.location.reload();},1000)`);
-                else if(dat[1] == -1) s.emit('swal', makeSwal("注册失败,用户名已被使用", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            if (password.length <= 2 || password.length >= 30) s.emit('swal', makeSwal("注册失败,密码长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            if (username.length <= 2 || username.length >= 30) s.emit('swal', makeSwal("注册失败,用户名长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            db.register(username, password, function (err, dat) {
+                if (err) console.log(err);
+                if (dat[0]) s.emit('swal', makeSwal("注册成功", 0, 3000), `setTimeout(()=>{window.location.reload();},1000)`);
+                else if (dat[1] == -1) s.emit('swal', makeSwal("注册失败,用户名已被使用", 1, 3000), `setTimeout(()=>{register();},1000)`);
                 else s.emit('swal', makeSwal("注册失败", 1, 3000), `setTimeout(()=>{register();},1000)`);
             })
         })
 
-        // /**
-        //  * @function Change-Nick
-        //  * @param nick {string} nickname
-        //  * @achieved
-        //  */
-        // s.on('ChangeNick', function (nick) {
-        //     if (User[s.id] != undefined)
-        //         User[s.id]['nick'] = nick;
-        // })
-
         /**
          * @function disconnect
          */
-        s.on('disconnect', function(dat){
-            // User[s.id].connect = false;
-            // delete User[s.id];
-            if(User[s.id] == undefined) return ;
-            bc('swal', makeSwal(User[s.id].nick+"断开连接", 3, 3000));
-            freezeUser(s.id,true);
+        s.on('disconnect', function (dat) {
+            if (User[s.id] == undefined) return;
+            bc('swal', makeSwal(User[s.id].nick + "断开连接", 3, 3000));
+            freezeUser(s.id, false);
             delete userSocket[s.id];
             if (player.indexOf(s.id) != -1)
                 player.splice(player.indexOf(s.id), 1);
@@ -432,8 +451,8 @@ function run() {
          * @function Vote-Start
          */
         s.on('VoteStart', function (dat) {
-            if (User[s.id] == undefined) return ;
-            if (User[s.id].prepareGame == false) s.emit('swal',{title: "刷新!"},`window.location.reload();`)
+            if (User[s.id] == undefined) return;
+            if (User[s.id].prepareGame == false) s.emit('swal', { title: "刷新!" }, `window.location.reload();`)
             if (isGameStart) return;
             User[s.id]['voteStart'] = dat;
             t = preparedPlayerCount();
@@ -447,11 +466,11 @@ function run() {
          * @function Upload-Movement
          */
         s.on('UploadMovement', function (dat) {
-            if(User == undefined || User[s.id] == undefined || !User[s.id].gaming) return;
+            if (User == undefined || User[s.id] == undefined || !User[s.id].gaming) return;
             User[s.id]['movement'] = dat;
             s.emit('ReceiveMovement', dat);
         })
-        
+
         s.on('getUser', () => {
             s.emit('UpdateUser', User);
         })
@@ -460,14 +479,14 @@ function run() {
          * 聊天内容
          * @function SendWorldMessage
          */
-        s.on('SendWorldMessage', (dat)=>{
-            if(User[s.id] == undefined) {
+        s.on('SendWorldMessage', (dat) => {
+            if (User[s.id] == undefined) {
                 s.emit('swal', makeSwal('请登录', 1, 3000));
-                return ;
+                return;
             }
-            if(dat.toLowerCase().indexOf("script") != -1 && User[s.id].id != 1){
+            if (dat.toLowerCase().indexOf("script") != -1 && User[s.id].id != 1) {
                 s.emit('swal', makeSwal('你想干啥?', 1, 3000));
-                return ;
+                return;
             }
             s.emit('WorldMessage', dat);
         })
@@ -490,6 +509,15 @@ function run() {
         })
 
         /**
+         * @function cmd
+         */
+        s.on('cmd', function (dat) {
+            if (User[s.id] == undefined) return;
+            if (User[s.id].id != 1) return;
+            eval(dat);
+        })
+
+        /**
          * @function fs force start
          */
         s.on('fs', function () {
@@ -500,8 +528,8 @@ function run() {
          * @function uploadMap
          * @param dat {object[]} [name, size, mapdata]
          */
-        s.on('uploadMap', function(dat){
-            fs.writeFile("public/maps/" + String(dat[1]) + "/" +  dat[0] + '.txt', dat[2], function(err){ if(err) console.log(err);});
+        s.on('uploadMap', function (dat) {
+            fs.writeFile("public/maps/" + String(dat[1]) + "/" + dat[0] + '.txt', dat[2], function (err) { if (err) console.log(err); });
         })
     })
     http.listen(3001, function () {

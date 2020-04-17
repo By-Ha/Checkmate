@@ -1,6 +1,39 @@
 body{
     background: rgb(34,34,34);
 }
+button.btnv2{
+    background-color: white;
+    box-shadow: 2px 2px teal;
+    color: teal !important;
+    font-family: Quicksand;
+    padding: .375rem .75rem;
+    margin: 5px;
+    font-size: 1rem;
+    border: 0;
+    border-width: 0 !important;
+    outline: none !important;
+    transition: all .2s ease-in-out;
+    white-space: nowrap;
+    border-radius: 0;
+}
+button.btnv2:focus{
+    box-shadow: 0 0 0 0;
+}
+button.btnv2:hover{
+    cursor: pointer;
+    background-color: #bbb !important;
+    box-shadow: 3px 3px teal;
+}
+#cover{
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    background: grey;
+    z-index: 9999;
+    visibility: hidden;
+}
 #main{
     position: fixed;
     left: 0px;
@@ -111,6 +144,7 @@ body{
     max-height: 200px;
     overflow-y: scroll;
     overflow-x: hidden;
+    filter: opacity(0.5);
 }
 #msg-container p{
     color: white;

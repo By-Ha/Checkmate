@@ -8,13 +8,26 @@ function run() {
     var gm = [];
 
     function decode(str) {
-        var t = window.atob(str);
-        var ret = JSON.parse(t);
+        // var t = window.atob(str);
+        var ret = JSON.parse(str);
         return ret;
     }
 
     function encode() {
-        return window.btoa(JSON.stringify(gm));
+        // return window.btoa(JSON.stringify(gm));
+        return JSON.stringify(gm);
+    }
+
+    function encodeUnicode(str) {  
+        var res = [];  
+        for ( var i=0; i<str.length; i++ ) {  
+        res[i] = ( "00" + str.charCodeAt(i).toString(16) ).slice(-4);  
+        }  
+        return "\\u" + res.join("\\u");  
+    }  
+    function decodeUnicode(str) {  
+        str = str.replace(/\\/g, "%");  
+        return unescape(str);  
     }
 
     function fillIn(x, y) {
@@ -143,8 +156,12 @@ function run() {
             });
     })
 
-    $("#export").click(function () {
-        gm[0][0] = { 'size': size, 'player': [], 'playerAmount': 0, 'playerData': [] };
+    function process(){
+        if($.cookie('checkmate-login-username') == undefined) {
+            swal('请先在主页登录', '', 'error');
+            return false;
+        }
+        gm[0][0] = { 'size': size, 'player': [], 'playerAmount': 0, 'playerData': [], 'author': $.cookie('checkmate-login-username'), 'cmd': $("#cmd")[0].value };
         for (var i = 1; i <= size; ++i) {
             for (var j = 1; j <= size; ++j) {
                 if (gm[i][j].type == 1) { //crown
@@ -159,22 +176,27 @@ function run() {
         gm[0][0].playerAmount = gm[0][0].player.length;
         if (gm[0][0].playerAmount <= 1) {
             swal('显然这是玩不了的', '', 'error');
-            return;
+            return false;
         }
         if (gm[0][0].playerAmount > 3 && gm[0][0].size == 10) {
             swal('必须使用更大的地图', '', 'error');
-            return;
+            return false;
         }
         if (gm[0][0].playerAmount > 8 && gm[0][0].size == 20) {
             swal('必须使用更大的地图', '', 'error');
-            return;
+            return false;
         }
         for (var i = 1; i <= gm[0][0].playerAmount; ++i) {
             if (gm[0][0].player.indexOf(i) == -1) {
                 swal('必须按照顺序使用颜色', '', 'error');
-                return;
+                return false;
             }
         }
+        return true;
+    }
+
+    $("#export").click(function () {
+        if(!process()) return ;
         var exp = encode(gm);
         var ele = document.createElement('a');
         ele.download = "Map_" + md5(exp).substring(0, 10);
@@ -186,6 +208,8 @@ function run() {
         document.body.removeChild(ele);
     })
 
+
+    
     $("#store").click(function () {
         if ($.cookie('editor-passwd') != "hahaha") {
             swal('无权限', '', 'error');
@@ -199,13 +223,12 @@ function run() {
             console.log("地图名称不能为空");
             return;
         }
-        if (gm[0][0] == undefined || (gm[0][0].size != 10 && gm[0][0].size != 20 && gm[0][0].size != 30)) {
-            swal('地图有误', '', 'error');
-            return;
-        }
+        if(!process()) return ;
+        gm[0][0].mapName = encodeUnicode($("#store-name")[0].value);
         s = io.connect('ws://175.24.85.24:3001/');
         s.emit('thirdPersonMode');
-        s.emit('uploadMap', [$("#store-name")[0].value, gm[0][0].size, encode()])
+        console.log(gm);
+        s.emit('uploadMap', [$("#store-name")[0].value, gm[0][0].playerAmount, encode()])
         $("#store-name")[0].value = "";
     })
 

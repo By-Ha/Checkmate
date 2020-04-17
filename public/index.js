@@ -77,6 +77,10 @@ function judgeShown(i, j) {
     if (j - 1 >= 1 && gm[i][j - 1].color == myColor) return true;
     if (i + 1 <= size && gm[i + 1][j].color == myColor) return true;
     if (j + 1 <= size && gm[i][j + 1].color == myColor) return true;
+    if (i + 1 <= size && j + 1 <= size && gm[i + 1][j + 1].color == myColor) return true;
+    if (i + 1 <= size && j - 1 >= 1 && gm[i + 1][j - 1].color == myColor) return true;
+    if (i - 1 >= 1 && j + 1 <= size && gm[i - 1][j + 1].color == myColor) return true;
+    if (i - 1 >= 1 && j - 1 >= 1 && gm[i - 1][j - 1].color == myColor) return true;
     return false;
 }
 function showSymbol() {
@@ -258,17 +262,17 @@ $(document).ready(() => {
         $(m).css('margin-top', t2 + "px");
     }
 })
-$("#changeUserName")[0].placeholder = $.cookie("UserNick");
-$("#changeUserNameSubmit")[0].onclick = function () {
-    var n = $("#changeUserName")[0].value;
-    if (n == "更改用户名" || n == "" || n == " " || n == "  ") {
-        swal("失败", "", 'error');
-        return;
-    }
-    $.cookie("UserNick", n, { expires: 1 });
-    console.log($.cookie("UserNick"));
-    s.emit('Change Nick', n);
-}
+// $("#changeUserName")[0].placeholder = $.cookie("UserNick");
+// $("#changeUserNameSubmit")[0].onclick = function () {
+//     var n = $("#changeUserName")[0].value;
+//     if (n == "更改用户名" || n == "" || n == " " || n == "  ") {
+//         swal("失败", "", 'error');
+//         return;
+//     }
+//     $.cookie("UserNick", n, { expires: 1 });
+//     console.log($.cookie("UserNick"));
+//     s.emit('Change Nick', n);
+// }
 $("#third")[0].onclick = function () {
     if ($.cookie("third") == "0" && $("#third")[0].innerHTML == "进入旁观") {
         $.cookie("third", "1", { expires: 1 });

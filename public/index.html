@@ -11,9 +11,11 @@
     <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.bootcss.com/blueimp-md5/2.13.0/js/md5.min.js"></script>
-    <link rel="stylesheet" href="index.css?ver=2.1.0b1">
+    <link rel="stylesheet" href="index.css?ver=2.1.0b2">
 </head>
 <body>
+    <div id="cover">
+    </div>
     <div id="main">
     <div id="l">
         <h1 id="l-title">Checkmate!</h1>
@@ -22,14 +24,9 @@
         <br/>
         <div>总人数:<span id="total-user"></span></div>
         <div>准备人数:<span id="ready-user"></span></div>
-        <button id="ready" class="btn btn-primary" type="button">准备</button>
+        <button id="ready" class="btn btnv2" type="button">准备</button>
         <br/>
-        <div class="input-group input-group-sm" style="margin-top: 5px">
-            <input type="text" class="form-control" id="changeUserName" placeholder="输入新的用户名">
-        </div>
-        <button id="changeUserNameSubmit" class="btn btn-primary" type="button" style="margin-top: 5px">更改</button>
-        <br/>
-        <button id="third" class="btn btn-primary" type="button" style="margin-top: 5px">旁观</button>
+        <button id="third" class="btn btnv2" type="button" style="margin-top: 5px">旁观</button>
         <br/>
         <div id="half">全部派兵</div>
     </div>
@@ -37,7 +34,7 @@
     </table>
     <div id="r">
         <div id="user-control">
-            <button id="login-button" class="btn btn-primary" type="button" style="margin-top: 5px;float: right;">登录</button>
+            <button id="login-button" class="btn btnv2" type="button" style="margin-top: 5px;float: right;">登录</button>
             <p id='user-info' style="display: none"></p>
         </div>
         <br/>
@@ -59,7 +56,7 @@
     </div>
     </div>
     <style id="font-size-control">#m td{width: 30px;max-width: 30px;height: 30px;max-height: 30px;}</style>
-    <script src="index.js?ver=2.1.0b1"></script>
-    <script src="client.js?ver=2.1.0b1"></script>
+    <script src="index.js?ver=2.1.0b2"></script>
+    <script src="client.js?ver=2.1.0b2"></script>
 </body>
 </html>

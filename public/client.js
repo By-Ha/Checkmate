@@ -14,17 +14,6 @@ function voteStart(i) {
 }
 s.on('connect', function () {
     console.log("Connected:", s.id);
-    // var nick = "";
-    // if ($.cookie("UserNick") != undefined) {
-    //     nick = $.cookie("UserNick");
-    // } else {
-    //     while (nick == "") {
-    //         nick = prompt("请输入您的昵称", "匿名玩家");
-    //     }
-    //     $.cookie("UserNick", nick, { expires: 1 });
-    // }
-    // s.emit('Login', nick);
-    // voteStart(0);
     s.emit('AutoLoginV2', $.cookie("checkmate-login-username"), $.cookie("checkmate-login-password"))
 })
 s.on('LoggedUserCount', function (dat) {
