@@ -44,7 +44,7 @@ function run() {
             gm[x][y].color = 0;
         }
         illu();
-        $.cookie('editor-map', encode(), { expires: 7 });
+        $.cookie('editor-map', "");
     }
 
     function makeBoard() {

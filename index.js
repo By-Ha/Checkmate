@@ -10,9 +10,11 @@ var fs = require('fs');
 var size = 20;
 var getMap = require('./getMap')
 var db = require('./db')
-var public = require('./app')
+var pub = require('./app')
+var bot = require('./bot')
+var events = require('events')
 
-public.run();
+pub.run();
 app.get('/', function (req, res) { res.send('<h1>WS Server</h1>'); });
 
 function run() {
@@ -22,6 +24,7 @@ function run() {
     var gameInterval;
     var round = 0;
     var evalcmd;
+    var botEmitter;
 
     // basic functions
 
@@ -34,6 +37,9 @@ function run() {
      */
     function bc(name, obj = null, room = 'Game') {
         io.sockets.in(room).emit(name, obj);
+        if(botEmitter!=undefined && botEmitter[0] != undefined){
+            botEmitter[0].emit(name, obj);
+        }
     }
 
     /**
@@ -44,6 +50,10 @@ function run() {
      * @param {any} [dat=null] - content
      */
     function ue(id, name, dat = null) {
+        if(id == 'bot' && botEmitter!=undefined && botEmitter[0] != undefined){
+            botEmitter[0].emit(name, dat);
+            return;
+        }
         if (typeof (id) == "string") {
             var s = userSocket[id];
             if (s != undefined) s.emit(name, dat);
@@ -90,8 +100,12 @@ function run() {
     function addAmountCrown() {
         for (var i = 1; i <= size; ++i) {
             for (var j = 1; j <= size; ++j) {
-                if (gm[i][j].type == 1)
+                if (gm[i][j].type == 1){
                     gm[i][j].amount++;
+                    if(color2Id[gm[i][j].color] == 'bot'){
+                        gm[i][j].amount++;
+                    }
+                }
             }
         }
     }
@@ -140,8 +154,10 @@ function run() {
      * @call when player.length <= 1 or other win anction
      */
     function playerWinAnction() {
-        if (player.length == 1)
-            bc('WinAnction', User[player[0]].nick);
+        for(var i = 0;i<player.length;++i){
+            if (User[player[i]].gaming == true)
+                bc('WinAnction', User[player[i]].nick);
+        }
         clearInterval(gameInterval);
         gameInit();
         endRound();
@@ -218,6 +234,15 @@ function run() {
             ue(needDeleteMovement[i], 'DeleteMovement');
     }
 
+    function alivePlayer(){
+        var t = 0;
+        for(var i = 0;i<player.length;++i){
+            if(User[player[i]] == undefined) continue;
+            if(User[player[i]].gaming == true) ++t;
+        }
+        return t;
+    }
+
     /**
      * codemeanings 0=>air 1=>home 2=>road 3=>city 4=>hill 5=>empty city
      * @function nextRound
@@ -225,14 +250,9 @@ function run() {
     function nextRound() {
         // console.log(round);
 
-        // will enable coustomize   // enabled !
         round++;
 
-        // custom anctions
-        // TODO : add custom anctions
-        // default anctions
-
-        if (player.length <= 1) playerWinAnction();
+        if (alivePlayer() <= 1) playerWinAnction();
 
         if (evalcmd == "") {
             if ((round % size) == 0) addAmountRoad();
@@ -284,20 +304,28 @@ function run() {
             User[key]['color'] = i;
             ++i;
         }
-        /*
-        if (player.length <= 3) size = 10;
-        else if (player.length <= 8) size = 20;
-        else size = 30;
-        bc('UpdateSize', size);
-        gm = getMap.randomGetFile(size, player.length); // V1
-        */
-        // /*
+        User['bot'] = {};
+        User['bot'].gaming = true;
+        User['bot'].id=0;
+        User['bot'].nick='伞兵1号带<span style="color: red;font-size: 150%;">Bot</span>';
+        User['bot'].color=i;
+        botEmitter=[];
+        botEmitter[0] = new events.EventEmitter;
+        player.push('bot');
+        color2Id[i] = 'bot';
+        bot.bot(botEmitter[0], i);
+        botEmitter[0].on('AskSize', ()=>{botEmitter[0].emit('UpdateSize', size)});
+        botEmitter[0].on('UploadMovement', (dat)=>{
+            User['bot'].movement = dat;
+        });
+
+
         gm = getMap.randomGetFileV2(player.length);
         evalcmd = gm[0][0].cmd;
         size = gm[0][0].size;
+
         bc('UpdateSize', size);
         bc('swal', makeSwal("地图名称:" + gm[0][0].mapName + "\n作者:" + gm[0][0].author, 3, 5000));
-        // */
         bc('LoggedUserCount', [0, 0]); // just clear it
         bc('execute', "$('#ready')[0].innerHTML = '准备'");
 
@@ -421,8 +449,14 @@ function run() {
         s.on('RegisterV2', function (username, password) {
             password = String(password);
             username = String(username);
-            if (password.length <= 2 || password.length >= 30) s.emit('swal', makeSwal("注册失败,密码长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
-            if (username.length <= 2 || username.length >= 30) s.emit('swal', makeSwal("注册失败,用户名长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+            if (username.indexOf("<")!=-1) {
+                s.emit('swal', makeSwal("不允许使用<", 1, 3000), `setTimeout(()=>{register();},1000)`);
+                return;
+            }
+            if (username.length <= 2 || username.length >= 30) {
+                s.emit('swal', makeSwal("注册失败,用户名长度不正确.", 1, 3000), `setTimeout(()=>{register();},1000)`);
+                return;
+            }
             db.register(username, password, function (err, dat) {
                 if (err) console.log(err);
                 if (dat[0]) s.emit('swal', makeSwal("注册成功", 0, 3000), `setTimeout(()=>{window.location.reload();},1000)`);
@@ -456,7 +490,7 @@ function run() {
             if (isGameStart) return;
             User[s.id]['voteStart'] = dat;
             t = preparedPlayerCount();
-            if (t[0] >= 2 && t[1] > (t[0] / 2))
+            if (t[0] >= 1 && t[1] > (t[0] / 2))
                 generateGame();
         })
 

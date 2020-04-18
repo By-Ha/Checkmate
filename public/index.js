@@ -62,7 +62,7 @@ function makeBoard() {
         for (var j = 1; j <= size; ++j) {
             $("#td-" + String((i - 1) * size + j))[0].onclick = function () {
                 var id = Number(this.id.substr(3));
-                var ln = Math.floor((id - 1) / size) + 1, col = (((id % size) == 0) ? size : (id % size));
+                var ln = Math.floor((id - 1) / size) + 1, col = Number((((id % size) == 0) ? size : (id % size)));
                 console.log(id, ln, col);
                 if (gm[ln][col].color == myColor) {
                     makeSelect(ln, col);

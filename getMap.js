@@ -21,7 +21,7 @@ function decodeUnicode(str) {
     str = str.replace(/\\/g, "%");  
     return unescape(str);  
 }
-function getFile(pathName = "public/maps/10") {
+function getFile(pathName = "public/maps/2") {
     var files = fs.readdirSync(pathName);
     var dirs = [];
     var finish = false;
