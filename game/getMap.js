@@ -41,7 +41,7 @@ function calcAmount(i,j){
 }
 
 function randomGetFile(size, player) {
-    var fpath = "public/maps/" + String(size);
+    var fpath = "../game/maps/" + String(size);
     var flist = getFile(fpath);
     if(flist.length){
         gm = md = [];
@@ -76,7 +76,7 @@ function randomGetFile(size, player) {
 }
 
 function randomGetFileV2(player) {
-    var fpath = "public/maps/" + String(player);
+    var fpath = "./game/maps/" + String(player);
     var flist = getFile(fpath);
     if(flist.length){
         gm = md = [];

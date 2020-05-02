@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-sm bg-light">
+  <ul class="nav navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link iconfont icon-home" href="/">主页</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link iconfont icon-category" href="/logout">登出</a>
+    </li>
+  </ul>
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item">
+      <% if(typeof(username) == "undefined"){ %> 
+      <a class="nav-link iconfont icon-category" href="#">登录/注册</a>
+      <% } else { %>
+        <a class="nav-link" href="/user/<%= uid %>"><%= username %></a>
+      <% } %>  
+    </li>
+  </ul>
+</nav>

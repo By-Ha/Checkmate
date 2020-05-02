@@ -1,0 +1,94 @@
+#container {
+  position: fixed;
+  left: 0%;
+  top: 0%;
+  width: 100%;
+  height: 100%;
+  background: url("/img/login-bg.jpg");
+  z-index: -100;
+}
+#loginBox {
+  height: 280px;
+}
+#registerBox {
+  height: 320px;
+}
+#loginBox,
+#registerBox {
+  width: 240px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  padding: 50px 40px 40px 40px;
+  -webkit-box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
+  box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
+  opacity: 1;
+  background: linear-gradient(230deg, rgba(53, 57, 74, 0), #000);
+  color: rgb(255, 255, 255);
+}
+#loginBox h3,
+#registerBox h3 {
+  text-align: center;
+}
+#loginBox input,
+#registerBox input {
+  background-color: transparent;
+  color: #39f;
+  width: 200px;
+  border: none;
+  color: #fff;
+  background-color: transparent;
+  font-size: 12px;
+  height: 40px;
+  line-height: 40px;
+}
+#loginBox form,
+#registerBox form {
+  height: 100%;
+  width: 100%;
+}
+#loginBox form input,
+#registerBox form input {
+  width: 100%;
+  border: none;
+  color: #fff;
+  background-color: transparent;
+  font-size: 12px;
+  border-bottom: 1px solid white;
+  border-radius: 0px;
+}
+.redirect{
+  text-align: center;
+}
+#loginBox form input:focus,
+#registerBox form input:focus {
+  outline: 0;
+}
+#submitButton {
+  outline: 0;
+  transition: all 0.5s;
+  bottom: 20px;
+  position: absolute;
+  left: 10%;
+  background-color: transparent;
+  color: #39f;
+  width: 80%;
+  border-radius: 50px;
+  padding: 12px 23px;
+  border-color: #409eff;
+  border-style: dashed;
+}
+#submitButton:hover {
+  background-color: #39f;
+  color: #fff;
+  border-radius: 50px;
+  padding: 12px 23px;
+  border-color: #409eff;
+}
+#submitButton::before {
+  display: inline-block;
+  animation: turn 1s linear infinite;
+}

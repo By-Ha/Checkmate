@@ -1,0 +1,15 @@
+<%- include('header'); -%>
+<%- include('navi'); -%>
+
+<link rel="stylesheet" href="/css/page.css">
+
+<div id="main">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/mainPart.css">
+    <script src="/js/index.js"></script>
+    <%- include('sidebar/leftSidebar') -%>
+    <%- include('mainPart', {username: username}) -%>
+    <%- include('sidebar/rightSidebar') -%>
+</div>
+
+<%- include('footer'); -%>

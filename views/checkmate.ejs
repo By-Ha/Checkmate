@@ -1,0 +1,53 @@
+<%- include('header'); -%>
+
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdn.bootcss.com/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="/css/test.css">
+
+<div id="cover">
+</div>
+<div id="main">
+<div id="l">
+    <h1 id="l-title">Checkmate!</h1>
+    <br/>
+    <div>左键:选中;WASD:移动兵力;↑↓←→:移动选择;Q:清除所有移动;Z:清除上一次移动;空格:切换半兵/全兵;滚轮:缩放;左键拖动:移动视图;</div>
+    <br/>
+    <div>总人数:<span id="total-user"></span></div>
+    <div>准备人数:<span id="ready-user"></span></div>
+    <button id="ready" class="btn btnv2" type="button">准备</button>
+    <br/>
+    <button id="third" class="btn btnv2" type="button" style="margin-top: 5px; display: none;">旁观</button>
+    <br/>
+    <div id="half">全部派兵</div>
+</div>
+<table id="m">
+</table>
+<div id="r">
+    <div id="user-control">
+        <button id="login-button" class="btn btnv2" type="button" style="margin-top: 5px;float: right;display: none;">登录</button>
+        <p id='user-info' style="display: none"></p>
+    </div>
+    <br/>
+    <table id="info" class="table">
+        <thead>
+            <tr>
+                <th>玩家昵称</th>
+                <th>领地数</th>
+                <th>兵力数</th>
+            </tr>
+        </thead>
+        <tbody id="info-content">
+        </tbody>
+    </table>
+</div>
+<div id="message-box">
+    <div id="msg-container"></div>
+    <input type="text" class="form-control" placeholder="输入聊天内容" id="msg-sender">
+</div>
+</div>
+<style id="font-size-control">#m td{width: 30px;max-width: 30px;height: 30px;max-height: 30px;}</style>
+<script>var room = '<%= room %>' ; </script>
+<script src="/js/game/client.js"></script>
+<script src="/js/game/index.js"></script>
+<%- include('footer'); -%>

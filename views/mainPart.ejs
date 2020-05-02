@@ -1,0 +1,10 @@
+<div id="main-part">
+    <div id="container">
+        <%- include('game/joinRoom') %> 
+        <%- include('article/write') %> 
+        <% dat.forEach(element => { %>
+        <%- include('article/preview', {art: element, username: username}); %> 
+        <% }); %> 
+    </div>
+    <div class="kana-item" id="getMore" page="1">戳我获取更多</div>
+</div>

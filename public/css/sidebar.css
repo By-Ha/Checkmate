@@ -1,0 +1,91 @@
+.sidebar{
+    width: 20%;
+}
+
+/* left sidebar */
+
+/* usercard */
+
+#usercard{
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    -webkit-box-shadow: 0 1px 3px rgba(26,26,26,.1);
+    box-shadow: 0 1px 3px rgba(26,26,26,.1);
+}
+
+#usercard-bg{
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+    background-size: cover !important;
+    width: 100%;
+    height: 64px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#usercard-name{
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    margin-left: 60px;
+    padding-top: 50px;
+    text-decoration-line: none;
+}
+
+#usercard-avatar{
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    left: 16px;
+    top: 36px;
+    border-radius: 50%;
+    box-shadow: 1px 1px 1px rgba(0,0,0,.1), 1px 1px 1px rgba(0,0,0,0.1), 1px 1px 1px rgba(0,0,0,0.1);
+    border: 2px solid #fff;
+    border-top-color: rgb(255, 255, 255);
+    border-top-style: solid;
+    border-top-width: 2px;
+    border-right-color: rgb(255, 255, 255);
+    border-right-style: solid;
+    border-right-width: 2px;
+    border-bottom-color: rgb(255, 255, 255);
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-left-color: rgb(255, 255, 255);
+    border-left-style: solid;
+    border-left-width: 2px;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+}
+
+#usercard-info{
+    display: flex;
+}
+
+#usercard-info .num{
+    letter-spacing: 0;
+    font-weight: bold;
+    font-size: 14px;
+    color: #00a1d6;
+    margin-bottom: 0px;
+}
+
+#usercard-info .txt{
+    padding-top: 9px;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 0;
+    color: #99a2aa;
+}
+
+.usercard-info-content{
+    margin-top: 35px;
+    text-align: center;
+    width: 33.33%;
+}

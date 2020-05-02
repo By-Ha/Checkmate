@@ -1,0 +1,18 @@
+<%- include('header', { title: '登录' }); -%>
+<%- include('navi'); -%>
+
+<link rel="stylesheet" href="/css/login.css">
+<script src="/js/login.js"></script>
+<div id="container">
+    <div id="loginBox">
+        <h3>Login</h3>
+        <form id="loginForm">
+            <input type="text"  name="username" placeholder="用户名"/>
+            <input type="password" name="pwd" placeholder="密码"/>
+            <button type="button" id="submitButton">登录</button>
+            <div class="redirect"><a href="/register">没有账号?</a></div>
+        </form>
+    </div>
+</div>
+
+<%- include('footer'); -%>

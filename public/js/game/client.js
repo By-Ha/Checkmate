@@ -1,4 +1,4 @@
-s = io.connect('ws://175.24.85.24:3001/');
+s = io.connect('ws://175.24.85.24:3002/');
 
 var nick = "";
 var roomName = "";
@@ -12,14 +12,14 @@ var init = false;
 function voteStart(i) {
     s.emit('VoteStart', i);
 }
+
 s.on('connect', function () {
-    console.log("Connected:", s.id);
+    s.emit('joinRoom', room)
     s.emit('AutoLoginV2', $.cookie("checkmate-login-username"), $.cookie("checkmate-login-password"))
 })
 s.on('LoggedUserCount', function (dat) {
     $("#total-user")[0].innerHTML = dat[0];
     $("#ready-user")[0].innerHTML = dat[1];
-    console.log("Connected:", dat[0], ",Ready:", dat[1]);
 })
 s.on('UpdateGM', function (dat) {
     gm = dat;
@@ -29,10 +29,12 @@ s.on('UpdateGM', function (dat) {
 s.on('UpdateUser', function (dat) {
     User = dat;
     colorNick = [];
-    myColor = User[s.id].color;
     for(var k in User){
-        colorNick[User[k].color] = User[k].nick;
+        colorNick[User[k].color] = User[k].uname;
     }
+})
+s.on('UpdateColor', function (dat){
+    myColor = dat;
 })
 s.on('UpdateSize', function (dat) {
     size = dat;
@@ -75,21 +77,14 @@ s.on('DeleteMovement', function () {
 })
 s.on('WinAnction', function (dat) {
     Swal.fire("欢呼", dat + "赢了", "success");
-    isThirdPerson = false;
-    if ($.cookie("third") != "1")
-        $("#ready")[0].innerHTML = "准备", $("#ready").css('visibility', 'unset');
 })
 s.on('isGameStart', function (dat) {
     if (dat) {
         s.emit('getUser');
         $("#ready").css('visibility', 'hidden');
-        isThirdPerson = true;
+        // isThirdPerson = true;
     }
 })
-s.on('ThirdPersonModeStatus', function (dat) {
-    if (dat) Swal.fire("进入旁观模式成功", "", 'success');
-    else Swal.fire("进入旁观模式失败", "", 'error');
-});
 s.on('ForceThird', function () {
     $.cookie("third", "1", { expires: 1 });
     location.reload();
@@ -97,7 +92,6 @@ s.on('ForceThird', function () {
 s.on('die', function () {
     Swal.fire("您死了!", "", 'warning');
     setTimeout(() => {
-        // $.cookie("third", "1", { expires: 1 });
         location.reload();
     }, 500);
 });
@@ -113,13 +107,13 @@ s.on('WorldMessage', (msg) => {
     $("#msg-container").append("<p>&nbsp&nbsp&nbsp&nbsp"+msg+"</p>");
     $("#msg-container")[0].scrollTop = 99999999;
 })
-if ($.cookie("third") == "0") {
-    $("#third")[0].innerHTML = "进入旁观";
-} else {
-    $("#third")[0].innerHTML = "退出旁观";
-    $("#ready").css('visibility', 'hidden');
-    s.emit('ThirdPersonMode');
-}
+// if ($.cookie("third") == "0") {
+//     $("#third")[0].innerHTML = "进入旁观";
+// } else {
+//     $("#third")[0].innerHTML = "退出旁观";
+//     $("#ready").css('visibility', 'hidden');
+//     s.emit('ThirdPersonMode');
+// }
 $("#ready")[0].onclick = function () {
     if (this.innerHTML == "准备") {
         voteStart(1);
