@@ -192,6 +192,7 @@ function deletePost(pid, username, callback){
                 return ;
             }
             callback(null, "成功删除");
+            addUserExperienceByUsername(username, -10);
         });
     });
 }
@@ -286,6 +287,15 @@ function addUserExperienceById(userid, exp, callback = ()=>{}){
     });
 }
 
+function addUserExperienceByUsername(username, exp, callback = ()=>{}){
+    getUserId(username, function(err, dat){
+        if(err) callback(err);
+        else {
+            addUserExperienceById(dat, exp, callback);
+        }
+    });
+}
+
 function post(username, type, content, callback){
     if(username == undefined || username.length <= 2) return;
     var SQL = `INSERT INTO content(type, user_id, user_name, content, hidden)
@@ -320,5 +330,7 @@ module.exports = {
     getUserLevelById,
     getUserLevelByUsername,
     getUserExperienceById,
-    getUserExperienceByUsername
+    getUserExperienceByUsername,
+    addUserExperienceById,
+    addUserExperienceByUsername
 }

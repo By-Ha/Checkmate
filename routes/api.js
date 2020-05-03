@@ -105,7 +105,7 @@ router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
                     console.log(error);
                     return false;
                 }
-                cos.uploadFile('/tmp/Kana/upload/', img, '/img/user/avatar/', req.session.uid+'.webp');
+                cos.uploadFile('/tmp/Kana/upload/', img, '/img/user/avatar/', req.session.uid + '.webp');
                 fs.unlink("/tmp/Kana/upload/" + img, ()=>{});
             })
         })

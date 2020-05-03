@@ -112,21 +112,21 @@ function showSymbol() {
             else c = c + ',';
             if (gm[i][j].type == 1) {//crown
                 if (c.indexOf("crown.png") != -1) continue;
-                if (isThirdPerson || judgeShown(i, j))
+                if (!start || judgeShown(i, j))
                     $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/crown.png')");
             } else if (gm[i][j].type == 3) {//city
                 if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (isThirdPerson || judgeShown(i, j))
+                if (!start || judgeShown(i, j))
                     $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
                 else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
             } else if (gm[i][j].type == 4) {//mountain
                 if (c.indexOf("mountain.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (isThirdPerson || judgeShown(i, j))
+                if (!start || judgeShown(i, j))
                     $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/mountain.png')");
                 else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
             } else if (gm[i][j].type == 5) {//empty city
                 if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (isThirdPerson || judgeShown(i, j))
+                if (!start || judgeShown(i, j))
                     $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
                 else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
             }
@@ -148,7 +148,7 @@ function illu() {
             }
             if (gm[i][j].color == myColor) d.addClass("own");
             else d.removeClass("own");
-            if (isThirdPerson || judgeShown(i, j)) {
+            if (!start || judgeShown(i, j)) {
                 d[0].innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
                 d.removeClass("unshown");
                 d.addClass("shown");
@@ -174,11 +174,6 @@ function illu() {
         $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>"+colorNick[playerInfo[i][2]]+"</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
     }
 }
-// function logged(){
-//     $("#login-button").css("display", "none");
-//     $("#user-info")[0].innerHTML = "您的用户名:" + $.cookie("checkmate-login-username");
-//     $("#user-info").css("display", "unset");
-// }
 document.onkeydown = function (event) {
     var e = event || window.event || arguments.callee.caller.arguments[0];
     if (!e) return;

@@ -7,6 +7,7 @@ var colorNick = [];
 var myColor;
 var movementUploader;
 var init = false;
+var start = false;
 
 
 function voteStart(i) {
@@ -43,6 +44,7 @@ s.on('UpdateSize', function (dat) {
 })
 s.on('GameStart', function () {
     round = 0; movement = [];
+    start = true;
     movementUploader = setInterval(() => {
         if(movement != undefined && movement != 0){
             if(movement[0][0] <= 2)
@@ -76,6 +78,7 @@ s.on('DeleteMovement', function () {
     }
 })
 s.on('WinAnction', function (dat) {
+    start = false;
     Swal.fire("欢呼", dat + "赢了", "success");
 })
 s.on('isGameStart', function (dat) {
