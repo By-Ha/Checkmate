@@ -52,7 +52,6 @@ s.on('GameStart', function () {
                 s.emit('UploadMovement', movement[0].slice(1)),movement[0][0]++;
             else movement[0][0]-=0.25;
         } 
-        else s.emit('UploadMovement', []);
     }, 50);
 })
 s.on('ReceiveMovement', function(dat){
@@ -74,7 +73,12 @@ s.on('DeleteMovement', function () {
     if (movement.length && movement[0][0])
         movement = movement.slice(1);
     while (movement.length) {
-        if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) movement = movement.slice(1);
+        if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) {
+            let t1 = movement[0][1];
+            let t2 = movement[0][2];
+            movement = movement.slice(1);
+            reloadSymbol(t1, t2, true);
+        }
         else break;
     }
 })

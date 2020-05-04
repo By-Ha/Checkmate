@@ -99,6 +99,7 @@ function Run(io) {
                 continue;
             }
             combineBlock(room, f, t, cnt);
+            player[k].movement = [];
         }
         bc(room, 'UpdateRound', Rooms[room].game.round);
         bc(room, 'UpdateGM', Rooms[room].game.gm)
@@ -261,8 +262,9 @@ function Run(io) {
 
         // 投票开始/结束
         s.on('VoteStart', function (dat) {
+            console.log(1);
             try{
-                if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]]) return;
+                if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]] == undefined) return;
                 if (Rooms[playerRoom[uid]].start) return;
                 Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
                 t = preparedPlayerCount(playerRoom[uid]);

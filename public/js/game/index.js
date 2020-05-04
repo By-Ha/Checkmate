@@ -17,7 +17,7 @@ function changeHalf(half = true) {
     else $("#half")[0].innerHTML = "全部派兵";
 }
 function makeSelect(ln, col) {
-    if(document.activeElement.id == "msg-sender") return ;
+    if (document.activeElement.id == "msg-sender") return;
     if (ln > size || col > size || ln <= 0 || col <= 0) return;
     $("td").removeClass("selected");
     selectNode[0] = ln;
@@ -33,9 +33,10 @@ function clearSelect() {
 }
 function clearMomement() {
     movement = [];
+    showSymbol(false);
 }
 function addMovement(x, y) {
-    if(document.activeElement.id == "msg-sender") return;
+    if (document.activeElement.id == "msg-sender") return;
     var t1 = selectNode[0] + x, t2 = selectNode[1] + y;
     if (t1 > size || t1 <= 0 || t2 > size || t2 <= 0) return;
     if (gm[t1][t2] == undefined || gm[t1][t2].type == 4) return;
@@ -85,9 +86,36 @@ function judgeShown(i, j) {
     if (i - 1 >= 1 && j - 1 >= 1 && gm[i - 1][j - 1].color == myColor) return true;
     return false;
 }
-function showSymbol() {
-    $("#m td").css('background-image', "");
-    for (var i = 0; i < movement.length; ++i) {
+function reloadSymbol(i, j, clear=false) {
+    let c = "";
+    if(!clear)  c = $("#td-" + String((i - 1) * size + j)).css('background-image');
+    if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
+    else c = c + ',';
+    if (gm[i][j].type == 1) {//crown
+        if (c.indexOf("crown.png") != -1) return;
+        if (!start || judgeShown(i, j))
+            $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/crown.png')");
+    } else if (gm[i][j].type == 3) {//city
+        if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
+        if (!start || judgeShown(i, j))
+            $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
+        else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
+    } else if (gm[i][j].type == 4) {//mountain
+        if (c.indexOf("mountain.png") != -1 || c.indexOf("obstacle.png") != -1) return;
+        if (!start || judgeShown(i, j))
+            $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/mountain.png')");
+        else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
+    } else if (gm[i][j].type == 5) {//empty city
+        if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
+        if (!start || judgeShown(i, j))
+            $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
+        else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
+    }
+}
+function showSymbol(onlyLast = false) {
+    if(!onlyLast)
+        $("#m td").css('background-image', "");
+    for (var i = (onlyLast ? movement.length - 1 : 0); i < movement.length; ++i) {
         var t = movement[i]; id = "#td-" + String((t[1] - 1) * size + t[2]);
         var c = $(id).css('background-image');
         if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
@@ -107,31 +135,9 @@ function showSymbol() {
         }
     }
     for (var i = 1; i <= size; ++i) {
-        if(gm[i] == undefined) continue;
+        if (gm[i] == undefined) continue;
         for (var j = 1; j <= size; ++j) {
-            var c = $("#td-" + String((i - 1) * size + j)).css('background-image');
-            if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
-            else c = c + ',';
-            if (gm[i][j].type == 1) {//crown
-                if (c.indexOf("crown.png") != -1) continue;
-                if (!start || judgeShown(i, j))
-                    $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/crown.png')");
-            } else if (gm[i][j].type == 3) {//city
-                if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (!start || judgeShown(i, j))
-                    $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-                else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-            } else if (gm[i][j].type == 4) {//mountain
-                if (c.indexOf("mountain.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (!start || judgeShown(i, j))
-                    $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/mountain.png')");
-                else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-            } else if (gm[i][j].type == 5) {//empty city
-                if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) continue;
-                if (!start || judgeShown(i, j))
-                    $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-                else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-            }
+            reloadSymbol(i, j);
         }
     }
 }
@@ -163,7 +169,7 @@ function illu() {
             }
         }
     }
-    showSymbol();
+    showSymbol(false);
     $("#info-content")[0].innerHTML = "";
     playerInfo.sort(function (a, b) {
         if (a == undefined) return (b == undefined) ? 0 : -1;
@@ -173,7 +179,7 @@ function illu() {
     })
     for (var i = 0; i < playerInfo.length; ++i) {
         if (playerInfo[i] == undefined) break;
-        $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>"+colorNick[playerInfo[i][2]]+"</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
+        $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
     }
 }
 document.onkeydown = function (event) {
@@ -181,19 +187,19 @@ document.onkeydown = function (event) {
     if (!e) return;
     if (e.keyCode == 87) { // W
         addMovement(-1, 0);
-        showSymbol();
+        showSymbol(true);
         changeHalf(false);
     } else if (e.keyCode == 65) { // A
         addMovement(0, -1);
-        showSymbol();
+        showSymbol(true);
         changeHalf(false);
     } else if (e.keyCode == 83) { // S
         addMovement(1, 0);
-        showSymbol();
+        showSymbol(true);
         changeHalf(false);
     } else if (e.keyCode == 68) { // D
         addMovement(0, 1);
-        showSymbol();
+        showSymbol(true);
         changeHalf(false);
     } else if (e.keyCode == 81) { // Q
         clearMomement();
@@ -203,18 +209,18 @@ document.onkeydown = function (event) {
         showSymbol();
     } else if (e.keyCode == 38) { // ↑
         makeSelect(selectNode[0] - 1, selectNode[1]);
-        showSymbol();
+        showSymbol(true);
     } else if (e.keyCode == 40) { // ↓
         makeSelect(selectNode[0] + 1, selectNode[1]);
-        showSymbol();
+        showSymbol(true);
     } else if (e.keyCode == 37) { // ←
         makeSelect(selectNode[0], selectNode[1] - 1);
-        showSymbol();
+        showSymbol(true);
     } else if (e.keyCode == 39) { // →
         makeSelect(selectNode[0], selectNode[1] + 1);
-        showSymbol();
+        showSymbol(true);
     } else if (e.keyCode == 13) { // Enter
-        if(document.activeElement.id == "msg-sender"){
+        if (document.activeElement.id == "msg-sender") {
             s.emit('SendWorldMessage', $("#msg-sender")[0].value);
             $("#msg-sender")[0].value = "";
             $("#msg-sender").blur();
