@@ -10,13 +10,14 @@ var isThirdPerson = false;
 var halfTag = false;
 var scrollSize = 30;
 
-function changeHalf() {
-    halfTag = !halfTag;
+function changeHalf(half = true) {
+    halfTag = half;
     if (halfTag)
         $("#half")[0].innerHTML = "一半派兵";
     else $("#half")[0].innerHTML = "全部派兵";
 }
 function makeSelect(ln, col) {
+    if(document.activeElement.id == "msg-sender") return ;
     if (ln > size || col > size || ln <= 0 || col <= 0) return;
     $("td").removeClass("selected");
     selectNode[0] = ln;
@@ -34,6 +35,7 @@ function clearMomement() {
     movement = [];
 }
 function addMovement(x, y) {
+    if(document.activeElement.id == "msg-sender") return;
     var t1 = selectNode[0] + x, t2 = selectNode[1] + y;
     if (t1 > size || t1 <= 0 || t2 > size || t2 <= 0) return;
     if (gm[t1][t2] == undefined || gm[t1][t2].type == 4) return;
@@ -180,20 +182,24 @@ document.onkeydown = function (event) {
     if (e.keyCode == 87) { // W
         addMovement(-1, 0);
         showSymbol();
+        changeHalf(false);
     } else if (e.keyCode == 65) { // A
         addMovement(0, -1);
         showSymbol();
+        changeHalf(false);
     } else if (e.keyCode == 83) { // S
         addMovement(1, 0);
         showSymbol();
+        changeHalf(false);
     } else if (e.keyCode == 68) { // D
         addMovement(0, 1);
         showSymbol();
+        changeHalf(false);
     } else if (e.keyCode == 81) { // Q
         clearMomement();
         showSymbol();
-    } else if (e.keyCode == 32) { // Space
-        changeHalf();
+    } else if (e.keyCode == 90) { // Z
+        changeHalf(!halfTag);
         showSymbol();
     } else if (e.keyCode == 38) { // ↑
         makeSelect(selectNode[0] - 1, selectNode[1]);
@@ -206,11 +212,6 @@ document.onkeydown = function (event) {
         showSymbol();
     } else if (e.keyCode == 39) { // →
         makeSelect(selectNode[0], selectNode[1] + 1);
-        showSymbol();
-    } else if (e.keyCode == 90) { // Z
-        if (movement != undefined && movement.length >= 1) {
-            movement = movement.slice(0, -1);
-        }
         showSymbol();
     } else if (e.keyCode == 13) { // Enter
         if(document.activeElement.id == "msg-sender"){

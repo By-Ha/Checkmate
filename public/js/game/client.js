@@ -23,6 +23,7 @@ s.on('LoggedUserCount', function (dat) {
     $("#ready-user")[0].innerHTML = dat[1];
 })
 s.on('UpdateGM', function (dat) {
+    $("#l").css('visibility', 'hidden');
     gm = dat;
     if (!init) s.emit('AskSize', null);
     if (init) illu();
@@ -80,6 +81,7 @@ s.on('DeleteMovement', function () {
 s.on('WinAnction', function (dat) {
     start = false;
     Swal.fire("欢呼", dat + "赢了", "success");
+    $("#l").css('visibility', 'unset');
 })
 s.on('isGameStart', function (dat) {
     if (dat) {
@@ -110,13 +112,6 @@ s.on('WorldMessage', (msg) => {
     $("#msg-container").append("<p>&nbsp&nbsp&nbsp&nbsp"+msg+"</p>");
     $("#msg-container")[0].scrollTop = 99999999;
 })
-// if ($.cookie("third") == "0") {
-//     $("#third")[0].innerHTML = "进入旁观";
-// } else {
-//     $("#third")[0].innerHTML = "退出旁观";
-//     $("#ready").css('visibility', 'hidden');
-//     s.emit('ThirdPersonMode');
-// }
 $("#ready")[0].onclick = function () {
     if (this.innerHTML == "准备") {
         voteStart(1);

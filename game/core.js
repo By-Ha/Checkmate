@@ -203,7 +203,7 @@ function Run(io) {
         bc(room, 'GameStart');
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
-        }, 500);
+        }, 1000/Rooms[room].settings.speed);
     }
 
     function preparedPlayerCount(room) {
@@ -232,18 +232,29 @@ function Run(io) {
             if (room == 'World') return;
             s.join(room);
             if (Rooms[room] == undefined) {
-                Rooms[room] = { game: undefined, start: false, player: {}, interval: undefined };
+                Rooms[room] = {
+                    game: undefined, start: false, player: {}, interval: undefined,
+                    settings: {speed: 2}
+                };
             }
             Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, color: 0, movement: [] };
             playerRoom[uid] = room;
             t = preparedPlayerCount(playerRoom[uid]);
             bc(playerRoom[uid], 'LoggedUserCount', t);
+            s.emit('UpdateSettings', Rooms[room].settings);
         });
 
         // 退出
         s.on('disconnect', function () {
             delete Rooms[playerRoom[uid]].player[uid];
             delete connectedUsers[uid];
+            if(Object.keys(Rooms[playerRoom[uid]].player).length == 0){
+                delete Rooms[playerRoom[uid]];
+            }
+            if(Rooms[playerRoom[uid]] != undefined){
+                t = preparedPlayerCount(playerRoom[uid]);
+                bc(playerRoom[uid], 'LoggedUserCount', t);
+            }
             delete playerRoom[uid];
         });
 
@@ -256,6 +267,16 @@ function Run(io) {
             bc(playerRoom[uid], 'LoggedUserCount', t);
             if (t[0] >= 2 && t[1] > (t[0] / 2))
                 startGame(playerRoom[uid]);
+        })
+
+        s.on('changeSettings', function(dat){
+            if(dat.speed){
+                let speed = Number(dat.speed);
+                if(speed == 1 || speed == 2 || speed == 3 || speed == 4) {
+                    Rooms[playerRoom[uid]].settings.speed = dat.speed;
+                }
+            }
+            bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
         })
 
         s.on('AskSize', function () {
