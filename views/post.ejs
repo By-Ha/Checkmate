@@ -1,0 +1,22 @@
+<%- include('header'); -%>
+<%- include('navi'); -%>
+
+<link rel="stylesheet" href="/css/page.css">
+
+<div id="main">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/mainPart.css">
+    <script src="/js/index.js"></script>
+    <%- include('sidebar/leftSidebar') -%>
+    <div id="main-part">
+        <div id="container">
+            <article class="<%= (dat.type==0)?'shuoshuo':'blog' %>">
+                <%- include('article/view') -%>
+                <%- include('comment/comment') %> 
+            </article>
+        </div>
+    </div>
+    <%- include('sidebar/rightSidebar') -%>
+</div>
+
+<%- include('footer'); -%>

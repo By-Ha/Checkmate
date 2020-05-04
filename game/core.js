@@ -246,8 +246,9 @@ function Run(io) {
 
         // 退出
         s.on('disconnect', function () {
-            delete Rooms[playerRoom[uid]].player[uid];
             delete connectedUsers[uid];
+            if(Rooms[playerRoom[uid]] == undefined) return ;
+            delete Rooms[playerRoom[uid]].player[uid];
             if(Object.keys(Rooms[playerRoom[uid]].player).length == 0){
                 delete Rooms[playerRoom[uid]];
             }
@@ -260,13 +261,17 @@ function Run(io) {
 
         // 投票开始/结束
         s.on('VoteStart', function (dat) {
-            if (connectedUsers[uid] == undefined) return;
-            if (Rooms[playerRoom[uid]].start) return;
-            Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
-            t = preparedPlayerCount(playerRoom[uid]);
-            bc(playerRoom[uid], 'LoggedUserCount', t);
-            if (t[0] >= 2 && t[1] > (t[0] / 2))
-                startGame(playerRoom[uid]);
+            try{
+                if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]]) return;
+                if (Rooms[playerRoom[uid]].start) return;
+                Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
+                t = preparedPlayerCount(playerRoom[uid]);
+                bc(playerRoom[uid], 'LoggedUserCount', t);
+                if (t[0] >= 2 && t[1] > (t[0] / 2))
+                    startGame(playerRoom[uid]);
+            }catch(err){
+                console("CORE ERROR", "VOTESTART");
+            }
         })
 
         s.on('changeSettings', function(dat){
@@ -296,7 +301,7 @@ function Run(io) {
             if (dat == "") {
                 return;
             }
-            if (dat.toLowerCase().indexOf("script") != -1 && User[s.id].id != 1) {
+            if ((dat.toLowerCase().indexOf("script") != -1 || dat.toLowerCase().indexOf("on") != -1) && uid != 1) {
                 s.emit('swal', makeSwal('你想干啥?', 1, 3000));
                 return;
             }

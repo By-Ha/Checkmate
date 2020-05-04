@@ -18,6 +18,7 @@ $(() => {
         </div>
     </article>
     `
+    
     $.ajax({
         type: "post",
         url: "/api/template",
@@ -31,12 +32,13 @@ $(() => {
             }
         }
     });
+
     function edit(pid) {
         toast('info', '获取文章中')
         var thispid = pid;
         $.ajax({
             type: "post",
-            url: "/api/post",
+            url: "/api/getSourcePost",
             data: { pid: thispid },
             dataType: "json",
             success: function (res) {
@@ -51,6 +53,7 @@ $(() => {
             }
         });
     }
+
     function del(pid) {
         var thispid = pid;
         $.ajax({
@@ -69,11 +72,26 @@ $(() => {
             }
         });
     }
+    
+    function getPostAmount(pid){
+        $.ajax({
+            type: "get",
+            url: "/api/commentAmount",
+            data: {pid: pid, parent: -1},
+            dataType: "json",
+            success: function (res) {
+                if(res.status == 'success')
+                    $("article[pid="+pid+"] .post-toolbar .post-comment-num a")[0].innerHTML = '<i class="iconfont icon-comment"></i>' + res.dat;
+            }
+        });
+    }
+
     function rebuild() {
         var t = $(".post-info-author-username i");
         userlevellist = new Map();
         t.each(function () {
             var ele = this;
+            getPostAmount($(ele.parentElement.parentElement.parentElement.parentElement).attr('pid'));
             if (!ele.parentElement.classList.contains("finished")) {
                 var uname = ele.parentElement.children[0].innerText;
                 if (userlevel[uname] == undefined) {
@@ -109,7 +127,7 @@ $(() => {
         })
     }
     rebuild();
-    function getPost() {
+    function getSourcePost() {
         $("#getMore").attr('page', Number($("#getMore").attr('page')) + 1);
         $.ajax({
             type: "post",
@@ -145,7 +163,7 @@ $(() => {
 
     $("#getMore").click(() => {
         if ($("#getMore").attr('disable')) return;
-        getPost();
+        getSourcePost();
     })
 
     $("article .edit").click(function () {

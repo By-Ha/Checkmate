@@ -151,6 +151,24 @@ function getPost(pid, callback){
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
+        let result = results[0];
+        if (error) {
+            callback(error, null);
+            return ;
+        }
+        if (result == undefined) {
+            callback('被删除'); 
+            return;
+        }
+        result.content = md.render(result.content);
+        callback(null, result);
+    });
+}
+
+function getSourcePost(pid, callback){
+    var SQL = `select * from content where id=? AND hidden=0;`
+    var SQLDATA = [pid];
+    connection.query(SQL, SQLDATA, function (error, results) {
         if (error) callback(error, results);
         callback(null, results);
     });
@@ -311,26 +329,57 @@ function post(username, type, content, callback){
     })
 }
 
+function getComment(pid, parent, page, callback = ()=>{}){
+    let pagesize = 10;
+    let SQL = 'SELECT * FROM `comment` WHERE pid=? AND parent=? order by id desc limit ?,?;';
+    let SQLDATA = [pid, parent, (page-1)*pagesize, pagesize];
+    connection.query(SQL, SQLDATA, function(err, dat){
+        if(err) callback(err);
+        else callback(null, JSON.parse(JSON.stringify(dat)));
+    })
+}
+
+function getCommentAmount(pid, parent, callback = () => {}){
+    let SQL = '';
+    let SQLDATA = '';
+    if(parent != -1){
+        SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE pid=? AND parent=?;';
+        SQLDATA = [pid, parent];
+    } else {
+        SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE pid=?;';
+        SQLDATA = [pid];
+    }
+    
+    connection.query(SQL, SQLDATA, function(err, dat){
+        if(err) callback(err);
+        else callback(null, dat[0].total);
+    })
+}
+
+function postCommentByUsername(pid, parent, uname, comment, callback = ()=>{}){
+    let SQL = 'INSERT INTO `comment`(`pid`, `parent`, `uid`, `username`, `comment`) \
+    VALUES (?, ?, ?, ?, ?)';
+    if(comment.length <= 2){
+        callback("评论长度有误");
+        return;
+    }
+    getUserId(uname, function(err,dat){
+        if(err) {
+            callback(err);
+            return ;
+        }
+        let SQLDATA = [pid, parent, dat, uname, comment];
+        connection.query(SQL, SQLDATA, function(err, dat){
+            if(err) callback(err);
+            else callback(null, "success");
+        })
+    })
+}
+
 module.exports = {
-    login,
-    register,
-    modifyExp,
-    querySubmission,
-    addSubmission,
-    sessionStore,
-    queryTypeContent,
-    getUsername,
-    post,
-    getUserId,
-    getUserInfo,
-    queryUserContent,
-    getPost,
-    updatePost,
-    deletePost,
-    getUserLevelById,
-    getUserLevelByUsername,
-    getUserExperienceById,
-    getUserExperienceByUsername,
-    addUserExperienceById,
-    addUserExperienceByUsername
+    login, register, modifyExp, querySubmission, addSubmission, sessionStore, 
+    queryTypeContent, getUsername, post, getUserId, getUserInfo, 
+    queryUserContent, getPost, getSourcePost, updatePost, deletePost, getUserLevelById, 
+    getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername, addUserExperienceById, addUserExperienceByUsername, 
+    getComment, postCommentByUsername, getCommentAmount
 }

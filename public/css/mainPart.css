@@ -108,3 +108,11 @@ article .post-info-content object{
   cursor: pointer;
   user-select: none;
 }
+.post-toolbar{
+  margin-top: 5px;
+  display: flex
+}
+.post-toolbar .post-comment-num a:hover{
+  text-decoration: none;
+  color: pink;
+}

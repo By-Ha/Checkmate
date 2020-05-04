@@ -9,13 +9,13 @@ setTimeout(() => {
         success: function (res) {
             if (res.status == "success") {
                 template = res.msg;
-                getPost();
+                getSourcePost();
             } else {
                 toast('error', '模板获取失败', res.msg);
             }
         }
     });
-    function getPost() {
+    function getSourcePost() {
         $.ajax({
             type: "post",
             url: "/api/user/post",
@@ -41,7 +41,7 @@ setTimeout(() => {
     }
     $("#getMore").click(() => {
         if ($("#getMore").attr('disable')) return;
-        getPost();
+        getSourcePost();
     })
 }, 10);
 

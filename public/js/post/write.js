@@ -12,7 +12,7 @@ $(function () {
         content = content.replace(/<br>/g,'\n');
         $.ajax({
             type: "post",
-            url: "/post",
+            url: "/api/post",
             data: {content: content, type: 0},
             dataType: "json",
             success: function (res) {

@@ -1,0 +1,22 @@
+<link rel="stylesheet" href="/css/comment.css">
+<script src="/js/post/comment.js"></script>
+
+<div class="kana-item comment-container" pid="<%= dat.id %>">
+    <div class="send-comment">
+        <div class="write-comment">
+            <textarea class="comment-textarea" id="write-comment" name="comment" rows="8" cols="45" aria-required="true"
+                placeholder="想说些什么?"></textarea>
+            <button class="comment-button" type="submit" name="submit">发表评论</button>
+        </div>
+    </div>
+    <br />
+    <div class="comment kana-item">
+    </div>
+    <div class="page-navi kana-item">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#write-comment">Previous</a></li>
+            <li class="page-item active"><a class="page-link" href="#write-comment">1</a></li>
+            <li class="page-item"><a class="page-link" href="#write-comment">Next</a></li>
+        </ul>
+    </div>
+</div>
