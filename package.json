@@ -20,6 +20,7 @@
     "multer": "^1.4.2",
     "mysql": "^2.18.1",
     "socket.io": "^2.3.0",
-    "webp-converter": "^2.2.3"
+    "webp-converter": "^2.2.3",
+    "xss": "^1.0.6"
   }
 }

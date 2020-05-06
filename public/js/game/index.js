@@ -112,7 +112,6 @@ function reloadSymbol(i, j, clear=false) {
     }
 }
 function showSymbol(onlyLast = false) {
-    console.log(onlyLast);
     if(!onlyLast) // 10%
         $("#m td").css('background-image', "");
     for (var i = (onlyLast ? Math.max(movement.length - 1,0) : 0); i < movement.length; ++i) {

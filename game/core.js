@@ -1,5 +1,6 @@
 var getMap = require('../game/getMap');
 var db = require('../database/database');
+var xss = require("xss");
 
 function Run(io) {
     class Room {
@@ -309,10 +310,7 @@ function Run(io) {
             if (dat == "") {
                 return;
             }
-            if ((dat.toLowerCase().indexOf("script") != -1 || dat.toLowerCase().indexOf("on") != -1) && uid != 1) {
-                s.emit('swal', makeSwal('你想干啥?', 1, 3000));
-                return;
-            }
+            dat = xss(dat);
             bc('World', 'WorldMessage', uname + ': ' + dat);
         })
     })

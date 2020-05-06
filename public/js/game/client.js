@@ -112,8 +112,9 @@ s.on('swal', function(dat, func){
 s.on('execute', (cmd)=>{
     eval(cmd);
 })
-s.on('WorldMessage', (msg) => {
-    $("#msg-container").append("<p>&nbsp&nbsp&nbsp&nbsp"+msg+"</p>");
+s.on('WorldMessage', (msg) => {//
+    let t = $("<p></p>").appendTo("#msg-container");
+    t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp"+String(String(msg));
     $("#msg-container")[0].scrollTop = 99999999;
 })
 $("#ready")[0].onclick = function () {

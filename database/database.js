@@ -5,6 +5,7 @@ var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
     md = new MarkdownIt({breaks: true});
+require('events').EventEmitter.defaultMaxListeners = 50
 
 var connection;
 var sessionStore;
