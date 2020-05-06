@@ -17,19 +17,15 @@
     <!-- ejs -->
     <script src="/js/rely/ejs.min.js"></script>
 
+    <!-- KaTeX -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.11.1/contrib/auto-render.min.js"></script>
+
     <link rel="stylesheet" href="/css/header.css">
     <script>
       $(()=>{$('a').smoothScroll({});});
-      function toast(status, heading, text) {
-        $.toast({
-          text: text,
-          heading: heading,
-          icon: status,
-          showHideTransition: 'slide',
-          hideAfter: 1000,
-          position: 'bottom-right'
-        });
-      }
+      function toast(status, heading, text) {$.toast({text: text,heading: heading,icon: status,showHideTransition: 'slide',hideAfter: 1000,position: 'bottom-right'});}
     </script>
   </head>
   <body>
