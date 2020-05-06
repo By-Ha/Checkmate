@@ -41,7 +41,7 @@ function hasFile(key){
         Region: Region,    /* 必须 */
         Key: key,               /* 必须 */
     }, function(err, data) {
-        console.log(err || data);
+        // console.log(err || data);
     });
 }
 
@@ -52,7 +52,7 @@ function downloadFile(key, outputPath){
         Key: key,
         Output: fs.createWriteStream(outputPath + '/' + key),
     }, function(err, data) {
-        console.log(err || data);
+        // console.log(err || data);
     });
 }
 
@@ -62,7 +62,7 @@ function deleteFile(key){
         Region: Region,    /* 必须 */
         Key: key
     }, function(err, data) {
-        console.log(err || data);
+        // console.log(err || data);
     });
 }
 

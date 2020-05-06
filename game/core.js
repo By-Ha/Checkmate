@@ -25,7 +25,7 @@ function Run(io) {
     }
 
     function ue(id, name, dat = null) {
-        if (connectedUsers[id].socket != undefined) {
+        if (connectedUsers[id] != undefined && connectedUsers[id].socket != undefined) {
             if (io.sockets.connected[connectedUsers[id].socket]) {
                 io.sockets.connected[connectedUsers[id].socket].emit(name, dat);
             }
@@ -269,7 +269,6 @@ function Run(io) {
 
         // 投票开始/结束
         s.on('VoteStart', function (dat) {
-            console.log(1);
             try{
                 if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]] == undefined) return;
                 if (Rooms[playerRoom[uid]].start) return;

@@ -9,7 +9,6 @@ router.get('/:pid', function (req, res) {
             res.send('404');
             return;
         }
-        console.log(dat);
         res.render('post', { title: dat.user_name + '的说说', username: req.session.username, uid: req.session.uid, dat: dat });
     })
 })

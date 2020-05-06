@@ -43,7 +43,6 @@ function addMovement(x, y) {
     if (!halfTag)
         movement.push([0, selectNode[0], selectNode[1], t1, t2, 0]);
     else movement.push([0, selectNode[0], selectNode[1], t1, t2, 1]);
-    // console.log(movement[0]);
     clearSelect();
     makeSelect(t1, t2);
 }
