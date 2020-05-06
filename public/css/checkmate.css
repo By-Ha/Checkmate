@@ -109,8 +109,8 @@ button.btnv2:hover {
   color: white;
   text-align: center;
   z-index: 20;
-  animation: backgroundmove 10s linear infinite;
-  -webkit-animation: backgroundmove 10s linear infinite;
+  /* animation: backgroundmove 10s linear infinite;
+  -webkit-animation: backgroundmove 10s linear infinite; */
 }
 @keyframes backgroundmove {
   0% {

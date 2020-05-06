@@ -83,6 +83,7 @@ function Run(io) {
     function updateMap(room) {
         let player = Rooms[room].player;
         let gm = Rooms[room].game.gm;
+        let size = Rooms[room].game.size;
         var needDeleteMovement = []; // players that finish movement below
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].gaming) { // maybe disconnected
@@ -91,6 +92,11 @@ function Run(io) {
             var mv = player[k].movement;
             if (mv == 0 || mv == undefined) continue; // the movement is empty
             needDeleteMovement.push(k);
+            if (mv[0]>size || mv[1]>size || mv[2]>size || mv[3]>size
+                || mv[0]<1 || mv[1]<1 || mv[2]<1 || mv[3]<1){
+                player[k].movement = [];
+                continue;
+            }
             var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
             cnt -= 1; // cannot move all

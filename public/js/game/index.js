@@ -66,7 +66,6 @@ function makeBoard() {
             $("#td-" + String((i - 1) * size + j))[0].onclick = function () {
                 var id = Number(this.id.substr(3));
                 var ln = Math.floor((id - 1) / size) + 1, col = Number((((id % size) == 0) ? size : (id % size)));
-                // console.log(id, ln, col);
                 if (gm[ln][col].color == myColor) {
                     makeSelect(ln, col);
                 }
@@ -113,9 +112,10 @@ function reloadSymbol(i, j, clear=false) {
     }
 }
 function showSymbol(onlyLast = false) {
-    if(!onlyLast)
+    console.log(onlyLast);
+    if(!onlyLast) // 10%
         $("#m td").css('background-image', "");
-    for (var i = (onlyLast ? movement.length - 1 : 0); i < movement.length; ++i) {
+    for (var i = (onlyLast ? Math.max(movement.length - 1,0) : 0); i < movement.length; ++i) {
         var t = movement[i]; id = "#td-" + String((t[1] - 1) * size + t[2]);
         var c = $(id).css('background-image');
         if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
@@ -134,53 +134,61 @@ function showSymbol(onlyLast = false) {
             $(id).css('background-image', c + "url('/img/arrow-left.png')");
         }
     }
-    for (var i = 1; i <= size; ++i) {
-        if (gm[i] == undefined) continue;
-        for (var j = 1; j <= size; ++j) {
-            reloadSymbol(i, j);
+    if(!onlyLast){
+        for (var i = 1; i <= size; ++i) {
+            if (gm[i] == undefined) continue;
+            for (var j = 1; j <= size; ++j) {
+                reloadSymbol(i, j);
+            }
         }
     }
 }
 function illu() {
-    playerInfo = [];
-    for (var i = 1; i <= size; ++i) {
-        for (var j = 1; j <= size; ++j) {
-            var d = $("#td-" + String((i - 1) * size + j));
-            d[0].innerHTML = "";
-            if (gm == 0) continue;
-            if (gm[i][j].color != 0) {
-                if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
-                playerInfo[gm[i][j].color][0] += 1;
-                playerInfo[gm[i][j].color][1] += gm[i][j].amount;
-                playerInfo[gm[i][j].color][2] = gm[i][j].color;
-            }
-            if (gm[i][j].color == myColor) d.addClass("own");
-            else d.removeClass("own");
-            if (!start || judgeShown(i, j)) {
-                d[0].innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
-                d.removeClass("unshown");
-                d.addClass("shown");
-                d.removeClass("blue red orange green grey pink purple chocolate maroon");
-                d.addClass(color[gm[i][j].color]);
-            } else {
-                d.removeClass("shown");
-                d.addClass("unshown");
-                d.removeClass("blue red orange green grey pink purple chocolate maroon");
-            }
+    playerInfo = [];// 12%
+    let doc = document;
+    for (let t1 = 1; t1 <= size; ++t1) {
+        for (let t2 = 1; t2 <= size; ++t2) {
+            setTimeout(()=>{
+                let i = t1,j = t2;
+                if (gm == 0) return ;
+                if (gm[i][j].color != 0) {
+                    if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
+                    playerInfo[gm[i][j].color][0] += 1;
+                    playerInfo[gm[i][j].color][1] += gm[i][j].amount;
+                    playerInfo[gm[i][j].color][2] = gm[i][j].color;
+                }
+                let d = doc.getElementById("td-" + String((i - 1) * size + j));
+                d.innerHTML = "";
+                if(d.classList.contains("selected")){
+                    d.classList = "selected";
+                } else {
+                    d.classList = "";
+                }
+                if (gm[i][j].color == myColor) d.classList.add("own");
+                if (!start || judgeShown(i, j)) {
+                    d.innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
+                    d.classList.add("shown");
+                    d.classList.add(color[gm[i][j].color]);
+                } else {
+                    d.classList.add("unshown");
+                }
+            }, 0);
         }
     }
-    showSymbol(false);
-    $("#info-content")[0].innerHTML = "";
-    playerInfo.sort(function (a, b) {
-        if (a == undefined) return (b == undefined) ? 0 : -1;
-        if (b == undefined) return 1;
-        if (a[1] == b[1]) return b[0] - a[0];
-        return b[1] - a[1];
-    })
-    for (var i = 0; i < playerInfo.length; ++i) {
-        if (playerInfo[i] == undefined) break;
-        $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
-    }
+    setTimeout(()=>{showSymbol(false);},0);
+    setTimeout(()=>{
+        $("#info-content")[0].innerHTML = "";
+        playerInfo.sort(function (a, b) {
+            if (a == undefined) return (b == undefined) ? 0 : -1;
+            if (b == undefined) return 1;
+            if (a[1] == b[1]) return b[0] - a[0];
+            return b[1] - a[1];
+        })
+        for (var i = 0; i < playerInfo.length; ++i) {
+            if (playerInfo[i] == undefined) break;
+            $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
+        }
+    }, 50)
 }
 document.onkeydown = function (event) {
     var e = event || window.event || arguments.callee.caller.arguments[0];
