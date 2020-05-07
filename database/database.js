@@ -316,7 +316,7 @@ function addUserExperienceByUsername(username, exp, callback = ()=>{}){
     });
 }
 
-function post(username, type, content, callback){
+function post(username, type, content, callback = ()=>{}){
     if(username == undefined || username.length <= 2) return;
     var SQL = `INSERT INTO content(type, user_id, user_name, content, hidden)
     VALUES (?, ?, ?, ?, 0)`;
@@ -341,6 +341,15 @@ function getComment(pid, parent, page, callback = ()=>{}){
     })
 }
 
+function getUserPostAmount(uid, callback){
+    let SQL = 'SELECT COUNT(*) as total FROM `content` WHERE user_id=? AND hidden=0';
+    let SQLDATA = [uid];
+    connection.query(SQL, SQLDATA, function(err, dat){
+        if(err) callback(err);
+        else callback(null, dat[0].total);
+    })
+}
+
 function getCommentAmount(pid, parent, callback = () => {}){
     let SQL = '';
     let SQLDATA = '';
@@ -351,6 +360,16 @@ function getCommentAmount(pid, parent, callback = () => {}){
         SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE pid=?;';
         SQLDATA = [pid];
     }
+    
+    connection.query(SQL, SQLDATA, function(err, dat){
+        if(err) callback(err);
+        else callback(null, dat[0].total);
+    })
+}
+
+function getUserCommentAmount(uid, callback = ()=>{}){
+    let SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE uid=?;';
+    let SQLDATA = [uid];
     
     connection.query(SQL, SQLDATA, function(err, dat){
         if(err) callback(err);
@@ -379,9 +398,13 @@ function postCommentByUsername(pid, parent, uname, comment, callback = ()=>{}){
 }
 
 module.exports = {
-    login, register, modifyExp, querySubmission, addSubmission, sessionStore, 
-    queryTypeContent, getUsername, post, getUserId, getUserInfo, 
-    queryUserContent, getPost, getSourcePost, updatePost, deletePost, getUserLevelById, 
-    getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername, addUserExperienceById, addUserExperienceByUsername, 
-    getComment, postCommentByUsername, getCommentAmount
+    sessionStore,
+    login, register,
+    getUsername, getUserId, getUserInfo, getUserLevelById,
+    getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername, 
+    modifyExp, addUserExperienceById, addUserExperienceByUsername, 
+    post, getPost, getSourcePost, queryTypeContent, queryUserContent, updatePost, deletePost,
+    querySubmission, addSubmission,  
+    getComment, postCommentByUsername, getCommentAmount, 
+    getUserPostAmount, getUserCommentAmount
 }

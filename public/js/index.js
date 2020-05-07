@@ -86,6 +86,36 @@ $(() => {
         });
     }
 
+    function getMyCommentAmount(){
+        $.ajax({
+            type: "get",
+            url: "/api/user/commentAmount",
+            data: {},
+            dataType: "json",
+            success: function (res) {
+                if(res.status = 'success')
+                    $("#usercard-info-comment .num")[0].innerHTML = res.msg;
+                else $("#usercard-info-comment .num")[0].innerHTML = 'ERR';
+            }
+        });
+    }
+    getMyCommentAmount();
+
+    function getMyPostAmount(){
+        $.ajax({
+            type: "get",
+            url: "/api/user/postAmount",
+            data: {},
+            dataType: "json",
+            success: function (res) {
+                if(res.status = 'success')
+                    $("#usercard-info-shuoshuo .num")[0].innerHTML = res.msg;
+                else $("#usercard-info-shuoshuo .num")[0].innerHTML = 'ERR';
+            }
+        });
+    }
+    getMyPostAmount();
+
     function rebuild() {
         var t = $(".post-info-author-username i");
         userlevellist = new Map();

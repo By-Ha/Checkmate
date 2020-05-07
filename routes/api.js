@@ -51,6 +51,26 @@ router.post('/user/exp', function (req, res) {
     })
 })
 
+router.get('/user/commentAmount', function(req,res){
+    let uid = 0;
+    if(req.query.uid == undefined) uid = req.session.uid;
+    else uid = req.query.uid;
+    db.getUserCommentAmount(uid, (err,dat)=>{
+        if(err) res.json({status: error, msg: '数据库错误'});
+        else res.json({status: 'success', msg: dat});
+    })
+})
+
+router.get('/user/postAmount', function(req,res){
+    let uid = 0;
+    if(req.query.uid == undefined) uid = req.session.uid;
+    else uid = req.query.uid;
+    db.getUserPostAmount(uid, (err,dat)=>{
+        if(err) res.json({status: error, msg: '数据库错误'});
+        else res.json({status: 'success', msg: dat});
+    })
+})
+
 router.post('/page', function (req, res) {
     db.queryTypeContent(0, req.body.page, 10, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
