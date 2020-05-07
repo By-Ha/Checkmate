@@ -16,6 +16,7 @@ router.post('/', function (req, res) {
       req.session.username = req.body.username;
       req.session.uid = dat[2];
       cos.uploadFile('./public/img/', 'akari.jpg', '/img/user/avatar/', dat[2] + '.webp');
+      cos.uploadFile('./public/img/', 'banner.jpg', '/img/user/banner/', dat[2] + '.webp');
     }
     res.json({ status: (dat[0] == 0 ? 'success' : 'error'), msg: dat[1] });
   })

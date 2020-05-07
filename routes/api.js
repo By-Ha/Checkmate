@@ -5,14 +5,15 @@ var multer = require('multer')
 var webp = require('webp-converter');
 var fs = require('fs');
 var cos = require('../cos/cos');
+var sharp = require('sharp');
 
 var upload = multer({
-        dest: '/tmp/Kana/upload' ,
-        limits: {
-            files: 1,
-            fileSize: 5*1000*1024
-        }
-    });
+    dest: '/tmp/Kana/upload',
+    limits: {
+        files: 1,
+        fileSize: 5 * 1000 * 1024
+    }
+});
 
 router.post('/', function (req, res) {
     res.json({ 'status': 'success' });
@@ -51,23 +52,23 @@ router.post('/user/exp', function (req, res) {
     })
 })
 
-router.get('/user/commentAmount', function(req,res){
+router.get('/user/commentAmount', function (req, res) {
     let uid = 0;
-    if(req.query.uid == undefined) uid = req.session.uid;
+    if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
-    db.getUserCommentAmount(uid, (err,dat)=>{
-        if(err) res.json({status: error, msg: '数据库错误'});
-        else res.json({status: 'success', msg: dat});
+    db.getUserCommentAmount(uid, (err, dat) => {
+        if (err) res.json({ status: error, msg: '数据库错误' });
+        else res.json({ status: 'success', msg: dat });
     })
 })
 
-router.get('/user/postAmount', function(req,res){
+router.get('/user/postAmount', function (req, res) {
     let uid = 0;
-    if(req.query.uid == undefined) uid = req.session.uid;
+    if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
-    db.getUserPostAmount(uid, (err,dat)=>{
-        if(err) res.json({status: error, msg: '数据库错误'});
-        else res.json({status: 'success', msg: dat});
+    db.getUserPostAmount(uid, (err, dat) => {
+        if (err) res.json({ status: error, msg: '数据库错误' });
+        else res.json({ status: 'success', msg: dat });
     })
 })
 
@@ -87,18 +88,18 @@ router.post('/post', function (req, res) {
         res.json({ status: ('error'), msg: '内容长度不符合规范' });
         return;
     }
-    if(req.body.type != 0){
+    if (req.body.type != 0) {
         res.json({ status: ('error'), msg: '类型错误' });
         return;
     }
-    db.post(req.session.username, req.body.type, req.body.content, function(err, dat){
-        if(err) res.json({ status: ('error'), msg: '数据库错误' });
+    db.post(req.session.username, req.body.type, req.body.content, function (err, dat) {
+        if (err) res.json({ status: ('error'), msg: '数据库错误' });
         else res.json({ status: ('success'), msg: '发送成功' });
     })
 });
 
-router.get('/comment', function (req, res){
-    if(req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) {
+router.get('/comment', function (req, res) {
+    if (req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) {
         res.json({ status: 'error', msg: '非法请求' });
         return;
     }
@@ -111,7 +112,7 @@ router.get('/comment', function (req, res){
     })
 })
 
-router.post('/comment', function (req, res){
+router.post('/comment', function (req, res) {
     if (req.session.username == undefined) {
         res.json({ status: ('error'), msg: '请先登录' });
         return;
@@ -120,18 +121,18 @@ router.post('/comment', function (req, res){
         res.json({ status: ('error'), msg: '内容长度不符合规范' });
         return;
     }
-    if (req.body.pid == undefined || req.body.parent == undefined){
+    if (req.body.pid == undefined || req.body.parent == undefined) {
         res.json({ status: ('error'), msg: '请求非法' });
         return;
     }
-    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment, function(err, dat){
-        if(err) res.json({ status: ('error'), msg: '数据库错误' });
+    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment, function (err, dat) {
+        if (err) res.json({ status: ('error'), msg: '数据库错误' });
         else res.json({ status: ('success'), msg: '发送成功' });
     })
 })
 
-router.get('/commentAmount', function (req, res){
-    if(req.query.pid == undefined || req.query.parent == undefined) {
+router.get('/commentAmount', function (req, res) {
+    if (req.query.pid == undefined || req.query.parent == undefined) {
         res.json({ status: 'error', msg: '非法请求' });
         return;
     }
@@ -178,20 +179,47 @@ router.post('/deletepost', function (req, res) {
 })
 
 router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
-    if(typeof(req.session.uid) != "number") return ;
+    if (typeof (req.session.uid) != "number") return;
     var imgType = req.file.mimetype; // 图片类型
     var url = "/tmp/Kana/upload/" + req.file.filename;
     if (imgType == "image/png" || imgType == "image/jpeg") {
         webp.cwebp(url, "/tmp/Kana/upload/" + req.file.filename.split(".")[0] + ".webp", "-q 80", function (status, error) {
-            if(error) return false;
-            img = req.file.filename.split(".")[0] + ".webp"; 
+            if (error) return false;
+            img = req.file.filename.split(".")[0] + ".webp";
             var oldUrl = "/tmp/Kana/upload/" + req.file.filename; // 原文件地址
             fs.unlink(oldUrl, function (error) {
                 if (error) {
                     return false;
                 }
                 cos.uploadFile('/tmp/Kana/upload/', img, '/img/user/avatar/', req.session.uid + '.webp');
-                fs.unlink("/tmp/Kana/upload/" + img, ()=>{});
+                fs.unlink("/tmp/Kana/upload/" + img, () => { });
+            })
+        })
+    }
+    res.send({ ret_code: '0' });
+})
+
+router.post('/upload/banner', upload.single('banner'), function (req, res) {
+    if (typeof (req.session.uid) != "number") return;
+    var imgType = req.file.mimetype; // 图片类型
+    var url = "/tmp/Kana/upload/" + req.file.filename;
+    if (imgType == "image/png" || imgType == "image/jpeg") {
+        webp.cwebp(url, "/tmp/Kana/upload/" + req.file.filename.split(".")[0] + ".webp", "-q 80", function (status, error) {
+            if (error) return false;
+            img = req.file.filename.split(".")[0] + ".webp";
+            var oldUrl = "/tmp/Kana/upload/" + req.file.filename; // 原文件地址
+            fs.unlink(oldUrl, function (error) {
+                if (error) {
+                    return false;
+                }
+                sharp('/tmp/Kana/upload/' + img)
+                    .resize(1504, 376) //缩放
+                    .toFile('/tmp/Kana/upload/' + img + '.webp')
+                    .then(()=>{
+                        cos.uploadFile('/tmp/Kana/upload/', img + '.webp', '/img/user/banner/', req.session.uid + '.webp');
+                        fs.unlink("/tmp/Kana/upload/" + img, () => { });
+                        fs.unlink("/tmp/Kana/upload/" + img + '.webp', () => { });
+                    })
             })
         })
     }

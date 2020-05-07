@@ -46,11 +46,10 @@ setTimeout(() => {
 }, 10);
 
 $(() => {
-    initFileInput();
     function initFileInput() {
         $("#avatar").fileinput({
             language: 'zh',
-            dropZoneTitle: '上传头像,可以将图片拖放到这里,最大5Mb',
+            dropZoneTitle: '上传头像,可以将图片拖放到这里,最大5Mb,最小尺寸50*50',
             uploadUrl: "/api/upload/avatar",
             autoOrientImage: false,
             allowedFileExtensions: ['jpg', 'png'],
@@ -64,8 +63,32 @@ $(() => {
             dropZoneEnabled: true,
             minImageWidth: 50,
             minImageHeight: 50,
-            maxImageWidth: 1000,
-            maxImageHeight: 1000,
+            maxImageWidth: 5000,
+            maxImageHeight: 5000,
+            maxFileSize: 5120,
+            minFileCount: 1,
+            maxFileCount: 1, 
+            previewFileIcon: "<i class='fa fa-file'></i>",
+            theme: 'fa',
+        })
+        $("#banner").fileinput({
+            language: 'zh',
+            dropZoneTitle: '上传横幅,可以将图片拖放到这里,最大5Mb,最小尺寸700*120',
+            uploadUrl: "/api/upload/banner",
+            autoOrientImage: false,
+            allowedFileExtensions: ['jpg', 'png'],
+            uploadAsync: true,
+            showUpload: true,
+            showRemove: true,
+            showPreview: true,
+            showCancel: true,
+            showCaption: true,
+            browseClass: "btn btn-primary",
+            dropZoneEnabled: true,
+            minImageWidth: 752,
+            minImageHeight: 188,
+            // maxImageWidth: 1000,
+            // maxImageHeight: 1000,
             maxFileSize: 5120,
             minFileCount: 1,
             maxFileCount: 1, 
@@ -73,17 +96,18 @@ $(() => {
             theme: 'fa',
         })
     }
+    initFileInput();
     $('.userinfo-edit').click(function(){
         if($(this).attr('edit') == "true"){
             $(this).attr('edit', false);
             $('.userpost-container').removeClass('kana-hidden');
             $('.useredit').addClass('kana-hidden');
-            $(this).innerHTML = "编辑";
+            $(this)[0].innerHTML = "编辑";
         } else{
             $(this).attr('edit', true);
             $('.userpost-container').addClass('kana-hidden');
             $('.useredit').removeClass('kana-hidden');
-            $(this).innerHTML = "取消";
+            $(this)[0].innerHTML = "取消";
         }
     })
 })

@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="/css/user.css">
     <div id="container">
         <div class="kana-item userinfo" uid="<%= dat.id %>">
-            <div class="userinfo-bg" style="background: url('/img/banner.jpg');"></div>
+            <div class="userinfo-bg" style="background: url('https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/banner/<%= dat.id %>.webp!752x180');"></div>
             <img class="userinfo-avatar" src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= dat.id %>.webp!100x100">
             <span class="userinfo-complex">
                 <a class="userinfo-name">@<%= dat.username %></a>
@@ -25,6 +25,8 @@
             <form>
                 <div class="custom-file">
                     <input type="file" id="avatar" name="avatar">
+                    <br/>
+                    <input type="file" id="banner" name="banner">
                 </div>
             </form>
         </div>
