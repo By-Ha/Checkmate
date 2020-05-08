@@ -67,7 +67,6 @@ app.use('/checkmate', checkmateRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  console.log(req.ip);
   next(createError(404));
 });
 

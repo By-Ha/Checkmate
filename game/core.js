@@ -1,6 +1,7 @@
 var getMap = require('../game/getMap');
 var db = require('../database/database');
 var xss = require("xss");
+var Rooms = new Map();
 
 function Run(io) {
     class Room {
@@ -13,15 +14,12 @@ function Run(io) {
             this.size;
         }
     }
-
-    var Rooms = new Map();
+    
     var connectedUsers = new Map();
     var playerRoom = {};
 
     function bc(room, name, dat = null) {
-        // console.log(room, name, dat==null);
         io.sockets.in(room).emit(name, dat);
-        // io.sockets.in("TEST").emit(1, [2]);
     }
 
     function ue(id, name, dat = null) {
@@ -317,5 +315,6 @@ function Run(io) {
 }
 
 module.exports = {
-    Run
+    Run,
+    Rooms
 }
