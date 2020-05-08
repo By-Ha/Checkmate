@@ -58,7 +58,8 @@ function Run(io) {
             if (t.amount < 0) { // t was cleared
                 if (t.type == 1) { // t was player's crown and the player was killed
                     ue(color2Id[t.color], 'die');
-                    User[color2Id[t.color]].gaming = false;
+                    if(color2Id[t.color] && User[color2Id[t.color]])
+                        User[color2Id[t.color]].gaming = false;
                     var tcolor = t.color;
                     for (var i = 1; i <= size; ++i) {
                         for (var j = 1; j <= size; ++j) {

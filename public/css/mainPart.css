@@ -103,10 +103,28 @@ article .post-info-content object{
   border-radius: 4px;
   cursor: pointer;
 }
-#getMore{
+#getMore {
+  position: relative;
   text-align: center;
+  padding: 0;
   cursor: pointer;
+  min-height: 60px;
+  text-align: center;
   user-select: none;
+}
+#getMore a{
+  outline: 0;
+  display: block;
+  padding: 20px 0;
+  color: black;
+}
+#getMore a:hover{
+  text-decoration: none;
+}
+#getMore p {
+  display: block;
+  padding: 20px 0;
+  margin-bottom: 0;
 }
 .post-toolbar{
   margin-top: 5px;

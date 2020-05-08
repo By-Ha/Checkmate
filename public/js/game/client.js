@@ -47,6 +47,7 @@ s.on('GameStart', function () {
     round = 0; movement = [];
     start = true;
     movementUploader = setInterval(() => {
+        if(start == false) clearInterval(movementUploader);
         if(movement != undefined && movement != 0){
             if(movement[0][0] <= 2)
                 s.emit('UploadMovement', movement[0].slice(1)),movement[0][0]++;

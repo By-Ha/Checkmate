@@ -209,10 +209,8 @@ router.post('/upload/banner', upload.single('banner'), function (req, res) {
             img = req.file.filename.split(".")[0] + ".webp";
             var oldUrl = "/tmp/Kana/upload/" + req.file.filename; // 原文件地址
             fs.unlink(oldUrl, function (error) {
-                if (error) {
-                    return false;
-                }
-                sharp('/tmp/Kana/upload/' + img)
+                if (error) return false;
+                sharp( '/tmp/Kana/upload/' + img )
                     .resize(1504, 376) //缩放
                     .toFile('/tmp/Kana/upload/' + img + '.webp')
                     .then(()=>{

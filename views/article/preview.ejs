@@ -9,7 +9,7 @@
                 <a rel="author" href="/user/<%= art.user_id %>"><%= art.user_name %></a>
                 <i class="iconfont"></i>
             </div>
-            <% if(username == art.user_name || username == "admin") {%>
+            <% if(false) {//if(username == art.user_name || username == "admin") {%>
                 <a class="delete" href="#" pid="<%= art.id %>" style="color: red;">删除</a>
                 <a class="edit" href="#write" pid="<%= art.id %>">编辑</a>
             <% } %>  
@@ -19,7 +19,7 @@
         </div>
         <div class="post-info-content"><a><object><%- art.content %></object></a></div>
         <div class="post-toolbar">
-            <span class="post-comment-num"><a href="/post/<%= art.id %>"><i class="iconfont icon-comment"></i>0</a></span>
+            <span class="post-comment-num"><a href="/post/<%= art.id %>"><i class="iconfont icon-comment"></i><%= art.comment %></a></span>
         </div>
     </div>
 </article>

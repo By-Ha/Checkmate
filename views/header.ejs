@@ -26,6 +26,7 @@
     <script>
       $(()=>{$('a').smoothScroll({});});
       function toast(status, heading, text) {$.toast({text: text,heading: heading,icon: status,showHideTransition: 'slide',hideAfter: 1000,position: 'bottom-right'});}
+      function KaTeXReRender() {renderMathInElement(document.body,{delimiters: [{left: "$$", right: "$$", display: true},{left: "$", right: "$", display: false}]});}
     </script>
   </head>
   <body>

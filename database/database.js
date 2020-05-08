@@ -142,10 +142,16 @@ function queryTypeContent(type, page, pagesize, callback){
     var SQLDATA = [type, (page-1)*pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) {callback(error);return;}
+        let finish = 0;
         results.forEach(e => {
             e.content = md.render(e.content);
+            getCommentAmount(e.id, -1, function(err, dat){
+                if(err) callback(err);
+                e.comment = dat;
+                finish++;
+                if(finish == results.length) callback(null, results);
+            });
         })
-        callback(null, results);
     });
 }
 

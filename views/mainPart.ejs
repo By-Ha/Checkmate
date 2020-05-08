@@ -6,5 +6,7 @@
         <%- include('article/preview', {art: element, username: username}); %> 
         <% }); %> 
     </div>
-    <div class="kana-item" id="getMore" page="1">戳我获取更多</div>
+    <div class="kana-item" id="getMore">
+        <a href="<%= (page!=-1)?"/page/"+String(Number(page)+1):"" %>">(｡・`ω´･)点我查看更多！</a>
+    </div>
 </div>
