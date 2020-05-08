@@ -7,7 +7,7 @@
             <img class="avatar" src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= art.user_id %>.webp!50x50" height="48px" width="48px">
             <div class="post-info-author-username">
                 <a rel="author" href="/user/<%= art.user_id %>"><%= art.user_name %></a>
-                <i class="iconfont"></i>
+                <i class="iconfont icon-level-<%= art.level %>"></i>
             </div>
             <% if(false) {//if(username == art.user_name || username == "admin") {%>
                 <a class="delete" href="#" pid="<%= art.id %>" style="color: red;">删除</a>

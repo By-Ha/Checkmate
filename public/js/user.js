@@ -1,50 +1,3 @@
-setTimeout(() => {
-    var template = ``;
-    var page = 0;
-    $.ajax({
-        type: "post",
-        url: "/api/template",
-        data: {},
-        dataType: "json",
-        success: function (res) {
-            if (res.status == "success") {
-                template = res.msg;
-                getSourcePost();
-            } else {
-                toast('error', '模板获取失败', res.msg);
-            }
-        }
-    });
-    function getSourcePost() {
-        $.ajax({
-            type: "post",
-            url: "/api/user/post",
-            data: { uid: $(".userinfo").attr('uid'), page: ++page },
-            dataType: "json",
-            success: function (res) {
-                if (res.status == "success") {
-                    toast('success', '获取成功', '渲染中');
-                    if (res.dat.length < 10) {
-                        $("#getMore")[0].innerHTML = "好像来到了世界的尽头";
-                        $("#getMore").attr('disable', true);
-                    }
-                    res.dat.forEach(art => {
-                        art.created = new Date(art.created);
-                        art.modified = new Date(art.modified);
-                        $("#userpost").append(ejs.render(template, { art: art }));
-                    });
-                } else {
-                    toast('error', '获取失败', res.msg);
-                }
-            }
-        });
-    }
-    $("#getMore").click(() => {
-        if ($("#getMore").attr('disable')) return;
-        getSourcePost();
-    })
-}, 10);
-
 $(() => {
     function initFileInput() {
         $("#avatar").fileinput({
@@ -109,5 +62,32 @@ $(() => {
             $('.useredit').removeClass('kana-hidden');
             $(this)[0].innerHTML = "取消";
         }
+    })
+})
+$(()=>{
+    KaTeXReRender();
+    $("#getMore a").click(function(e){
+        e.preventDefault();
+        $("#getMore a").hide();
+        $.ajax({ 
+            url: $(this).attr('href'),
+            type: "get",
+            error: function(request) {
+                alert('加载错误!请联系网站管理员！');
+            },
+            success: function(data) {
+                var $result = $(data).find("#container article");
+                $('#userpost').append($result.fadeIn(1000));
+                KaTeXReRender();
+                if($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != ""){
+                    $("#getMore a").show();
+                    $("#getMore a").text('(｡・`ω´･)点我查看更多！');
+                    $("#getMore a").attr('href', $(data).find("#getMore a").attr('href'));
+                } else {
+                    $("#getMore a").remove();
+                    $("#getMore").html('<p>你已到达了世界的尽头(｡・`ω´･)！</p>');
+                }
+            }
+        });
     })
 })

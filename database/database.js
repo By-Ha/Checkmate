@@ -149,8 +149,14 @@ function queryTypeContent(type, page, pagesize, callback){
                 if(err) callback(err);
                 e.comment = dat;
                 finish++;
-                if(finish == results.length) callback(null, results);
+                if(finish == results.length * 2) callback(null, results);
             });
+            getUserLevelById(e.user_id, function(err , dat){
+                if(err) callback(err);
+                e.level = dat;
+                finish++;
+                if(finish == results.length * 2) callback(null, results);
+            })
         })
     });
 }
@@ -224,14 +230,32 @@ function deletePost(pid, username, callback){
 }
 
 function queryUserContent(uid, page, pagesize, callback){
+    page = Number(page);
     var SQL = `select * from content where user_id=? AND hidden=0 order by id desc limit ?,?;`
     var SQLDATA = [uid, (page-1)*pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) {callback(error);return;}
+        let finish = 0;
+        if(results.length == 0) callback(null, results);
         results.forEach(e => {
             e.content = md.render(e.content);
+            getCommentAmount(e.id, -1, function(err, dat){
+                if(err) callback(err);
+                e.comment = dat;
+                finish++;
+                if(finish == (results.length * 2)) {
+                    callback(null, results);
+                }
+            });
+            getUserLevelById(e.user_id, function(err , dat){
+                if(err) callback(err);
+                e.level = dat;
+                finish++;
+                if(finish == (results.length * 2)) {
+                    callback(null, results);
+                }
+            })
         })
-        callback(null, results);
     });
 }
 
@@ -259,13 +283,25 @@ function getUsername(userid, callback){
 }
 
 function getUserInfo(userid, callback){
-    var SQL = `SELECT id,username, exp FROM user WHERE id=?`;
+    var SQL = `SELECT id, username, exp FROM user WHERE id=?`;
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) throw error;
-        if(results[0] != undefined)
-            callback(null, results[0]);
-        else callback("No Such User", null);
+        if (error) callback(error);
+        else {
+            if(results[0] == undefined) callback(null, results[0]);
+            else getUserCommentAmount(userid, (err, dat)=>{
+                if(err) callback(err);
+                else {
+                    results[0].comment = dat;
+                    getUserPostAmount(userid, (err, dat)=>{
+                        results[0].post = dat;
+                        callback(null, results[0]);
+                    })  
+                }
+                
+            })
+        }
+        
     });
 }
 
