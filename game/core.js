@@ -241,7 +241,7 @@ function Run(io) {
             if (Rooms[room] == undefined) {
                 Rooms[room] = {
                     game: undefined, start: false, player: {}, interval: undefined,
-                    settings: {speed: 2}
+                    settings: {speed: 4, private: false}
                 };
             }
             Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, color: 0, movement: [] };
@@ -287,6 +287,9 @@ function Run(io) {
                 if(speed == 1 || speed == 2 || speed == 3 || speed == 4) {
                     Rooms[playerRoom[uid]].settings.speed = dat.speed;
                 }
+            }
+            if(dat.private != undefined){
+                Rooms[playerRoom[uid]].settings.private = dat.private;
             }
             bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
         })

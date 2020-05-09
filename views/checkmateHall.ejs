@@ -16,6 +16,7 @@
           </tr>
         </thead>
         <% for(let k in r){ %>
+            <% if(r[k].settings.private == true) continue; %> 
             <% amount++; %> 
             <tbody>
                 <th><%= k %></th>
