@@ -31,11 +31,11 @@ s.on('UpdateGM', function (dat) {
 s.on('UpdateUser', function (dat) {
     User = dat;
     colorNick = [];
-    for(var k in User){
+    for (var k in User) {
         colorNick[User[k].color] = User[k].uname;
     }
 })
-s.on('UpdateColor', function (dat){
+s.on('UpdateColor', function (dat) {
     myColor = dat;
 })
 s.on('UpdateSize', function (dat) {
@@ -47,22 +47,22 @@ s.on('GameStart', function () {
     round = 0; movement = [];
     start = true;
     movementUploader = setInterval(() => {
-        if(start == false) clearInterval(movementUploader);
-        if(movement != undefined && movement != 0){
-            if(movement[0][0] <= 2)
-                s.emit('UploadMovement', movement[0].slice(1)),movement[0][0]++;
-            else movement[0][0]-=0.25;
-        } 
+        if (start == false) clearInterval(movementUploader);
+        if (movement != undefined && movement != 0) {
+            if (movement[0][0] <= 2)
+                s.emit('UploadMovement', movement[0].slice(1)), movement[0][0]++;
+            else movement[0][0] -= 0.25;
+        }
     }, 50);
 })
-s.on('ReceiveMovement', function(dat){
-    if(movement != undefined && movement != 0){
-        if(dat[0] == movement[1] && dat[1] == movement[2] && dat[2] == movement[3] && dat[3] == movement[4])
-            movement[0][0] ++;
+s.on('ReceiveMovement', function (dat) {
+    if (movement != undefined && movement != 0) {
+        if (dat[0] == movement[1] && dat[1] == movement[2] && dat[2] == movement[3] && dat[3] == movement[4])
+            movement[0][0]++;
     }
 })
 s.on('UpdateRound', function (dat) {
-    round = dat; 
+    round = dat;
 })
 s.on('ClearMovement', function () {
     while (movement.length) {
@@ -105,17 +105,17 @@ s.on('die', function () {
         location.reload();
     }, 500);
 });
-s.on('swal', function(dat, func){
+s.on('swal', function (dat, func) {
     Swal.fire(dat);
-    if(func != undefined)
+    if (func != undefined)
         eval(func);
 })
-s.on('execute', (cmd)=>{
+s.on('execute', (cmd) => {
     eval(cmd);
 })
 s.on('WorldMessage', (msg) => {//
     let t = $("<p></p>").appendTo("#msg-container");
-    t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp"+String(String(msg));
+    t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp" + String(String(msg));
     $("#msg-container")[0].scrollTop = 99999999;
 })
 $("#ready")[0].onclick = function () {

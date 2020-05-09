@@ -1,6 +1,6 @@
 <%- include('header', { title: '大厅' }); -%>
 <%- include('navi'); -%>
-<% function getInfo(t){let ret = '';for(let i in t){ret += t[i].uname + ';';}return ret;}let amount = 0;%> 
+<% function getInfo(t){let ret = '';for(let i in t){ret += t[i].uname + ';';}return ret;}let amount = 0;%>
 
 <div id="main">
     <link rel="stylesheet" href="/css/sidebar.css">
@@ -8,31 +8,31 @@
     <script src="/js/index.js"></script>
     <table class="table table-bordered">
         <thead>
-          <tr>
-            <th>房间号</th>
-            <th>人数</th>
-            <th>人员名单</th>
-            <th>加入</th>
-          </tr>
+            <tr>
+                <th>房间号</th>
+                <th>人数</th>
+                <th>人员名单</th>
+                <th>加入</th>
+            </tr>
         </thead>
         <% for(let k in r){ %>
-            <% if(r[k].settings.private == true) continue; %> 
-            <% amount++; %> 
-            <tbody>
-                <th><%= k %></th>
-                <th><%= Object.keys(r[k].player).length %> </th>
-                <th><%= getInfo(r[k].player) %></th>
-                <th><a href="/checkmate/room/<%= k %>">点击加入</a></th>
-            </tbody>
-        <% } %> 
+        <% if(r[k].settings.private == true) continue; %>
+        <% amount++; %>
+        <tbody>
+            <th><%= k %></th>
+            <th><%= Object.keys(r[k].player).length %> </th>
+            <th><%= getInfo(r[k].player) %></th>
+            <th><a href="/checkmate/room/<%= k %>">点击加入</a></th>
+        </tbody>
+        <% } %>
         <% if(amount == 0){ %>
-            <tbody>
-                <th>没</th>
-                <th>人</th>
-                <th>在</th>
-                <th>玩</th>
-            </tbody>
-        <% } %>  
+        <tbody>
+            <th>没</th>
+            <th>人</th>
+            <th>在</th>
+            <th>玩</th>
+        </tbody>
+        <% } %>
     </table>
 </div>
 

@@ -14,7 +14,7 @@ function Run(io) {
             this.size;
         }
     }
-    
+
     var connectedUsers = new Map();
     var playerRoom = {};
 
@@ -56,7 +56,7 @@ function Run(io) {
             if (t.amount < 0) { // t was cleared
                 if (t.type == 1) { // t was player's crown and the player was killed
                     ue(color2Id[t.color], 'die');
-                    if(color2Id[t.color] && User[color2Id[t.color]])
+                    if (color2Id[t.color] && User[color2Id[t.color]])
                         User[color2Id[t.color]].gaming = false;
                     var tcolor = t.color;
                     for (var i = 1; i <= size; ++i) {
@@ -92,8 +92,8 @@ function Run(io) {
             var mv = player[k].movement;
             if (mv == 0 || mv == undefined) continue; // the movement is empty
             needDeleteMovement.push(k);
-            if (mv[0]>size || mv[1]>size || mv[2]>size || mv[3]>size
-                || mv[0]<1 || mv[1]<1 || mv[2]<1 || mv[3]<1){
+            if (mv[0] > size || mv[1] > size || mv[2] > size || mv[3] > size
+                || mv[0] < 1 || mv[1] < 1 || mv[2] < 1 || mv[3] < 1) {
                 player[k].movement = [];
                 continue;
             }
@@ -210,7 +210,7 @@ function Run(io) {
         bc(room, 'GameStart');
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
-        }, 1000/Rooms[room].settings.speed);
+        }, 1000 / Rooms[room].settings.speed);
     }
 
     function preparedPlayerCount(room) {
@@ -241,7 +241,7 @@ function Run(io) {
             if (Rooms[room] == undefined) {
                 Rooms[room] = {
                     game: undefined, start: false, player: {}, interval: undefined,
-                    settings: {speed: 4, private: false}
+                    settings: { speed: 4, private: false }
                 };
             }
             Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, color: 0, movement: [] };
@@ -254,12 +254,12 @@ function Run(io) {
         // 退出
         s.on('disconnect', function () {
             delete connectedUsers[uid];
-            if(Rooms[playerRoom[uid]] == undefined) return ;
+            if (Rooms[playerRoom[uid]] == undefined) return;
             delete Rooms[playerRoom[uid]].player[uid];
-            if(Object.keys(Rooms[playerRoom[uid]].player).length == 0){
+            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0) {
                 delete Rooms[playerRoom[uid]];
             }
-            if(Rooms[playerRoom[uid]] != undefined){
+            if (Rooms[playerRoom[uid]] != undefined) {
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
             }
@@ -268,7 +268,7 @@ function Run(io) {
 
         // 投票开始/结束
         s.on('VoteStart', function (dat) {
-            try{
+            try {
                 if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]] == undefined) return;
                 if (Rooms[playerRoom[uid]].start) return;
                 Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
@@ -276,19 +276,19 @@ function Run(io) {
                 bc(playerRoom[uid], 'LoggedUserCount', t);
                 if (t[0] >= 2 && t[1] > (t[0] / 2))
                     startGame(playerRoom[uid]);
-            }catch(err){
+            } catch (err) {
                 console.log("CORE ERROR", "VOTESTART");
             }
         })
 
-        s.on('changeSettings', function(dat){
-            if(dat.speed){
+        s.on('changeSettings', function (dat) {
+            if (dat.speed) {
                 let speed = Number(dat.speed);
-                if(speed == 1 || speed == 2 || speed == 3 || speed == 4) {
+                if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
                     Rooms[playerRoom[uid]].settings.speed = dat.speed;
                 }
             }
-            if(dat.private != undefined){
+            if (dat.private != undefined) {
                 Rooms[playerRoom[uid]].settings.private = dat.private;
             }
             bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);

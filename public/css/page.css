@@ -1,8 +1,8 @@
-#main{
-    width: 1280px;
-    max-width: 100%;
-    margin: 16px auto 0;
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
+#main {
+  width: 1280px;
+  max-width: 100%;
+  margin: 16px auto 0;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
 }

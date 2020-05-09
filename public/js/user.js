@@ -20,7 +20,7 @@ $(() => {
             maxImageHeight: 5000,
             maxFileSize: 5120,
             minFileCount: 1,
-            maxFileCount: 1, 
+            maxFileCount: 1,
             previewFileIcon: "<i class='fa fa-file'></i>",
             theme: 'fa',
         })
@@ -44,19 +44,19 @@ $(() => {
             // maxImageHeight: 1000,
             maxFileSize: 5120,
             minFileCount: 1,
-            maxFileCount: 1, 
+            maxFileCount: 1,
             previewFileIcon: "<i class='fa fa-file'></i>",
             theme: 'fa',
         })
     }
     initFileInput();
-    $('.userinfo-edit').click(function(){
-        if($(this).attr('edit') == "true"){
+    $('.userinfo-edit').click(function () {
+        if ($(this).attr('edit') == "true") {
             $(this).attr('edit', false);
             $('.userpost-container').removeClass('kana-hidden');
             $('.useredit').addClass('kana-hidden');
             $(this)[0].innerHTML = "编辑";
-        } else{
+        } else {
             $(this).attr('edit', true);
             $('.userpost-container').addClass('kana-hidden');
             $('.useredit').removeClass('kana-hidden');
@@ -64,22 +64,22 @@ $(() => {
         }
     })
 })
-$(()=>{
+$(() => {
     KaTeXReRender();
-    $("#getMore a").click(function(e){
+    $("#getMore a").click(function (e) {
         e.preventDefault();
         $("#getMore a").hide();
-        $.ajax({ 
+        $.ajax({
             url: $(this).attr('href'),
             type: "get",
-            error: function(request) {
+            error: function (request) {
                 alert('加载错误!请联系网站管理员！');
             },
-            success: function(data) {
+            success: function (data) {
                 var $result = $(data).find("#container article");
                 $('#userpost').append($result.fadeIn(1000));
                 KaTeXReRender();
-                if($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != ""){
+                if ($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != "") {
                     $("#getMore a").show();
                     $("#getMore a").text('(｡・`ω´･)点我查看更多！');
                     $("#getMore a").attr('href', $(data).find("#getMore a").attr('href'));

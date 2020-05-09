@@ -19,35 +19,35 @@
   margin: 0 0 0 76px;
 }
 
-.post-info-author a{
+.post-info-author a {
   text-decoration: none;
 }
 
-.post-info-author .edit{
+.post-info-author .edit {
   float: right;
   position: relative;
   top: -21px;
 }
-.post-info-author .delete{
+.post-info-author .delete {
   float: right;
   position: relative;
   top: -21px;
   padding: 0px 5px;
 }
 
-.post-info-author-username{
+.post-info-author-username {
   height: 21px;
   display: flex;
 }
 
-.post-info-author-username i{
+.post-info-author-username i {
   font-size: 21px;
   position: relative;
   top: -3px;
   left: 5px;
 }
 
-article .post-info-content object{
+article .post-info-content object {
   word-break: break-word;
 }
 
@@ -60,7 +60,7 @@ article .post-info-content object{
   display: flex;
 }
 
-#container #writepost{
+#container #writepost {
   resize: none;
   outline: 0px;
   font-size: 16px;
@@ -83,15 +83,15 @@ article .post-info-content object{
   animation: turn 1s linear infinite;
 }
 
-#container #writepost:hover{
+#container #writepost:hover {
   background-color: #fff;
   border-color: #00b5e5;
 }
-#container #writepost:focus{
+#container #writepost:focus {
   background-color: #fff;
   border-color: #00b5e5;
 }
-#container #write button{
+#container #write button {
   float: right;
   width: 70px;
   height: 32px;
@@ -112,13 +112,13 @@ article .post-info-content object{
   text-align: center;
   user-select: none;
 }
-#getMore a{
+#getMore a {
   outline: 0;
   display: block;
   padding: 20px 0;
   color: black;
 }
-#getMore a:hover{
+#getMore a:hover {
   text-decoration: none;
 }
 #getMore p {
@@ -126,11 +126,11 @@ article .post-info-content object{
   padding: 20px 0;
   margin-bottom: 0;
 }
-.post-toolbar{
+.post-toolbar {
   margin-top: 5px;
-  display: flex
+  display: flex;
 }
-.post-toolbar .post-comment-num a:hover{
+.post-toolbar .post-comment-num a:hover {
   text-decoration: none;
   color: pink;
 }

@@ -1,10 +1,10 @@
 <div id="main-part">
     <div id="container">
-        <%- include('game/joinRoom') %> 
-        <%- include('article/write') %> 
+        <%- include('game/joinRoom') %>
+        <%- include('article/write') %>
         <% dat.forEach(element => { %>
-        <%- include('article/preview', {art: element, username: username}); %> 
-        <% }); %> 
+        <%- include('article/preview', {art: element, username: username}); %>
+        <% }); %>
     </div>
     <div class="kana-item" id="getMore">
         <a href="<%= (page!=-1)?"/page/"+String(Number(page)+1):"" %>">(｡・`ω´･)点我查看更多！</a>

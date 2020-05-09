@@ -189,7 +189,7 @@ button.btnv2:hover {
   overflow-x: hidden;
   filter: opacity(0.5);
 }
-#msg-container strong{
+#msg-container strong {
   -moz-user-select: all;
   -webkit-user-select: all;
 }

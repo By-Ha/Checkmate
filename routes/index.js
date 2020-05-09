@@ -10,8 +10,8 @@ router.get('/', function (req, res, next) {
         db.queryTypeContent(0, 1, 10, function (err, dat) {
             if (err) next(createError(500));
             else {
-                db.getUserInfo(req.session.uid, (err2, dat2)=>{
-                    if(err2) next(createError(500));
+                db.getUserInfo(req.session.uid, (err2, dat2) => {
+                    if (err2) next(createError(500));
                     res.render('index', { title: '首页', username: req.session.username, uid: req.session.uid, dat: dat, page: 1, userInfo: dat2 });
                 })
             }
@@ -22,13 +22,13 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/page/:pid', function (req, res, next) {
-    if (req.session.username == undefined) {res.redirect('/login');return ;}
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.queryTypeContent(0, req.params.pid, 10, function (err, dat) {
         if (err) next(createError(500));
         else {
-            db.getUserInfo(req.session.uid, (err2, dat2)=>{
-                if(err2) next(createError(500));
-                else if(dat.length == 10)
+            db.getUserInfo(req.session.uid, (err2, dat2) => {
+                if (err2) next(createError(500));
+                else if (dat.length == 10)
                     res.render('index', { title: '首页', username: req.session.username, uid: req.session.uid, dat: dat, page: req.params.pid, userInfo: dat2 });
                 else res.render('index', { title: '首页', username: req.session.username, uid: req.session.uid, dat: dat, page: -1, userInfo: dat2 });
             })

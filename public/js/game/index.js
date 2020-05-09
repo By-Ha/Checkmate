@@ -84,9 +84,9 @@ function judgeShown(i, j) {
     if (i - 1 >= 1 && j - 1 >= 1 && gm[i - 1][j - 1].color == myColor) return true;
     return false;
 }
-function reloadSymbol(i, j, clear=false) {
+function reloadSymbol(i, j, clear = false) {
     let c = "";
-    if(!clear)  c = $("#td-" + String((i - 1) * size + j)).css('background-image');
+    if (!clear) c = $("#td-" + String((i - 1) * size + j)).css('background-image');
     if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
     else c = c + ',';
     if (gm[i][j].type == 1) {//crown
@@ -111,9 +111,9 @@ function reloadSymbol(i, j, clear=false) {
     }
 }
 function showSymbol(onlyLast = false) {
-    if(!onlyLast) // 10%
+    if (!onlyLast) // 10%
         $("#m td").css('background-image', "");
-    for (var i = (onlyLast ? Math.max(movement.length - 1,0) : 0); i < movement.length; ++i) {
+    for (var i = (onlyLast ? Math.max(movement.length - 1, 0) : 0); i < movement.length; ++i) {
         var t = movement[i]; id = "#td-" + String((t[1] - 1) * size + t[2]);
         var c = $(id).css('background-image');
         if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
@@ -132,7 +132,7 @@ function showSymbol(onlyLast = false) {
             $(id).css('background-image', c + "url('/img/arrow-left.png')");
         }
     }
-    if(!onlyLast){
+    if (!onlyLast) {
         for (var i = 1; i <= size; ++i) {
             if (gm[i] == undefined) continue;
             for (var j = 1; j <= size; ++j) {
@@ -146,9 +146,9 @@ function illu() {
     let doc = document;
     for (let t1 = 1; t1 <= size; ++t1) {
         for (let t2 = 1; t2 <= size; ++t2) {
-            setTimeout(()=>{
-                let i = t1,j = t2;
-                if (gm == 0) return ;
+            setTimeout(() => {
+                let i = t1, j = t2;
+                if (gm == 0) return;
                 if (gm[i][j].color != 0) {
                     if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
                     playerInfo[gm[i][j].color][0] += 1;
@@ -157,7 +157,7 @@ function illu() {
                 }
                 let d = doc.getElementById("td-" + String((i - 1) * size + j));
                 d.innerHTML = "";
-                if(d.classList.contains("selected")){
+                if (d.classList.contains("selected")) {
                     d.classList = "selected";
                 } else {
                     d.classList = "";
@@ -173,8 +173,8 @@ function illu() {
             }, 0);
         }
     }
-    setTimeout(()=>{showSymbol(false);},0);
-    setTimeout(()=>{
+    setTimeout(() => { showSymbol(false); }, 0);
+    setTimeout(() => {
         $("#info-content")[0].innerHTML = "";
         playerInfo.sort(function (a, b) {
             if (a == undefined) return (b == undefined) ? 0 : -1;

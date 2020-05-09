@@ -2,18 +2,19 @@
     <div class="input-group mt-3 mb-3">
         <div class="input-group-prepend">
             <span class="input-group-text">RoomId</span>
-            
+
         </div>
-        
+
         <input type="text" class="form-control" placeholder="加入你的好友的房间或自己创建房间!" id="usr" name="roomid">
         <div class="input-group-append">
-            <button type="button" class="btn btn-outline-primary" onclick="window.location.href='/checkmate/room'">进入大厅</button>
+            <button type="button" class="btn btn-outline-primary"
+                onclick="window.location.href='/checkmate/room'">进入大厅</button>
             <button type="button" class="btn btn-outline-primary" id="Go">Go!</button>
         </div>
     </div>
     <script>
         $("#Go").click(() => {
-            if($("#usr")[0].value == "") return ;
+            if ($("#usr")[0].value == "") return;
             window.location.href = '/checkmate/room/' + $("#usr")[0].value;
         })
     </script>

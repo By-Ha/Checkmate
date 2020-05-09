@@ -1,71 +1,72 @@
-.userinfo{
-    min-height: 280px;
+.userinfo {
+  min-height: 280px;
 }
 
-.userinfo .userinfo-bg{
-    background-position: 50% !important;
-    background-repeat: no-repeat !important;
-    background-attachment: scroll !important;
-    background-size: cover !important;
-    width: 100%;
-    height: 180px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
+.userinfo .userinfo-bg {
+  background-position: 50% !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+  background-size: cover !important;
+  width: 100%;
+  height: 180px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
 }
-.userinfo .userinfo-avatar{
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    left: 30px;
-    top: 140px;
-    border-radius: 50%;
-    box-shadow: 1px 1px 1px rgba(0,0,0,.1), 1px 1px 1px rgba(0,0,0,0.1), 1px 1px 1px rgba(0,0,0,0.1);
-    border: 2px solid #fff;
-    border-top-color: rgb(255, 255, 255);
-    border-top-style: solid;
-    border-top-width: 2px;
-    border-right-color: rgb(255, 255, 255);
-    border-right-style: solid;
-    border-right-width: 2px;
-    border-bottom-color: rgb(255, 255, 255);
-    border-bottom-style: solid;
-    border-bottom-width: 2px;
-    border-left-color: rgb(255, 255, 255);
-    border-left-style: solid;
-    border-left-width: 2px;
-    border-image-source: initial;
-    border-image-slice: initial;
-    border-image-width: initial;
-    border-image-outset: initial;
-    border-image-repeat: initial;
+.userinfo .userinfo-avatar {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  left: 30px;
+  top: 140px;
+  border-radius: 50%;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1), 1px 1px 1px rgba(0, 0, 0, 0.1),
+    1px 1px 1px rgba(0, 0, 0, 0.1);
+  border: 2px solid #fff;
+  border-top-color: rgb(255, 255, 255);
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-right-color: rgb(255, 255, 255);
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-bottom-color: rgb(255, 255, 255);
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-left-color: rgb(255, 255, 255);
+  border-left-style: solid;
+  border-left-width: 2px;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
 }
 
-.userinfo .userinfo-complex{
-    margin-left: 120px;
-    padding-top: 160px;
-    display: inline-block;
+.userinfo .userinfo-complex {
+  margin-left: 120px;
+  padding-top: 160px;
+  display: inline-block;
 }
-.userinfo .userinfo-name{
-    display: inline-block;
-    font-size: 32px;
-    font-weight: 500;
-    letter-spacing: 0;
-    color: #222;
+.userinfo .userinfo-name {
+  display: inline-block;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #222;
 }
 .userinfo .userinfo-level {
-    font-size: 30px;
-    position: relative;
-    top: 5px;
+  font-size: 30px;
+  position: relative;
+  top: 5px;
 }
-.userinfo-edit{
-    float: right;
-    margin-top: 170px;
-    box-shadow: none !important;
+.userinfo-edit {
+  float: right;
+  margin-top: 170px;
+  box-shadow: none !important;
 }
 .edit {
-    display: none !important;
+  display: none !important;
 }
-.kana-hidden{
-    display: none;
+.kana-hidden {
+  display: none;
 }

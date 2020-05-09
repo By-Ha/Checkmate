@@ -44,7 +44,7 @@ $(function () {
         });
     });
     $("#registerForm").keydown(function (e) {
-        if($("#submitButton").attr('disabled') == 'disabled') return ;
+        if ($("#submitButton").attr('disabled') == 'disabled') return;
         var e = e || event,
             keycode = e.which || e.keyCode;
         if (keycode == 13) {

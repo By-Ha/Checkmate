@@ -5,15 +5,15 @@ var db = require('../database/database');
 /* GET users listing. */
 
 router.get("/:uid", function (req, res, next) {
-    if (req.session.username == undefined) {res.redirect('/login');return ;}
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getUserInfo(req.params.uid, (err, dat) => {
         if (err) {
             res.send('404');
             return;
         }
-        db.queryUserContent(req.params.uid, 1, 10, (err2, dat2)=>{
-            db.getUserInfo(req.session.uid, (err3, dat3)=>{
-                if(err2 || err3) {
+        db.queryUserContent(req.params.uid, 1, 10, (err2, dat2) => {
+            db.getUserInfo(req.session.uid, (err3, dat3) => {
+                if (err2 || err3) {
                     res.send('404');
                     return;
                 }
@@ -24,15 +24,15 @@ router.get("/:uid", function (req, res, next) {
 });
 
 router.get("/:uid/page/:page", function (req, res, next) {
-    if (req.session.username == undefined) {res.redirect('/login');return ;}
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getUserInfo(req.params.uid, (err, dat) => {
         if (err) {
             res.send('404');
             return;
         }
-        db.queryUserContent(req.params.uid, req.params.page, 10, (err2, dat2)=>{
-            db.getUserInfo(req.session.uid, (err3, dat3)=>{
-                if(err2 || err3) {
+        db.queryUserContent(req.params.uid, req.params.page, 10, (err2, dat2) => {
+            db.getUserInfo(req.session.uid, (err3, dat3) => {
+                if (err2 || err3) {
                     res.send('404');
                     return;
                 }

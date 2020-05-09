@@ -4,13 +4,13 @@ var crypto = require('crypto');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
-    md = new MarkdownIt({breaks: true});
+    md = new MarkdownIt({ breaks: true });
 require('events').EventEmitter.defaultMaxListeners = 50
 
 var connection;
 var sessionStore;
 
-function handleError () {
+function handleError() {
     connection = eval(fs.readFileSync('database/database_data.js').toString());
     // connection = eval(fs.readFileSync('./database_data.js').toString());
 
@@ -31,10 +31,10 @@ function handleError () {
     connection.connect(function (err) {
         if (err) {
             console.log('error when connecting to db:', err);
-            setTimeout(handleError , 2000);
+            setTimeout(handleError, 2000);
         }
     });
- 
+
     connection.on('error', function (err) {
         console.log('db error', err);
         // 如果是连接断开，自动重新连接
@@ -52,7 +52,7 @@ handleError();
 function login(username, password, callback) {
     password = String(password);
     username = String(username);
-    for(var i = 1;i<=10;++i)
+    for (var i = 1; i <= 10; ++i)
         password = crypto.createHash('md5').update("114514" + password + 'encryptionKana').digest("hex");
     var SQL = 'SELECT * FROM `user` WHERE BINARY username=? AND BINARY password=?';
     var SQLDATA = [username, password];
@@ -66,14 +66,14 @@ function login(username, password, callback) {
 function register(username, password, callback) {
     password = String(password);
     username = String(username);
-    if(username.indexOf('<') != -1 || username.length < 3){
+    if (username.indexOf('<') != -1 || username.length < 3) {
         callback(null, [-2, '用户名不能小于3位且不能包含"<"号']);
-        return ;
-    } else if(password.length < 8){
+        return;
+    } else if (password.length < 8) {
         callback(null, [-2, '密码不能小于八位']);
-        return ;
+        return;
     }
-    for(var i = 1;i<=10;++i)
+    for (var i = 1; i <= 10; ++i)
         password = crypto.createHash('md5').update("114514" + password + 'encryptionKana').digest("hex")
     username = String(username), password = String(password);
     var SQL = 'SELECT * FROM `user` WHERE BINARY username=?';
@@ -81,26 +81,26 @@ function register(username, password, callback) {
     var p = new Promise(function (resolve, reject) {
         connection.query(SQL, SQLDATA, function (error, results) {
             if (error) reject(-1);
-            if(results == 0) resolve(0);
+            if (results == 0) resolve(0);
             else resolve(-1);
         });
     });
-    p.then(function(data){
-        if(data == -1)  {
+    p.then(function (data) {
+        if (data == -1) {
             callback(null, [-1, "该用户名已被注册"]);
-            return ;
+            return;
         }
         SQL = "INSERT INTO user (`username`, `password`) VALUES (?, ?)";
         SQLDATA = [username, password];
-        connection.query(SQL, SQLDATA, function(error, results){
+        connection.query(SQL, SQLDATA, function (error, results) {
             if (error) callback(error);
-            getUserId(username, function(err, dat){
-                if(err) callback(err);
+            getUserId(username, function (err, dat) {
+                if (err) callback(err);
                 callback(null, [0, "注册成功", dat]);
             })
             // callback(null, [0, "注册成功"]);
         });
-    },function(reason){
+    }, function (reason) {
         callback(reason);
     });
 }
@@ -109,7 +109,7 @@ function modifyExp(uid, amount, callback) {
     var SQL = 'UPDATE `user` SET exp=exp+? WHERE id=?';
     var SQLDATA = [amount, uid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         var SQL = 'SELECT * FROM `user` WHERE id=?';
         var SQLDATA = [uid];
         connection.query(SQL, SQLDATA, function (error, results) {
@@ -123,7 +123,7 @@ function querySubmission(uid, callback) {
     var SQL = 'SELECT * FROM `submission` WHERE uid=? ORDER BY time DESC';
     var SQLDATA = [uid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         callback(null, [0, results]);
     });
 }
@@ -132,46 +132,46 @@ function addSubmission(uid, dat, callback) {
     var SQL = 'INSERT INTO `submission`(`data`, `uid`) VALUES (?,?)';
     var SQLDATA = [uid, dat];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         callback(null, [0]);
     });
 }
 
-function queryTypeContent(type, page, pagesize, callback){
+function queryTypeContent(type, page, pagesize, callback) {
     var SQL = `select * from content where type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?;`
-    var SQLDATA = [type, (page-1)*pagesize, pagesize];
+    var SQLDATA = [type, (page - 1) * pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         let finish = 0;
         results.forEach(e => {
             e.content = md.render(e.content);
-            getCommentAmount(e.id, -1, function(err, dat){
-                if(err) callback(err);
+            getCommentAmount(e.id, -1, function (err, dat) {
+                if (err) callback(err);
                 e.comment = dat;
                 finish++;
-                if(finish == results.length * 2) callback(null, results);
+                if (finish == results.length * 2) callback(null, results);
             });
-            getUserLevelById(e.user_id, function(err , dat){
-                if(err) callback(err);
+            getUserLevelById(e.user_id, function (err, dat) {
+                if (err) callback(err);
                 e.level = dat;
                 finish++;
-                if(finish == results.length * 2) callback(null, results);
+                if (finish == results.length * 2) callback(null, results);
             })
         })
     });
 }
 
-function getPost(pid, callback){
+function getPost(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
         let result = results[0];
         if (error) {
             callback(error, null);
-            return ;
+            return;
         }
         if (result == undefined) {
-            callback('被删除'); 
+            callback('被删除');
             return;
         }
         result.content = md.render(result.content);
@@ -179,7 +179,7 @@ function getPost(pid, callback){
     });
 }
 
-function getSourcePost(pid, callback){
+function getSourcePost(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
@@ -188,40 +188,40 @@ function getSourcePost(pid, callback){
     });
 }
 
-function updatePost(pid, username, content, callback){
+function updatePost(pid, username, content, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if(username != results[0].user_name && username != "admin") {
+        if (username != results[0].user_name && username != "admin") {
             callback("Permission Denied", null);
             return;
         }
         var SQL = `UPDATE content SET content=? WHERE id=?;`
         var SQLDATA = [content, pid];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if(error) {
+            if (error) {
                 callback(error, null);
-                return ;
+                return;
             }
             callback(null, "成功修改");
         });
     });
 }
 
-function deletePost(pid, username, callback){
+function deletePost(pid, username, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if(username != results[0].user_name && username != "admin") {
+        if (username != results[0].user_name && username != "admin") {
             callback("Permission Denied", null);
             return;
         }
         var SQL = `UPDATE content SET hidden=? WHERE id=?;`
         var SQLDATA = [true, pid];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if(error) {
+            if (error) {
                 callback(error, null);
-                return ;
+                return;
             }
             callback(null, "成功删除");
             addUserExperienceByUsername(username, -10);
@@ -229,29 +229,29 @@ function deletePost(pid, username, callback){
     });
 }
 
-function queryUserContent(uid, page, pagesize, callback){
+function queryUserContent(uid, page, pagesize, callback) {
     page = Number(page);
     var SQL = `select * from content where user_id=? AND hidden=0 order by id desc limit ?,?;`
-    var SQLDATA = [uid, (page-1)*pagesize, pagesize];
+    var SQLDATA = [uid, (page - 1) * pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         let finish = 0;
-        if(results.length == 0) callback(null, results);
+        if (results.length == 0) callback(null, results);
         results.forEach(e => {
             e.content = md.render(e.content);
-            getCommentAmount(e.id, -1, function(err, dat){
-                if(err) callback(err);
+            getCommentAmount(e.id, -1, function (err, dat) {
+                if (err) callback(err);
                 e.comment = dat;
                 finish++;
-                if(finish == (results.length * 2)) {
+                if (finish == (results.length * 2)) {
                     callback(null, results);
                 }
             });
-            getUserLevelById(e.user_id, function(err , dat){
-                if(err) callback(err);
+            getUserLevelById(e.user_id, function (err, dat) {
+                if (err) callback(err);
                 e.level = dat;
                 finish++;
-                if(finish == (results.length * 2)) {
+                if (finish == (results.length * 2)) {
                     callback(null, results);
                 }
             })
@@ -259,181 +259,181 @@ function queryUserContent(uid, page, pagesize, callback){
     });
 }
 
-function getUserId(username, callback){
+function getUserId(username, callback) {
     var SQL = 'SELECT * FROM `user` WHERE username=?';
     var SQLDATA = [username];
-    
+
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
-        if(results[0] != undefined)
+        if (error) { callback(error); return; }
+        if (results[0] != undefined)
             callback(null, results[0].id);
         else callback("No Such User", null);
     });
 }
 
-function getUsername(userid, callback){
+function getUsername(userid, callback) {
     var SQL = 'SELECT * FROM `user` WHERE id=?';
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
-        if(results[0] != undefined)
+        if (error) { callback(error); return; }
+        if (results[0] != undefined)
             callback(null, results[0].username);
         else callback("No Such User", null);
     });
 }
 
-function getUserInfo(userid, callback){
+function getUserInfo(userid, callback) {
     var SQL = `SELECT id, username, exp FROM user WHERE id=?`;
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error || results.length == 0) callback('No Such User');
         else {
-            if(results[0] == undefined) callback(null, results[0]);
-            else getUserCommentAmount(userid, (err, dat)=>{
-                if(err) callback(err);
+            if (results[0] == undefined) callback(null, results[0]);
+            else getUserCommentAmount(userid, (err, dat) => {
+                if (err) callback(err);
                 else {
                     results[0].comment = dat;
-                    getUserPostAmount(userid, (err, dat)=>{
+                    getUserPostAmount(userid, (err, dat) => {
                         results[0].post = dat;
                         callback(null, results[0]);
-                    })  
+                    })
                 }
-                
+
             })
         }
-        
+
     });
 }
 
-function getUserExperienceById(userid, callback){
-    getUserInfo(userid, function(err, dat){
-        if(err) callback(err, null);
+function getUserExperienceById(userid, callback) {
+    getUserInfo(userid, function (err, dat) {
+        if (err) callback(err, null);
         else callback(null, dat.exp);
     })
 }
 
-function getUserExperienceByUsername(username, callback){
-    getUserId(username, function(err, userid){
-        getUserInfo(userid, function(err, dat){
-            if(err) callback(err, null);
+function getUserExperienceByUsername(username, callback) {
+    getUserId(username, function (err, userid) {
+        getUserInfo(userid, function (err, dat) {
+            if (err) callback(err, null);
             else callback(null, dat.exp);
         })
     })
 }
 
-function getUserLevelById(userid, callback){
-    getUserExperienceById(userid, function(err, dat){
-        if(err) callback(err);
-        else callback(null, ((dat>=28800)?6:((dat>=10800)?5:((dat>=4500)?4:((dat>=1500)?3:((dat>=200?2:((dat>=100)?1:0))))))));
+function getUserLevelById(userid, callback) {
+    getUserExperienceById(userid, function (err, dat) {
+        if (err) callback(err);
+        else callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0))))))));
     });
 }
 
-function getUserLevelByUsername(username, callback){
+function getUserLevelByUsername(username, callback) {
     getUserId(username, (err, dat) => {
-        if(err) callback(err);
+        if (err) callback(err);
         else {
-            getUserExperienceById(dat, function(err, dat){
-                if(err) callback(err);
-                else callback(null, ((dat>=28800)?6:((dat>=10800)?5:((dat>=4500)?4:((dat>=1500)?3:((dat>=200?2:((dat>=100)?1:0))))))));
+            getUserExperienceById(dat, function (err, dat) {
+                if (err) callback(err);
+                else callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0))))))));
             });
         }
     })
 }
 
-function addUserExperienceById(userid, exp, callback = ()=>{}){
+function addUserExperienceById(userid, exp, callback = () => { }) {
     var SQL = 'UPDATE `user` SET `exp`= `exp` + ? WHERE id=?';
     var SQLDATA = [exp, userid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) {callback(error);return;}
+        if (error) { callback(error); return; }
         callback(null, 'success');
     });
 }
 
-function addUserExperienceByUsername(username, exp, callback = ()=>{}){
-    getUserId(username, function(err, dat){
-        if(err) callback(err);
+function addUserExperienceByUsername(username, exp, callback = () => { }) {
+    getUserId(username, function (err, dat) {
+        if (err) callback(err);
         else {
             addUserExperienceById(dat, exp, callback);
         }
     });
 }
 
-function post(username, type, content, callback = ()=>{}){
-    if(username == undefined || username.length <= 2) return;
+function post(username, type, content, callback = () => { }) {
+    if (username == undefined || username.length <= 2) return;
     var SQL = `INSERT INTO content(type, user_id, user_name, content, hidden)
     VALUES (?, ?, ?, ?, 0)`;
-    getUserId(username, (err, dat)=>{
-        if(err) {callback(error);return;}
+    getUserId(username, (err, dat) => {
+        if (err) { callback(error); return; }
         var SQLDATA = [type, dat, username, content];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) {callback(error);return;}
+            if (error) { callback(error); return; }
             callback(null, [0]);
         });
         addUserExperienceById(dat, 10);
     })
 }
 
-function getComment(pid, parent, page, callback = ()=>{}){
+function getComment(pid, parent, page, callback = () => { }) {
     let pagesize = 10;
     let SQL = 'SELECT * FROM `comment` WHERE pid=? AND parent=? order by id desc limit ?,?;';
-    let SQLDATA = [pid, parent, (page-1)*pagesize, pagesize];
-    connection.query(SQL, SQLDATA, function(err, dat){
-        if(err) callback(err);
+    let SQLDATA = [pid, parent, (page - 1) * pagesize, pagesize];
+    connection.query(SQL, SQLDATA, function (err, dat) {
+        if (err) callback(err);
         else callback(null, JSON.parse(JSON.stringify(dat)));
     })
 }
 
-function getUserPostAmount(uid, callback){
+function getUserPostAmount(uid, callback) {
     let SQL = 'SELECT COUNT(*) as total FROM `content` WHERE user_id=? AND hidden=0';
     let SQLDATA = [uid];
-    connection.query(SQL, SQLDATA, function(err, dat){
-        if(err) callback(err);
+    connection.query(SQL, SQLDATA, function (err, dat) {
+        if (err) callback(err);
         else callback(null, dat[0].total);
     })
 }
 
-function getCommentAmount(pid, parent, callback = () => {}){
+function getCommentAmount(pid, parent, callback = () => { }) {
     let SQL = '';
     let SQLDATA = '';
-    if(parent != -1){
+    if (parent != -1) {
         SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE pid=? AND parent=?;';
         SQLDATA = [pid, parent];
     } else {
         SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE pid=?;';
         SQLDATA = [pid];
     }
-    
-    connection.query(SQL, SQLDATA, function(err, dat){
-        if(err) callback(err);
+
+    connection.query(SQL, SQLDATA, function (err, dat) {
+        if (err) callback(err);
         else callback(null, dat[0].total);
     })
 }
 
-function getUserCommentAmount(uid, callback = ()=>{}){
+function getUserCommentAmount(uid, callback = () => { }) {
     let SQL = 'SELECT COUNT(*) as total FROM `comment` WHERE uid=?;';
     let SQLDATA = [uid];
-    
-    connection.query(SQL, SQLDATA, function(err, dat){
-        if(err) callback(err);
+
+    connection.query(SQL, SQLDATA, function (err, dat) {
+        if (err) callback(err);
         else callback(null, dat[0].total);
     })
 }
 
-function postCommentByUsername(pid, parent, uname, comment, callback = ()=>{}){
+function postCommentByUsername(pid, parent, uname, comment, callback = () => { }) {
     let SQL = 'INSERT INTO `comment`(`pid`, `parent`, `uid`, `username`, `comment`) \
     VALUES (?, ?, ?, ?, ?)';
-    if(comment.length <= 2){
+    if (comment.length <= 2) {
         callback("评论长度有误");
         return;
     }
-    getUserId(uname, function(err,dat){
-        if(err) {
+    getUserId(uname, function (err, dat) {
+        if (err) {
             callback(err);
-            return ;
+            return;
         }
         let SQLDATA = [pid, parent, dat, uname, comment];
-        connection.query(SQL, SQLDATA, function(err, dat){
-            if(err) callback(err);
+        connection.query(SQL, SQLDATA, function (err, dat) {
+            if (err) callback(err);
             else callback(null, "success");
         })
     })
@@ -443,10 +443,10 @@ module.exports = {
     sessionStore,
     login, register,
     getUsername, getUserId, getUserInfo, getUserLevelById,
-    getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername, 
-    modifyExp, addUserExperienceById, addUserExperienceByUsername, 
+    getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername,
+    modifyExp, addUserExperienceById, addUserExperienceByUsername,
     post, getPost, getSourcePost, queryTypeContent, queryUserContent, updatePost, deletePost,
-    querySubmission, addSubmission,  
-    getComment, postCommentByUsername, getCommentAmount, 
+    querySubmission, addSubmission,
+    getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount
 }
