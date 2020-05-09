@@ -3,11 +3,9 @@ var router = express.Router();
 var db = require('../database/database');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.render('index', { title: '测试页面' });
-});
 
 router.get("/:uid", function (req, res, next) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.getUserInfo(req.params.uid, (err, dat) => {
         if (err) {
             res.send('404');
@@ -26,6 +24,7 @@ router.get("/:uid", function (req, res, next) {
 });
 
 router.get("/:uid/page/:page", function (req, res, next) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.getUserInfo(req.params.uid, (err, dat) => {
         if (err) {
             res.send('404');

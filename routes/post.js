@@ -4,6 +4,7 @@ var db = require('../database/database');
 
 /* GET home page. */
 router.get('/:pid', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.getPost(req.params.pid, function (err, dat) {
         if (err) {
             res.send('404');

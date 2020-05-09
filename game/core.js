@@ -277,7 +277,7 @@ function Run(io) {
                 if (t[0] >= 2 && t[1] > (t[0] / 2))
                     startGame(playerRoom[uid]);
             }catch(err){
-                console("CORE ERROR", "VOTESTART");
+                console.log("CORE ERROR", "VOTESTART");
             }
         })
 

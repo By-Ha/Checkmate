@@ -20,6 +20,7 @@ router.post('/', function (req, res) {
 })
 
 router.post('/user/post', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.queryUserContent(req.body.uid, req.body.page, 10, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
         else res.json({ status: 'success', dat: dat });
@@ -27,6 +28,7 @@ router.post('/user/post', function (req, res) {
 })
 
 router.post('/user/level', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (req.body.uid != undefined) {
         db.getUserLevelById(req.body.uid, (err, dat) => {
             if (err) res.json({ status: 'error', msg: err });
@@ -40,6 +42,7 @@ router.post('/user/level', function (req, res) {
 })
 
 router.post('/user/exp', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (req.body.uid != undefined) {
         db.getUserExperienceById(req.body.uid, (err, dat) => {
             if (err) res.json({ status: 'error', msg: err });
@@ -53,6 +56,7 @@ router.post('/user/exp', function (req, res) {
 })
 
 router.get('/user/commentAmount', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     let uid = 0;
     if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
@@ -63,6 +67,7 @@ router.get('/user/commentAmount', function (req, res) {
 })
 
 router.get('/user/postAmount', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     let uid = 0;
     if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
@@ -73,6 +78,7 @@ router.get('/user/postAmount', function (req, res) {
 })
 
 router.post('/page', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.queryTypeContent(0, req.body.page, 10, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
         else res.json({ status: 'success', dat: dat });
@@ -99,6 +105,7 @@ router.post('/post', function (req, res) {
 });
 
 router.get('/comment', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) {
         res.json({ status: 'error', msg: '非法请求' });
         return;
@@ -132,6 +139,7 @@ router.post('/comment', function (req, res) {
 })
 
 router.get('/commentAmount', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (req.query.pid == undefined || req.query.parent == undefined) {
         res.json({ status: 'error', msg: '非法请求' });
         return;
@@ -146,6 +154,7 @@ router.get('/commentAmount', function (req, res) {
 })
 
 router.post('/getSourcePost', function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.getSourcePost(req.body.pid, (err, dat) => {
         if (err) res.json({ 'status': 'error', 'msg': 'No Such User' });
         else res.json({ 'status': 'success', 'msg': dat[0].content });
@@ -179,6 +188,7 @@ router.post('/deletepost', function (req, res) {
 })
 
 router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (typeof (req.session.uid) != "number") return;
     var imgType = req.file.mimetype; // 图片类型
     var url = "/tmp/Kana/upload/" + req.file.filename;
@@ -200,6 +210,7 @@ router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
 })
 
 router.post('/upload/banner', upload.single('banner'), function (req, res) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     if (typeof (req.session.uid) != "number") return;
     var imgType = req.file.mimetype; // 图片类型
     var url = "/tmp/Kana/upload/" + req.file.filename;

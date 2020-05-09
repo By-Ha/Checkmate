@@ -22,6 +22,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/page/:pid', function (req, res, next) {
+    if (req.session.username == undefined) {res.redirect('/login');return ;}
     db.queryTypeContent(0, req.params.pid, 10, function (err, dat) {
         if (err) next(createError(500));
         else {
