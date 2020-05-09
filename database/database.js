@@ -286,7 +286,7 @@ function getUserInfo(userid, callback){
     var SQL = `SELECT id, username, exp FROM user WHERE id=?`;
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) callback(error);
+        if (error || results.length == 0) callback('No Such User');
         else {
             if(results[0] == undefined) callback(null, results[0]);
             else getUserCommentAmount(userid, (err, dat)=>{
