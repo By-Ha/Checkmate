@@ -54,6 +54,12 @@
     position: relative;
     min-height: 40px;
 }
+.comment-container .page-navi{
+    margin: 0;
+}
+.comment-container .page-navi ul{
+    margin: 0;
+}
 .comment-avatar{
     position: relative;
     margin-left: -15px;
