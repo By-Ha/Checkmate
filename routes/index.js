@@ -7,7 +7,7 @@ var createError = require('http-errors');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (req.session.username) {
-        db.queryTypeContent(0, 1, 10, function (err, dat) {
+        db.getTypePost(0, 1, 10, function (err, dat) {
             if (err) next(createError(500));
             else {
                 db.getUserInfo(req.session.uid, (err2, dat2) => {
@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
 
 router.get('/page/:pid', function (req, res, next) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    db.queryTypeContent(0, req.params.pid, 10, function (err, dat) {
+    db.getTypePost(0, req.params.pid, 10, function (err, dat) {
         if (err) next(createError(500));
         else {
             db.getUserInfo(req.session.uid, (err2, dat2) => {

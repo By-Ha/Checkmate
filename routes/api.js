@@ -21,7 +21,7 @@ router.post('/', function (req, res) {
 
 router.post('/user/post', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    db.queryUserContent(req.body.uid, req.body.page, 10, (err, dat) => {
+    db.getUserPost(req.body.uid, req.body.page, 10, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
         else res.json({ status: 'success', dat: dat });
     })
@@ -79,7 +79,7 @@ router.get('/user/postAmount', function (req, res) {
 
 router.post('/page', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    db.queryTypeContent(0, req.body.page, 10, (err, dat) => {
+    db.getTypePost(0, req.body.page, 10, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
         else res.json({ status: 'success', dat: dat });
     })

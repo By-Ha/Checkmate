@@ -19,6 +19,9 @@
   background-color: #fff;
   border-color: #00b5e5;
 }
+.comment-button:focus {
+  outline: 0 !important;
+}
 .comment-button {
   width: 70px;
   height: 64px;

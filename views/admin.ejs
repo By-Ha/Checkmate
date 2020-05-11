@@ -1,0 +1,19 @@
+<%- include('admin/header', {}) -%>
+
+<header>
+    <%- include('admin/leftSidebar') -%>
+    <%- include('admin/topSidebar') -%>
+    <%- include('admin/loading') -%>
+</header>
+
+<div class="container">
+    <div class="page-wrap">
+    </div>
+    <div class="admincard loading-dot-container">
+        <div class="admincard-content loading-dot">
+            <%- include('loading', {}) -%>
+        </div>
+    </div>
+</div>
+
+<%- include('admin/footer', {}) -%>

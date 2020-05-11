@@ -11,7 +11,7 @@ router.get("/:uid", function (req, res, next) {
             res.send('404');
             return;
         }
-        db.queryUserContent(req.params.uid, 1, 10, (err2, dat2) => {
+        db.getUserPost(req.params.uid, 1, 10, (err2, dat2) => {
             db.getUserInfo(req.session.uid, (err3, dat3) => {
                 if (err2 || err3) {
                     res.send('404');
@@ -30,7 +30,7 @@ router.get("/:uid/page/:page", function (req, res, next) {
             res.send('404');
             return;
         }
-        db.queryUserContent(req.params.uid, req.params.page, 10, (err2, dat2) => {
+        db.getUserPost(req.params.uid, req.params.page, 10, (err2, dat2) => {
             db.getUserInfo(req.session.uid, (err3, dat3) => {
                 if (err2 || err3) {
                     res.send('404');

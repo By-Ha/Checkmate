@@ -137,7 +137,7 @@ function addSubmission(uid, dat, callback) {
     });
 }
 
-function queryTypeContent(type, page, pagesize, callback) {
+function getTypePost(type, page, pagesize, callback) {
     var SQL = `select * from content where type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?;`
     var SQLDATA = [type, (page - 1) * pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
@@ -184,7 +184,7 @@ function getSourcePost(pid, callback) {
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) callback(error, results);
-        callback(null, results);
+        callback(null, results[0]);
     });
 }
 
@@ -229,7 +229,7 @@ function deletePost(pid, username, callback) {
     });
 }
 
-function queryUserContent(uid, page, pagesize, callback) {
+function getUserPost(uid, page, pagesize, callback) {
     page = Number(page);
     var SQL = `select * from content where user_id=? AND hidden=0 order by id desc limit ?,?;`
     var SQLDATA = [uid, (page - 1) * pagesize, pagesize];
@@ -256,6 +256,46 @@ function queryUserContent(uid, page, pagesize, callback) {
                 }
             })
         })
+    });
+}
+
+function getUserPostByPID(uid, PID, pagesize, callback) {
+    PID = Number(PID);
+    var SQL = `select * from content where user_id=? AND hidden=0 AND id<? order by id desc limit 0,?;`
+    var SQLDATA = [uid, PID, pagesize];
+    connection.query(SQL, SQLDATA, function (error, results) {
+        if (error) { callback(error); return; }
+        let finish = 0;
+        if (results.length == 0) callback(null, results);
+        results.forEach(e => {
+            e.content = md.render(e.content);
+            getCommentAmount(e.id, -1, function (err, dat) {
+                if (err) callback(err);
+                e.comment = dat;
+                finish++;
+                if (finish == (results.length * 2)) {
+                    callback(null, results);
+                }
+            });
+            getUserLevelById(e.user_id, function (err, dat) {
+                if (err) callback(err);
+                e.level = dat;
+                finish++;
+                if (finish == (results.length * 2)) {
+                    callback(null, results);
+                }
+            })
+        })
+    });
+}
+
+function getUserSourcePost(uid, page, pagesize, callback) {
+    page = Number(page);
+    var SQL = `select * from content where user_id=? AND hidden=0 order by id desc limit ?,?;`
+    var SQLDATA = [uid, (page - 1) * pagesize, pagesize];
+    connection.query(SQL, SQLDATA, function (error, results) {
+        if (error) { callback(error); return; }
+        callback(null, results);
     });
 }
 
@@ -445,7 +485,7 @@ module.exports = {
     getUsername, getUserId, getUserInfo, getUserLevelById,
     getUserLevelByUsername, getUserExperienceById, getUserExperienceByUsername,
     modifyExp, addUserExperienceById, addUserExperienceByUsername,
-    post, getPost, getSourcePost, queryTypeContent, queryUserContent, updatePost, deletePost,
+    post, getPost, getSourcePost, getTypePost, getUserPost, updatePost, deletePost, getUserSourcePost, getUserPostByPID,
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount
