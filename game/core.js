@@ -56,6 +56,9 @@ function Run(io) {
             if (t.amount < 0) { // t was cleared
                 if (t.type == 1) { // t was player's crown and the player was killed
                     ue(color2Id[t.color], 'die');
+                    let place = 0;
+                    for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                    Rooms[room].playedPlayer[color2Id[t.color]].place = place;
                     if (color2Id[t.color] && User[color2Id[t.color]])
                         User[color2Id[t.color]].gaming = false;
                     var tcolor = t.color;
@@ -114,17 +117,37 @@ function Run(io) {
     }
 
     function playerWinAnction(room) {
-        for (let k in Rooms[room].player) {
-            if (Rooms[room].player[k].gaming == true) {
-                bc(room, 'WinAnction', Rooms[room].player[k].uname);
-                db.addUserExperienceById(k, 20);
+        try {
+            for (let k in Rooms[room].playedPlayer) {
+                if (Rooms[room].player[k].gaming == true) {
+                    Rooms[room].playedPlayer[k].place = 1;
+                } else if (Rooms[room].playedPlayer[k].place == 0) {
+                    Rooms[room].playedPlayer[k].place = 2;
+                }
             }
-            Rooms[room].player[k].gaming = false;
-            Rooms[room].player[k].prepare = false;
+            db.gameRatingCalc(Rooms[room].playedPlayer);
+            for (let k in Rooms[room].player) {
+                if (Rooms[room].player[k].connect == false) {
+                    delete Rooms[room].player[k];
+                    continue;
+                }
+                if (Rooms[room].player[k].gaming == true) {
+                    bc(room, 'WinAnction', Rooms[room].player[k].uname);
+                    db.addUserExperienceById(k, 20);
+                }
+                Rooms[room].player[k].gaming = false;
+                Rooms[room].player[k].prepare = false;
+            }
+            clearInterval(Rooms[room].interval);
+            delete Rooms[room].game;
+            Rooms[room].start = false;
+            if (Object.keys(Rooms[room].player).length == 0) {
+                delete Rooms[room];
+            }
         }
-        clearInterval(Rooms[room].interval);
-        delete Rooms[room].game;
-        Rooms[room].start = false;
+        catch (e) {
+            console.log('WinAnction', e, Rooms[room]);
+        }
     }
 
     function alivePlayer(room) {
@@ -187,8 +210,11 @@ function Run(io) {
         if (Rooms[room].start) return;
         Rooms[room].game = new Room();
         Rooms[room].start = true;
+        Rooms[room].playedPlayer = {};
         let i = 1;
         for (var k in Rooms[room].player) {
+            Rooms[room].playedPlayer[k] = {};
+            Rooms[room].playedPlayer[k].place = 0;
             Rooms[room].player[k].prepare = false;
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
@@ -240,11 +266,12 @@ function Run(io) {
             s.join(room);
             if (Rooms[room] == undefined) {
                 Rooms[room] = {
-                    game: undefined, start: false, player: {}, interval: undefined,
+                    game: undefined, start: false, player: {}, playedPlayer: {},
+                    interval: undefined,
                     settings: { speed: 4, private: false }
                 };
             }
-            Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, color: 0, movement: [] };
+            Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, color: 0, movement: [] };
             playerRoom[uid] = room;
             t = preparedPlayerCount(playerRoom[uid]);
             bc(playerRoom[uid], 'LoggedUserCount', t);
@@ -255,8 +282,17 @@ function Run(io) {
         s.on('disconnect', function () {
             delete connectedUsers[uid];
             if (Rooms[playerRoom[uid]] == undefined) return;
-            delete Rooms[playerRoom[uid]].player[uid];
-            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0) {
+            if (Rooms[playerRoom[uid]].gaming) {
+                let place = 0;
+                for (let temp in Rooms[playerRoom[uid]].playedPlayer) if (Rooms[playerRoom[uid]].playedPlayer[temp].place == 0) place++;
+                Rooms[playerRoom[uid]].playedPlayer[uid].place = place;
+                Rooms[playerRoom[uid]].player[uid].gaming = false;
+                Rooms[playerRoom[uid]].player[uid].connect = false;
+            } else {
+                delete Rooms[playerRoom[uid]].player[uid];
+                return;
+            }
+            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 || Rooms[playerRoom[uid]].game == undefined) {
                 delete Rooms[playerRoom[uid]];
             }
             if (Rooms[playerRoom[uid]] != undefined) {
@@ -277,7 +313,7 @@ function Run(io) {
                 if (t[0] >= 2 && t[1] > (t[0] / 2))
                     startGame(playerRoom[uid]);
             } catch (err) {
-                console.log("CORE ERROR", "VOTESTART");
+                console.log("CORE ERROR", "VOTESTART", err);
             }
         })
 

@@ -85,8 +85,8 @@ app.use(function (err, req, res, next) {
 
 /* socket.io */
 
-server.listen(3002, function () {
-  console.log('listening on *:3002');
+server.listen(3001, function () {
+  console.log('listening on *:3001');
 });
 
 io.use(function (socket, next) {
