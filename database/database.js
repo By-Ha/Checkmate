@@ -5,6 +5,8 @@ var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
     md = new MarkdownIt({ breaks: true });
+var stringRandom = require('string-random');
+
 require('events').EventEmitter.defaultMaxListeners = 50
 
 var connection;
@@ -31,6 +33,7 @@ function handleError() {
     connection.connect(function (err) {
         if (err) {
             console.log('error when connecting to db:', err);
+            delete connection;
             setTimeout(handleError, 2000);
         }
     });
@@ -224,7 +227,13 @@ function deletePost(pid, username, callback) {
                 return;
             }
             callback(null, "成功删除");
-            addUserExperienceByUsername(username, -10);
+            let SQL2 = `select * from content where id=?`;
+            let SQLDATA2 = [pid];
+            connection.query(SQL2, SQLDATA2, function (err, dat) {
+                if (err) return;
+                addUserExperienceById(dat[0].user_id, -10);
+            })
+
         });
     });
 }
@@ -261,8 +270,9 @@ function getUserPost(uid, page, pagesize, callback) {
 
 function getUserPostByPID(uid, PID, pagesize, callback) {
     PID = Number(PID);
-    var SQL = `select * from content where user_id=? AND hidden=0 AND id<? order by id desc limit 0,?;`
-    var SQLDATA = [uid, PID, pagesize];
+    let SQL = ""; let SQLDATA = [];
+    if (uid == 1) SQL = `select * from content where hidden=0 AND id<? order by id desc limit 0,?;`, SQLDATA = [PID, pagesize];
+    else SQL = `select * from content where user_id=? AND hidden=0 AND id<? order by id desc limit 0,?;`, SQLDATA = [uid, PID, pagesize];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         let finish = 0;
@@ -323,12 +333,12 @@ function getUsername(userid, callback) {
 }
 
 function getUserInfo(userid, callback) {
-    var SQL = `SELECT id, username, exp FROM user WHERE id=?`;
+    var SQL = `SELECT * FROM user WHERE id=?`;
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error || results.length == 0) callback('No Such User');
         else {
-            if (results[0] == undefined) callback(null, results[0]);
+            if (results[0] == undefined) callback('No Such User', null);
             else getUserCommentAmount(userid, (err, dat) => {
                 if (err) callback(err);
                 else {
@@ -479,6 +489,82 @@ function postCommentByUsername(pid, parent, uname, comment, callback = () => { }
     })
 }
 
+function getRating(uid, callback = () => { }) {
+    getUserInfo(uid, (err, dat) => {
+        if (err) callback(err);
+        else callback(null, dat.rating);
+    })
+}
+
+function addBattle(uid, battle_id, dr) {
+    console.log('ADD_BATTLE', uid, battle_id);
+    let SQL = 'INSERT INTO `battle`(`battle_id`, `player`, `rating`, `delta_rating`) VALUES (?, ?, ?, ?)'
+    getRating(uid, (err, dat) => {
+        if (err) {
+            console.log('addBattleError:', e);
+        }
+        else try {
+            let SQLDATA = [battle_id, uid, dat, dr];
+            connection.query(SQL, SQLDATA, () => { });
+        } catch (e) {
+            console.log('addBattleError:', e);
+        }
+    })
+}
+
+function changeRating(uid, rating) {
+    console.log('RATING_CHANGE', uid, rating);
+    let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
+    let SQLDATA = [rating, uid];
+    try {
+        connection.query(SQL, SQLDATA, (err, dat) => { });
+    } catch (e) {
+        console.log('changeRatingError:', e);
+    }
+
+}
+
+function gameRatingCalc(data) {
+    console.log("PLACE_DATA:", data);
+    try {
+        let bid = stringRandom(64);
+        let amount = 0;
+        let p = [];
+        if (Object.keys(data).length == 0) return;
+        for (let k in data) {
+            getRating(k, (err, dat) => {
+                if (err) return;
+                else {
+                    data[k].rating = Number(dat);
+                    p[Number(data[k].place)] = k;
+                    amount++;
+                    if (amount == Object.keys(data).length) {
+                        let firstRating = data[p[1]].rating;
+                        let firstBounce = 0;
+                        for (let it = 2; it <= Object.keys(data).length; ++it) {
+                            if (data[p[it]].rating >= firstRating) {
+                                firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
+                                let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
+                                changeRating(p[it], dr);
+                                addBattle(p[it], bid, dr);
+                            } else {
+                                firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
+                                let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
+                                changeRating(p[it], dr);
+                                addBattle(p[it], bid, dr);
+                            }
+                        }
+                        changeRating(p[1], Math.min(12, firstBounce + 1));
+                        addBattle(p[1], bid, Math.min(12, firstBounce + 1));
+                    }
+                }
+            })
+        }
+    } catch (e) {
+        console.log("GRC", e);
+    }
+}
+
 module.exports = {
     sessionStore,
     login, register,
@@ -488,5 +574,6 @@ module.exports = {
     post, getPost, getSourcePost, getTypePost, getUserPost, updatePost, deletePost, getUserSourcePost, getUserPostByPID,
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
-    getUserPostAmount, getUserCommentAmount
+    getUserPostAmount, getUserCommentAmount,
+    gameRatingCalc
 }
