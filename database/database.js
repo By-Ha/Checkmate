@@ -538,7 +538,6 @@ function gameRatingCalc(data) {
                     data[k].rating = Number(dat);
                     p[Number(data[k].place)] = k;
                     amount++;
-                    console.log('amount', amount, Object.keys(data).length);
                     if (amount == Object.keys(data).length) {
                         let firstRating = data[p[1]].rating;
                         let firstBounce = 0;
