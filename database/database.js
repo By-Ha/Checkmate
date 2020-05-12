@@ -33,6 +33,7 @@ function handleError() {
     connection.connect(function (err) {
         if (err) {
             console.log('error when connecting to db:', err);
+            delete connection;
             setTimeout(handleError, 2000);
         }
     });
@@ -495,17 +496,24 @@ function getRating(uid, callback = () => { }) {
     })
 }
 
-function addBattle(uid, battle_id, rating) {
-    let SQL = 'INSERT INTO `battle`(`battle_id`, `player`, `rating`) VALUES (?, ?, ?)'
-    let SQLDATA = [battle_id, uid, rating];
-    try {
-        connection.query(SQL, SQLDATA, () => { });
-    } catch (e) {
-        console.log('addBattleError:', e);
-    }
+function addBattle(uid, battle_id, dr) {
+    console.log('ADD_BATTLE', uid, battle_id);
+    let SQL = 'INSERT INTO `battle`(`battle_id`, `player`, `rating`, `delta_rating`) VALUES (?, ?, ?, ?)'
+    getRating(uid, (err, dat) => {
+        if (err) {
+            console.log('addBattleError:', e);
+        }
+        else try {
+            let SQLDATA = [battle_id, uid, dat, dr];
+            connection.query(SQL, SQLDATA, () => { });
+        } catch (e) {
+            console.log('addBattleError:', e);
+        }
+    })
 }
 
 function changeRating(uid, rating) {
+    console.log('RATING_CHANGE', uid, rating);
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
     let SQLDATA = [rating, uid];
     try {
@@ -536,16 +544,18 @@ function gameRatingCalc(data) {
                         for (let it = 2; it <= Object.keys(data).length; ++it) {
                             if (data[p[it]].rating >= firstRating) {
                                 firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
-                                changeRating(p[it], -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8));
-                                addBattle(p[it], bid, data[p[it]].rating - 5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8));
+                                let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
+                                changeRating(p[it], dr);
+                                addBattle(p[it], bid, dr);
                             } else {
                                 firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
-                                changeRating(p[it], -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1));
-                                addBattle(p[it], bid, data[p[it]].rating - 1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1));
+                                let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
+                                changeRating(p[it], dr);
+                                addBattle(p[it], bid, dr);
                             }
                         }
                         changeRating(p[1], Math.min(12, firstBounce + 1));
-                        addBattle(p[1], bid, data[p[1]].rating + Math.min(12, firstBounce + 1));
+                        addBattle(p[1], bid, Math.min(12, firstBounce + 1));
                     }
                 }
             })

