@@ -14,18 +14,17 @@
 - 执行`git clone https://github.com/By-Ha/Checkmate.git`
 - 切换目录`cd Checkmate/`
 - 安装依赖`npm install`
-- 建立一个数据库并导入`/database/database_struct.sql`,此文件为数据表的结构
+- 建立一个数据库并导入`/database/database_struct.sql`,此文件为数据表的结构,小版本不一定更新对应 SQL,大版本一定更新.
 - 在`/database`下创建`database_data.js`,按照如下格式填写您的数据库账号密码:
   - `mysql.createConnection({host: '数据库host(localhost)',user: '访问数据库用户名',password: '数据库密码',database: '数据库名'});`
 - 在`/cos`下创建`cos_data.js`,按照如下格式填写您的腾讯云 COS 的 SecretId 和 SecretKey:
   - `new COS({SecretId: '您的SecretId',SecretKey: '您的SecretKey'});`
+- 全项目搜索`https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/`并改成您的 COS 地址
 - 更改`public/js/game/client.js`第一行的 ip 到您的服务器的 ip.
 - 执行`npm start`.
 - 打开`http://YourServerIpAdress:8080`开始玩耍.
 - 注意,玩耍前请注册一个名字为`admin`的账户,并确保其`id=1`以免引起不必要的意外.
-- 注意,`username`为`admin`可以对所有的微博进行前台管理,请务必确保设置强密码.
-- ~~`http://YourServerIpAdress:8080/editor`为地图编辑器,导出后放入`public/maps/Mapsize`里即可自定义地图.~~
-- 上面一条没了.
+- 注意,`username`为`admin`可以对所有的微博进行后台管理,请务必确保设置强密码.
 
 ## 无法游玩?
 
@@ -57,6 +56,32 @@
   - A: 请提 issue.
 
 ## 更新日志
+
+- V3.3.0b1 2020 年 5 月 12 日 更新 README.md
+
+- V3.3.0 2020 年 5 月 12 日 增加 Rating 排行,记录对战数据(部分)
+
+  - #汶川地震十二年#【缅怀逝者，致敬重生 ❤】
+
+- V3.2.0 2020 年 5 月 11 日 管理后台
+
+- V3.1.2b1 2020 年 5 月 9 日 代码格式化(这种东西有必要写么
+
+- V3.1.2 2020 年 5 月 9 日 修复 css,删除评论中上一页/下一页
+
+- V3.1.1 2020 年 5 月 9 日 私密模式
+
+- V3.1.0 2020 年 5 月 8 日 大厅
+
+- V3.0.5 2020 年 5 月 8 日 ajax 优化
+
+- V3.0.4 2020 年 5 月 7 日 Banner 上传
+
+- V3.0.3 2020 年 5 月 7 日 左侧统计信息
+
+- V3.0.2 2020 年 5 月 6 日 Latex & XSS protect
+
+- V3.0.1 2020 年 5 月 4 日 评论
 
 - V3.0.0 2020 年 5 月 2 日 删除了沙雕 bot(解决 Bug),更换了巨强的外包装(真的只是包装),增加了多房间支持(稳定性有待考究).
 
