@@ -533,11 +533,12 @@ function gameRatingCalc(data) {
         if (Object.keys(data).length == 0) return;
         for (let k in data) {
             getRating(k, (err, dat) => {
-                if (err) return;
+                if (err) { console.log('gameRatingCalc', err); return; }
                 else {
                     data[k].rating = Number(dat);
                     p[Number(data[k].place)] = k;
                     amount++;
+                    console.log('amount', amount, Object.keys(data).length);
                     if (amount == Object.keys(data).length) {
                         let firstRating = data[p[1]].rating;
                         let firstBounce = 0;
@@ -565,8 +566,7 @@ function gameRatingCalc(data) {
     }
 }
 let rating = undefined;
-function getRating() {
-    console.log(rating);
+function getRatingList() {
     let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 10';
     connection.query(SQL, [], (err, dat) => { rating = dat; });
     return rating;
@@ -582,5 +582,5 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc, getRating
+    gameRatingCalc, getRatingList
 }

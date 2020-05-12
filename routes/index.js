@@ -12,7 +12,7 @@ router.get('/', function (req, res, next) {
             else {
                 db.getUserInfo(req.session.uid, (err2, dat2) => {
                     if (err2) next(createError(500));
-                    res.render('index', { title: '首页', username: req.session.username, uid: req.session.uid, dat: dat, page: 1, userInfo: dat2, rating: db.getRating() });
+                    res.render('index', { title: '首页', username: req.session.username, uid: req.session.uid, dat: dat, page: 1, userInfo: dat2, rating: db.getRatingList() });
                 })
             }
         });
