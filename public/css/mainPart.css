@@ -134,3 +134,53 @@ article .post-info-content object {
   text-decoration: none;
   color: pink;
 }
+.center {
+  text-align: center;
+}
+#sRight .rating .avatar {
+  border-radius: 50%;
+  float: left;
+}
+#sRight .rating .info {
+  margin-left: 60px;
+  line-height: 50px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: black;
+}
+#sRight .rating a:hover {
+  text-decoration: none;
+}
+#sRight .rating .rank-box {
+  /* height: 55px;
+  padding: 5px;
+  line-height: 45px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  margin-bottom: 10px; */
+  background-image: repeating-linear-gradient(
+    45deg,
+    hsla(0, 0%, 100%, 0.3),
+    hsla(0, 0%, 100%, 0.3) 15px,
+    transparent,
+    transparent 30px
+  );
+  display: inline-block;
+  width: 100%;
+}
+
+#sRight .rating .rank-link:nth-child(5n + 1) .rank-box {
+  background-color: #fff8e1;
+}
+#sRight .rating .rank-link:nth-child(5n + 2) .rank-box {
+  background-color: #fff0e6;
+}
+#sRight .rating .rank-link:nth-child(5n + 3) .rank-box {
+  background-color: #f7fdde;
+}
+#sRight .rating .rank-link:nth-child(5n + 4) .rank-box {
+  background-color: #f4f6fe;
+}
+#sRight .rating .rank-link:nth-child(5n + 5) .rank-box {
+  background-color: #fef4ff;
+}

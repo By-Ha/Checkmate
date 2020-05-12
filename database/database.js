@@ -564,6 +564,13 @@ function gameRatingCalc(data) {
         console.log("GRC", e);
     }
 }
+let rating = undefined;
+function getRating() {
+    console.log(rating);
+    let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 10';
+    connection.query(SQL, [], (err, dat) => { rating = dat; });
+    return rating;
+}
 
 module.exports = {
     sessionStore,
@@ -575,5 +582,5 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc
+    gameRatingCalc, getRating
 }

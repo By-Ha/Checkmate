@@ -1,3 +1,18 @@
 <div id="sRight" class="sidebar">
-
+    <% if(typeof(rating) != "undefined"){ %>
+    <div class="kana-item rating">
+        <h5 class="center">RATING</h5>
+        <% let r = 1; %>
+        <% rating.forEach(e=>{ %>
+        <a href="/user/<%= e.id %>" class="rank-link">
+            <div class="kana-item rank-box">
+                <img src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= e.id %>.webp!50x50"
+                    height="50px" width="50px" class="avatar">
+                <div class="info">#<%= r %>,<%= e.rating %>:<%= e.username %></div>
+                <% ++r; %>
+            </div>
+        </a>
+        <% }) %>
+    </div>
+    <% } %>
 </div>
