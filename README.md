@@ -19,7 +19,7 @@
   - `mysql.createConnection({host: '数据库host(localhost)',user: '访问数据库用户名',password: '数据库密码',database: '数据库名'});`
 - 在`/cos`下创建`cos_data.js`,按照如下格式填写您的腾讯云 COS 的 SecretId 和 SecretKey:
   - `new COS({SecretId: '您的SecretId',SecretKey: '您的SecretKey'});`
-- 全项目搜索`https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/`并改成您的 COS 地址
+- 全项目搜索`https://kana-1252071452.cos.ap-shanghai.myqcloud.com/`并改成您的 COS 地址
 - 更改`public/js/game/client.js`第一行的 ip 到您的服务器的 ip.
 - 执行`npm start`.
 - 打开`http://YourServerIpAdress:8080`开始玩耍.
@@ -56,6 +56,8 @@
   - A: 请提 issue.
 
 ## 更新日志
+
+- V3.3.1 2020 年 5 月 13 日 更新战斗历史查询
 
 - V3.3.0b1 2020 年 5 月 12 日 更新 README.md
 

@@ -32,4 +32,16 @@ router.get('/edit', function (req, res, next) {
     })
 })
 
+router.get('/battle', function (req, res, next) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    if (req.query.page == undefined) {
+        res.json({ status: 'error', msg: '超出范围' });
+        return;
+    }
+    db.getUserBattle(req.session.uid, req.query.page, (err, dat) => {
+        if (err) res.json({ status: 'error', msg: '超出范围' });
+        else res.render('admin/battle', { dat: dat });
+    })
+})
+
 module.exports = router;

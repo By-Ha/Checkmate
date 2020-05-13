@@ -46,6 +46,11 @@ $(() => {
         });
     }
 
+    function clearPage() {
+        $(".page-wrap")[0].innerHTML = "";
+        content = "";
+    }
+
     function postPageAnction() {
         $(".loading-dot-container").css("display", "unset");
         $(".page-wrap .post i.ad-del").unbind("click");
@@ -105,6 +110,10 @@ $(() => {
     }
 
     function showPost(pid) {
+        if (pid == 999999999) {
+            $(".loading-dot")[0].innerHTML = '<style>.loader{position:absolute;top:50%;left:40%;margin-left:10%;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0)}.dot:nth-child(1){-webkit-animation-delay:.1s;animation-delay:.1s;background:#32bbff}.dot:nth-child(2){-webkit-animation-delay:.2s;animation-delay:.2s;background:#64bbff}.dot:nth-child(3){-webkit-animation-delay:.3s;animation-delay:.3s;background:#96bbff}.dot{width:8px;height:8px;background:#3ac;border-radius:100%;display:inline-block;-webkit-animation:slide 1s infinite;animation:slide 1s infinite;margin:0 10px}@keyframes slide{0%{-webkit-transform:scale(1);transform:scale(1)}50%{opacity:.3;-webkit-transform:scale(2);transform:scale(2)}100%{-webkit-transform:scale(1);transform:scale(1)}}</style><div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+            $(".loading-dot").removeClass('end');
+        }
         content = "";
         get('/admin/post', { pid: pid }, (err, dat) => {
             show();
@@ -119,6 +128,20 @@ $(() => {
             }
         })
     }
+
+    $("#left-bar .nav-link.post").click(() => {
+        $(".loading-dot-container").css("display", "unset");
+        clearPage();
+        showPost(999999999);
+    })
+
+    $("#left-bar .nav-link.battle").click(() => {
+        $(".loading-dot-container").css("display", "none");
+        clearPage();
+        get('/admin/battle', { page: 1 }, (err, dat) => {
+            $(".page-wrap")[0].innerHTML = dat;
+        })
+    })
 
     $(window).scroll(function () {
         if (loadingTag) return;

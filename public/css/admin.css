@@ -264,8 +264,15 @@ html::-webkit-scrollbar-track {
   text-align: center;
 }
 .loading-dot.end {
-  background: url(https://s1.hdslb.com/bfs/seed/bplus-common/dynamic-assets/end.png);
+  background: url(/img/end.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+}
+
+.admincard-content.battle {
+  display: flex;
+}
+.admincard-content.battle .rating {
+  margin: auto;
 }

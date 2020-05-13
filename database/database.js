@@ -564,11 +564,21 @@ function gameRatingCalc(data) {
         console.log("GRC", e);
     }
 }
+
 let rating = undefined;
 function getRatingList() {
     let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 10';
     connection.query(SQL, [], (err, dat) => { rating = dat; });
     return rating;
+}
+
+function getUserBattle(uid, page, callback) {
+    let SQL = 'SELECT * FROM `battle` WHERE player=? ORDER BY id DESC LIMIT ?,10';
+    let SQLDATA = [uid, (--page) * 10];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) callback(err);
+        else callback(null, dat);
+    })
 }
 
 module.exports = {
@@ -581,5 +591,5 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc, getRatingList
+    gameRatingCalc, getRatingList, getUserBattle
 }
