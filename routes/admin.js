@@ -40,7 +40,11 @@ router.get('/battle', function (req, res, next) {
     }
     db.getUserBattle(req.session.uid, req.query.page, (err, dat) => {
         if (err) res.json({ status: 'error', msg: '超出范围' });
-        else res.render('admin/battle', { dat: dat });
+        else if (req.session.uid == 1) {
+            res.render('admin/battleAdmin', { dat: dat });
+        } else {
+            res.render('admin/battle', { dat: dat });
+        }
     })
 })
 

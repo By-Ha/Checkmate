@@ -139,7 +139,31 @@ $(() => {
         $(".loading-dot-container").css("display", "none");
         clearPage();
         get('/admin/battle', { page: 1 }, (err, dat) => {
+            let ctxdata = [];
             $(".page-wrap")[0].innerHTML = dat;
+            $(".battle .rating a").each(function (e) {
+                ctxdata.splice(0, 0, Number(this.innerHTML));
+            })
+            var ctx = document.getElementById('myChart');
+            var myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].splice(0, ctxdata.length),
+                    datasets: [{
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 0.6)',
+                        data: ctxdata,
+                        label: 'Dataset',
+                        fill: 'start'
+                    }]
+                },
+                options: {
+                    title: {
+                        text: 'Rating变化图',
+                        display: true
+                    }
+                }
+            });
         })
     })
 

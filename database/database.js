@@ -573,7 +573,10 @@ function getRatingList() {
 }
 
 function getUserBattle(uid, page, callback) {
-    let SQL = 'SELECT * FROM `battle` WHERE player=? ORDER BY id DESC LIMIT ?,10';
+    let SQL = "";
+    if (uid != 1)
+        SQL = 'SELECT * FROM `battle` WHERE player=? ORDER BY id DESC LIMIT ?, 20';
+    else SQL = 'SELECT * FROM `battle` WHERE (1 OR player=?) ORDER BY id DESC LIMIT ?, 100';
     let SQLDATA = [uid, (--page) * 10];
     connection.query(SQL, SQLDATA, (err, dat) => {
         if (err) callback(err);

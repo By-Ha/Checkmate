@@ -1,10 +1,9 @@
 <% ;function dateFormat(a,b){let ret;const opt={"Y+":b.getFullYear().toString(),"m+":(b.getMonth()+1).toString(),"d+":b.getDate().toString(),"H+":b.getHours().toString(),"M+":b.getMinutes().toString(),"S+":b.getSeconds().toString()};for(let k in opt){ret=new RegExp("("+k+")").exec(a);if(ret){a=a.replace(ret[1],(ret[1].length==1)?(opt[k]):(opt[k].padStart(ret[1].length,"0")))}};return a}; %>
-<div height="200px" width="100%">
-    <canvas id="myChart"></canvas>
-</div>
+
 <% dat.forEach(e=>{ %>
 <div class="admincard">
     <div class="admincard-content battle" bid="<%= e.id %>">
+        <div class="player"><%= e.player %> </div>
         <div class="time">时间:<%- dateFormat("YYYY-mm-dd HH:MM", e.time) %></div>
         <div class="rating">Rating:<a><%= e.rating %></a></div>
         <div class="delta-rating">Rating差值:<%= e.delta_rating %></div>
