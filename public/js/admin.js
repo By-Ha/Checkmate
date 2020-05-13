@@ -148,7 +148,7 @@ $(() => {
             var myLineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].splice(0, ctxdata.length),
+                    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].splice(0, ctxdata.length),
                     datasets: [{
                         backgroundColor: 'rgba(255, 99, 132, 0.6)',
                         borderColor: 'rgba(255, 99, 132, 0.6)',
