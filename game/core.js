@@ -211,9 +211,6 @@ function Run(io) {
             var t = Math.round(Math.random() * num);
             return (t == 0) ? num : t
         }
-        function dist(x, y, i, j) {
-            return Math.abs(x - i) + Math.abs(y - j);
-        }
         function Astar(gm, x, y, tar_x, tar_y) {
             let vis = [];
             let q = [];
@@ -221,15 +218,16 @@ function Run(io) {
             for (let i = 1; i <= size; ++i) vis[i] = [];
             q.push([x, y, 0]);
             vis[x][y] = 1;
-            if (q.length) {
+            while (q.length > 0) {
                 let tx = q[0][0], ty = q[0][1], step = q[0][2];
-                q = q.splice(1);
+                q = q.slice(1);
                 for (let j = 0; j < 4; ++j) {
                     let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
                     if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
                     vis[tx2][ty2] = 1;
                     q.push([tx2, ty2, step + 1]);
-                    if (tx2 == tar_x && ty2 == tar_y) return step + 1;
+                    if (tx2 == tar_x && ty2 == tar_y)
+                        return step + 1;
                 }
             }
             return -1;
@@ -267,40 +265,34 @@ function Run(io) {
         for (var i = 1; i <= player; ++i) {
             ++calcTimes;
             if (calcTimes >= 100) return generateMap(player);
-            var t1 = rnd(size),
-                t2 = rnd(size);
+            var t1 = rnd(size - 2) + 1,
+                t2 = rnd(size - 2) + 1;
             // 至少留一个方位有空
-            while (gm[t1][t2].type != 0) {//  || (gm[t1 + 1][t2].type != 0 && gm[t1 - 1][t2].type != 0 && gm[t1][t2 + 1].type != 0 && gm[t1][t2 + 1].type != 0)
-                t1 = rnd(size), t2 = rnd(size);
+            while (gm[t1][t2].type != 0 || (gm[t1 + 1][t2].type != 0 && gm[t1 - 1][t2].type != 0 && gm[t1][t2 + 1].type != 0 && gm[t1][t2 + 1].type != 0)) {//  
+                t1 = rnd(size - 2) + 1, t2 = rnd(size - 2) + 1;
             }
 
-            if (i == 1 || Astar(gm, t1, t2, last[0], last[1]) >= (size == 10 ? 3 : 4)) {
+            if (i == 1) {
                 gm[t1][t2].color = i;
                 gm[t1][t2].amount = 1;
                 gm[t1][t2].type = 1;
-                last[0] = t1, last[1] = t2;
             } else {
-                console.log(Astar(gm, t1, t2, last[0], last[1]));
-                let str = "\n";
-                for (let i = 1; i <= 10; ++i) {
-                    for (let j = 1; j <= 10; ++j) {
-                        if (i == t1 && j == t2) {
-                            str += '2';
-                        }
-                        else if (gm[i][j].color) {
-                            str += '1';
-                        } else if (gm[i][j].type == 4) {
-                            str += '#';
-                        } else if (gm[i][j].type == 5) {
-                            str += 'x';
-                        } else str += ' ';
+                let flag = 0;
+                for (let j = 0; j < last.length; ++j) {
+                    if (Astar(gm, t1, t2, last[j][0], last[j][1]) >= 6) {
+                        continue;
                     }
-                    str += '\n';
+                    flag = 1;
+                    --i;
+                    break;
                 }
-                throw str;
-                last[0] = t1, last[1] = t2;
-                --i;
+                if (flag == 0) {
+                    gm[t1][t2].color = i;
+                    gm[t1][t2].amount = 1;
+                    gm[t1][t2].type = 1;
+                }
             }
+            last.push([t1, t2]);
         }
         return gm;
     }
