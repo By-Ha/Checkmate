@@ -1,4 +1,3 @@
-var getMap = require('../game/getMap');
 var db = require('../database/database');
 var xss = require("xss");
 var Rooms = new Map();
@@ -12,6 +11,7 @@ function Run(io) {
             this.round = 0;
             this.evalcmd;
             this.size;
+            this.gamelog = [];
         }
     }
 
@@ -196,12 +196,8 @@ function Run(io) {
             return;
         }
 
-        // if (game.evalcmd == "") {
         if ((round % size) == 0) addAmountRoad();
         addAmountCity(), addAmountCrown();
-        // } else {
-        //     eval(game.evalcmd);
-        // }
 
         updateMap(room);
     }
@@ -315,13 +311,11 @@ function Run(io) {
             ++i;
         }
         Rooms[room].game.gm = generateMap(--i);
-        console.log(Rooms[room].game.gm);
-        // Rooms[room].game.gm = getMap.randomGetFileV2(--i);
+        Rooms[room].game.gamelog[0] = JSON.stringify(Rooms[room].game.gm);
         Rooms[room].game.evalcmd = Rooms[room].game.gm[0][0].cmd;
         Rooms[room].game.gm[0][0].cmd = "";
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;
         bc(room, 'UpdateSize', Rooms[room].game.size);
-        bc(room, 'swal', makeSwal("地图名称:" + Rooms[room].game.gm[0][0].mapName + "\n作者:" + Rooms[room].game.gm[0][0].author, 3, 5000));
         bc(room, 'LoggedUserCount', [0, 0]); // just clear it
         bc(room, 'execute', "$('#ready')[0].innerHTML = '准备'");
 
