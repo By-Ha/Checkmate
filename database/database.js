@@ -2,9 +2,14 @@ var mysql = require('mysql');
 var fs = require('fs');
 var crypto = require('crypto');
 var session = require('express-session');
+var xss = require('xss');
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
-    md = new MarkdownIt({ breaks: true });
+    md = new MarkdownIt({
+        breaks: true,
+        linkify: true,
+        html: true,
+    });
 var stringRandom = require('string-random');
 
 require('events').EventEmitter.defaultMaxListeners = 50
@@ -138,7 +143,7 @@ function getTypePost(type, page, pagesize, callback) {
         if (error) { callback(error); return; }
         let finish = 0;
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
@@ -168,7 +173,7 @@ function getPost(pid, callback) {
             callback('被删除');
             return;
         }
-        result.content = md.render(result.content);
+        result.content = xss(md.render(result.content));
         callback(null, result);
     });
 }
@@ -238,7 +243,7 @@ function getUserPost(uid, page, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) callback(null, results);
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
@@ -269,7 +274,7 @@ function getUserPostByPID(uid, PID, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) callback(null, results);
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
