@@ -12,6 +12,7 @@ router.get('/', function (req, res, next) {
 router.post('/', function (req, res) {
   db.register(req.body.username, req.body.pwd, function (err, dat) {
     if (err) res.json({ status: 'error', msg: err });
+    console.log(dat);
     if (dat[0] == 0) {
       req.session.username = req.body.username;
       req.session.uid = dat[2];

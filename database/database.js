@@ -2,9 +2,14 @@ var mysql = require('mysql');
 var fs = require('fs');
 var crypto = require('crypto');
 var session = require('express-session');
+var xss = require('xss');
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
-    md = new MarkdownIt({ breaks: true });
+    md = new MarkdownIt({
+        breaks: true,
+        linkify: true,
+        html: true,
+    });
 var stringRandom = require('string-random');
 
 require('events').EventEmitter.defaultMaxListeners = 50
@@ -79,32 +84,23 @@ function register(username, password, callback) {
     for (var i = 1; i <= 10; ++i)
         password = crypto.createHash('md5').update("114514" + password + 'encryptionKana').digest("hex")
     username = String(username), password = String(password);
-    var SQL = 'SELECT * FROM `user` WHERE BINARY username=?';
+    var SQL = 'SELECT * FROM `user` WHERE username=?';
     var SQLDATA = [username];
-    var p = new Promise(function (resolve, reject) {
-        connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) reject(-1);
-            if (results == 0) resolve(0);
-            else resolve(-1);
-        });
-    });
-    p.then(function (data) {
-        if (data == -1) {
-            callback(null, [-1, "该用户名已被注册"]);
-            return;
+
+    connection.query(SQL, SQLDATA, function (error, results) {
+        if (error) callback('error');
+        if (results == 0) {
+            SQL = "INSERT INTO user (`username`, `password`, `exp`, `rating`) VALUES (?, ?, 0, 0)";
+            SQLDATA = [username, password];
+            connection.query(SQL, SQLDATA, function (error, results) {
+                if (error) callback('error');
+                else getUserId(username, function (err, dat) {
+                    if (err) callback(err);
+                    callback(null, [0, "注册成功", dat]);
+                })
+            });
         }
-        SQL = "INSERT INTO user (`username`, `password`) VALUES (?, ?)";
-        SQLDATA = [username, password];
-        connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) callback(error);
-            getUserId(username, function (err, dat) {
-                if (err) callback(err);
-                callback(null, [0, "注册成功", dat]);
-            })
-            // callback(null, [0, "注册成功"]);
-        });
-    }, function (reason) {
-        callback(reason);
+        else callback(null, [-1, "该用户名已被注册"]);;
     });
 }
 
@@ -147,7 +143,7 @@ function getTypePost(type, page, pagesize, callback) {
         if (error) { callback(error); return; }
         let finish = 0;
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
@@ -177,7 +173,7 @@ function getPost(pid, callback) {
             callback('被删除');
             return;
         }
-        result.content = md.render(result.content);
+        result.content = xss(md.render(result.content));
         callback(null, result);
     });
 }
@@ -247,7 +243,7 @@ function getUserPost(uid, page, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) callback(null, results);
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
@@ -278,7 +274,7 @@ function getUserPostByPID(uid, PID, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) callback(null, results);
         results.forEach(e => {
-            e.content = md.render(e.content);
+            e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;

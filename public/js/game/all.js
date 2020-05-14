@@ -62,9 +62,8 @@ $(() => {
         movementUploader = setInterval(() => {
             if (start == false) clearInterval(movementUploader);
             if (movement != undefined && movement != 0) {
-                if (movement[0][0] <= 2)
-                    s.emit('UploadMovement', movement[0].slice(1)), movement[0][0]++;
-                else movement[0][0] -= 0.25;
+                if (movement[0][0] == 0)
+                    s.emit('UploadMovement', movement[0].slice(1));
             }
         }, 50);
     });
@@ -84,8 +83,9 @@ $(() => {
         }
     });
     s.on('DeleteMovement', function () {
-        if (movement.length && movement[0][0])
+        if (movement.length && movement[0][0]) {
             movement = movement.slice(1);
+        }
         while (movement.length) {
             if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) {
                 let t1 = movement[0][1];
