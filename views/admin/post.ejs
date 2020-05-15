@@ -1,7 +1,7 @@
 <% dat.forEach(e=>{ %>
 <div class="admincard">
     <div class="admincard-content post" pid="<%= e.id %>">
-        <div class="content"><%- e.content %></div>
+        <div class="content"><object><%- e.content %></object></div>
         <i class="iconfont ad-del"></i>
         <i class="iconfont ad-edit"></i>
     </div>

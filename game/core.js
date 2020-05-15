@@ -88,11 +88,13 @@ function Run(io) {
         let gm = Rooms[room].game.gm;
         let size = Rooms[room].game.size;
         var needDeleteMovement = []; // players that finish movement below
+        Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].gaming) { // maybe disconnected
                 continue;
             }
             var mv = player[k].movement;
+            Rooms[room].game.gamelog[Rooms[room].game.round][k] = mv.concat();
             if (mv == 0 || mv == undefined) continue; // the movement is empty
             needDeleteMovement.push(k);
             if (mv[0] > size || mv[1] > size || mv[2] > size || mv[3] > size
@@ -118,6 +120,7 @@ function Run(io) {
 
     function playerWinAnction(room) {
         try {
+            Rooms[room].game.gamelog[0][0][0].version = 1;
             for (let k in Rooms[room].playedPlayer) {
                 if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true) {
                     Rooms[room].playedPlayer[k].place = 1;
@@ -125,7 +128,7 @@ function Run(io) {
                     Rooms[room].playedPlayer[k].place = 2;
                 }
             }
-            db.gameRatingCalc(Rooms[room].playedPlayer);
+            db.gameRatingCalc(Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
             for (let k in Rooms[room].player) {
                 if (Rooms[room].player[k].connect == false) {
                     delete Rooms[room].player[k];
@@ -311,7 +314,8 @@ function Run(io) {
             ++i;
         }
         Rooms[room].game.gm = generateMap(--i);
-        Rooms[room].game.gamelog[0] = JSON.stringify(Rooms[room].game.gm);
+        Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
+        Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
         Rooms[room].game.evalcmd = Rooms[room].game.gm[0][0].cmd;
         Rooms[room].game.gm[0][0].cmd = "";
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;

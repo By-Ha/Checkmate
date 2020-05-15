@@ -1,0 +1,27 @@
+<%- include('../header', {title: 'test'}); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.js"
+    integrity="sha256-uEFhyfv3UgzRTnAZ+SEgvYepKKB0FW6RqZLrqfyUNug=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.3.0/dist/socket.io.js"
+    integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.min.js"></script>
+<link rel="stylesheet" href="/css/checkmate.css">
+
+<div id="cover">
+</div>
+<div id="main">
+    <table id="m">
+    </table>
+</div>
+<style id="font-size-control">
+    #m td {
+        width: 30px;
+        max-width: 30px;
+        height: 30px;
+        max-height: 30px;
+    }
+</style>
+
+<!-- <script src="/js/game/all.min.js"></script> -->
+<script src="/js/game/replay.js"></script>
+<%- include('../footer'); -%>

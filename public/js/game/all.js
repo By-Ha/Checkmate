@@ -319,20 +319,18 @@ $(() => {
                 }, 0);
             }
         }
-        setTimeout(() => { showSymbol(false); }, 0);
-        setTimeout(() => {
-            $("#info-content")[0].innerHTML = "";
-            playerInfo.sort(function (a, b) {
-                if (a == undefined) return (b == undefined) ? 0 : -1;
-                if (b == undefined) return 1;
-                if (a[1] == b[1]) return b[0] - a[0];
-                return b[1] - a[1];
-            });
-            for (var i = 0; i < playerInfo.length; ++i) {
-                if (playerInfo[i] == undefined) break;
-                $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
-            }
-        }, 50);
+        showSymbol(false);
+        $("#info-content")[0].innerHTML = "";
+        playerInfo.sort(function (a, b) {
+            if (a == undefined) return (b == undefined) ? 0 : -1;
+            if (b == undefined) return 1;
+            if (a[1] == b[1]) return b[0] - a[0];
+            return b[1] - a[1];
+        });
+        for (var i = 0; i < playerInfo.length; ++i) {
+            if (playerInfo[i] == undefined) break;
+            $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
+        }
     }
     document.onkeydown = function (event) {
         var e = event || window.event || arguments.callee.caller.arguments[0];

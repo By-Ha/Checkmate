@@ -9,6 +9,7 @@ var MarkdownIt = require('markdown-it'),
         breaks: true,
         linkify: true,
         html: true,
+        xhtmlOut: true,
     });
 var stringRandom = require('string-random');
 
@@ -508,6 +509,12 @@ function addBattle(uid, battle_id, dr) {
     })
 }
 
+function addBattleData(battle_id, data) {
+    let SQL = 'INSERT INTO `battle_data`(`battle_id`, `battle_data`) VALUES (?, ?)'
+    let SQLDATA = [battle_id, data];
+    connection.query(SQL, SQLDATA, () => { });
+}
+
 function changeRating(uid, rating) {
     console.log('RATING_CHANGE', uid, rating);
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
@@ -520,13 +527,14 @@ function changeRating(uid, rating) {
 
 }
 
-function gameRatingCalc(data) {
+function gameRatingCalc(data, battle_data) {
     console.log("PLACE_DATA:", data);
     try {
         let bid = stringRandom(64);
         let amount = 0;
         let p = [];
         if (Object.keys(data).length == 0) return;
+        addBattleData(bid, battle_data);
         for (let k in data) {
             getRating(k, (err, dat) => {
                 if (err) { console.log('gameRatingCalc', err); return; }

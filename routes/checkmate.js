@@ -19,4 +19,9 @@ router.get('/room', function (req, res, next) {
     res.render('checkmateHall', { username: req.session.username, uid: req.session.uid, r: game.Rooms });
 })
 
+router.get('/replay', function (req, res, next) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    res.render('game/replay');
+})
+
 module.exports = router;
