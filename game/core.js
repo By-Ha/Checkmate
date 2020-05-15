@@ -353,6 +353,7 @@ function Run(io) {
 
         // 加入房间
         s.on('joinRoom', function (room) {
+            if (room == undefined) return;
             room = String(room);
             if (room == 'World') return;
             s.join(room);
