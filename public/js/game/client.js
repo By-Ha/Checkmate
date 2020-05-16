@@ -1,4 +1,4 @@
-s = io.connect('ws://175.24.85.24:3001/');
+s = io.connect('ws://127.0.0.1:3001/');
 
 var nick = "";
 var roomName = "";

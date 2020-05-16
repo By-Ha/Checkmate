@@ -1,6 +1,6 @@
 "use strict";
 $(() => {
-    let s = io.connect('ws://175.24.85.24:3001/');
+    let s = io.connect('ws://127.0.0.1:3001/'); // 请改变这里的内容
 
     let nick = "";
     let roomName = "";

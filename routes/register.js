@@ -6,12 +6,12 @@ var cos = require('../cos/cos');
 /* GET home page. */
 router.get('/', function (req, res, next) {
   if (req.session.username != undefined) res.redirect('/');
-  res.render('register', { username: undefined });
+  else res.render('register', { username: undefined });
 });
 
 router.post('/', function (req, res) {
   db.register(req.body.username, req.body.pwd, function (err, dat) {
-    if (err) res.json({ status: 'error', msg: err });
+    if (err) { res.json({ status: 'error', msg: err }); return; };
     console.log(dat);
     if (dat[0] == 0) {
       req.session.username = req.body.username;

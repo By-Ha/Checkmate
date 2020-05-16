@@ -1,5 +1,6 @@
 database/database_data.js
 cos/cos_data.js
+config.json
 
 # Logs
 logs

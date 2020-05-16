@@ -1,11 +1,10 @@
 var COS = require('cos-nodejs-sdk-v5');
 var fs = require('fs');
-var appid = 1252071452;
 
-var cos = eval(fs.readFileSync('cos/cos_data.js').toString()); // product
-// var cos = eval(fs.readFileSync('./cos_data.js').toString()); // develop test
-var Bucket = 'kana' + '-' + String(appid);
-var Region = 'ap-shanghai';
+var cos = eval(require('../config').cos_data); // product
+var appid = Number(require('../config').cos_appid);
+var Bucket = require('../config').cos_bucket + '-' + String(appid);
+var Region = require('../config').cos_region;
 
 
 function getFile(path = '/', callback) {
