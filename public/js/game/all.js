@@ -1,6 +1,6 @@
 "use strict";
 $(() => {
-    let s = io.connect('ws://175.24.85.24:3001/'); // 请改变这里的内容
+    let s = io.connect('ws://' + window.location.hostname + ':3001/'); // 请改变这里的内容,现在不用改了
 
     let User;
     let colorNick = [];
