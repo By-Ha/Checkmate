@@ -189,7 +189,6 @@ router.post('/deletepost', function (req, res) {
 
 router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    if (typeof (req.session.uid) != "number") return;
     var imgType = req.file.mimetype; // 图片类型
     var url = "/tmp/Kana/upload/" + req.file.filename;
     if (imgType == "image/png" || imgType == "image/jpeg") {
@@ -211,7 +210,6 @@ router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
 
 router.post('/upload/banner', upload.single('banner'), function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    if (typeof (req.session.uid) != "number") return;
     var imgType = req.file.mimetype; // 图片类型
     var url = "/tmp/Kana/upload/" + req.file.filename;
     if (imgType == "image/png" || imgType == "image/jpeg") {
