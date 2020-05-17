@@ -76,6 +76,7 @@ button.btnv2:hover {
   text-align: center;
   padding: 0;
   background: #dcdcdc;
+  font-weight: 600;
 }
 #m .shown {
   border: 1px solid black; /*transparent*/
@@ -85,7 +86,7 @@ button.btnv2:hover {
   border: 1px solid transparent; /**/
 }
 #m .selected {
-  filter: opacity(0.8);
+  filter: opacity(0.4);
 }
 #m .own {
   cursor: pointer;
@@ -162,6 +163,8 @@ button.btnv2:hover {
 }
 #info {
   color: aliceblue;
+  margin: 0;
+  font-weight: 600;
 }
 #message-box {
   position: fixed;
@@ -259,6 +262,24 @@ button.btnv2:hover {
 .maroon {
   background-color: grey !important;
   color: white;
+}
+.crown{
+  background-image: url('/img/crown.png') !important;
+}
+.city{
+  background-image: url('/img/city.png') !important;
+}
+.mountain{
+  background-image: url('/img/mountain.png') !important;
+  background-color: gray !important;
+}
+.empty-city{
+  background-image: url('/img/city.png') !important;
+  background-color: gray !important;
+  color: white;
+}
+.obstacle{
+  background-image: url('/img/obstacle.png') !important;
 }
 * {
   padding: 0px;

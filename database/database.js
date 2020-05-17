@@ -13,14 +13,13 @@ var MarkdownIt = require('markdown-it'),
     });
 var stringRandom = require('string-random');
 
-require('events').EventEmitter.defaultMaxListeners = 50
+require('events').EventEmitter.defaultMaxListeners = 50;
 
 var connection;
 var sessionStore;
 
 function handleError() {
-    connection = eval(fs.readFileSync('database/database_data.js').toString());
-    // connection = eval(fs.readFileSync('./database_data.js').toString());
+    connection = eval(require('../config').db_data);
 
     sessionStore = new MySQLStore({
         expiration: 86400000,
@@ -36,7 +35,7 @@ function handleError() {
     }, connection);
 
     //连接错误，2秒重试
-    connection.connect(function (err) {
+    connection.connect(function (err, dat) {
         if (err) {
             console.log('error when connecting to db:', err);
             connection.destroy();
@@ -149,15 +148,16 @@ function getTypePost(type, page, pagesize, callback) {
                 if (err) callback(err);
                 e.comment = dat;
                 finish++;
-                if (finish == results.length * 2) callback(null, results);
+                if (finish == results.length * 2) { callback(null, results); return; }
             });
             getUserLevelById(e.user_id, function (err, dat) {
                 if (err) callback(err);
                 e.level = dat;
                 finish++;
-                if (finish == results.length * 2) callback(null, results);
+                if (finish == results.length * 2) { callback(null, results); return; }
             })
         })
+        callback(null, results);
     });
 }
 
@@ -592,6 +592,15 @@ function getUserBattle(uid, page, callback) {
     })
 }
 
+function getReplay(rid, callback) {
+    let SQL = 'SELECT * FROM `battle_data` WHERE battle_id=?;';
+    let SQLDATA = [rid];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) callback(err);
+        else callback(null, dat);
+    })
+}
+
 module.exports = {
     sessionStore,
     login, register,
@@ -602,5 +611,5 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc, getRatingList, getUserBattle
+    gameRatingCalc, getRatingList, getUserBattle, getReplay
 }

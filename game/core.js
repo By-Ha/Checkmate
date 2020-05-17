@@ -6,6 +6,7 @@ function Run(io) {
     class Room {
         constructor() {
             this.gm;
+            this.lastGM;
             this.color2Id = [];
             this.gameInterval;
             this.round = 0;
@@ -30,14 +31,13 @@ function Run(io) {
         }
     }
 
-    function makeSwal(title, type = 0, timer = 3000) {
-        var ty = ['success', 'error', 'warning', 'info', ''];
+    function makeSwal(title, type, timer = 3000, toast = true) {
         return {
-            toast: true,
-            position: 'top',
+            toast: toast,
+            position: (toast ? 'top' : 'center'),
             showConfirmButton: false,
             timer: timer,
-            type: ty[type],
+            type: type,
             title: title
         };
     }
@@ -83,12 +83,49 @@ function Run(io) {
         }
     }
 
+    function generatePatch(last, now) {
+        let ret = [];
+        for (let i in now) {
+            for (let j in now[i]) {
+                if (last[i] == undefined || last[i][j] == undefined || JSON.stringify(last[i][j]) != JSON.stringify(now[i][j])) {
+                    ret.push([i, j, JSON.stringify(now[i][j])]);
+                }
+            }
+        }
+        return ret;
+    }
+
+    function Rank(room) {
+        let gm = Rooms[room].game.gm;
+        let size = Rooms[room].game.size;
+        let playerInfo = [];
+        if (gm == 0) return;
+        for (let i = 1; i <= size; ++i) {
+            for (let j = 1; j <= size; ++j) {
+                if (gm[i][j].color != 0) {
+                    if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
+                    playerInfo[gm[i][j].color][0] += 1;
+                    playerInfo[gm[i][j].color][1] += gm[i][j].amount;
+                    playerInfo[gm[i][j].color][2] = gm[i][j].color;
+                }
+            }
+        }
+        playerInfo.sort(function (a, b) {
+            if (a == undefined) return (b == undefined) ? 0 : -1;
+            if (b == undefined) return 1;
+            if (a[1] == b[1]) return b[0] - a[0];
+            return b[1] - a[1];
+        });
+        return playerInfo;
+    }
+
     function updateMap(room) {
         let player = Rooms[room].player;
         let gm = Rooms[room].game.gm;
         let size = Rooms[room].game.size;
         var needDeleteMovement = []; // players that finish movement below
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
+        Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].gaming) { // maybe disconnected
                 continue;
@@ -112,8 +149,8 @@ function Run(io) {
             combineBlock(room, f, t, cnt);
             player[k].movement = [];
         }
-        bc(room, 'UpdateRound', Rooms[room].game.round);
-        bc(room, 'UpdateGM', Rooms[room].game.gm)
+        bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
+        bc(room, 'Rank_Update', Rank(room));
         for (var i = 0; i < needDeleteMovement.length; ++i)
             ue(needDeleteMovement[i], 'DeleteMovement');
     }
@@ -324,8 +361,8 @@ function Run(io) {
         bc(room, 'execute', "$('#ready')[0].innerHTML = '准备'");
 
         bc(room, 'UpdateUser', Rooms[room].player);
-        bc(room, 'UpdateGM', Rooms[room].game.gm)
         bc(room, 'GameStart');
+        bc(room, 'UpdateGM', Rooms[room].game.gm);
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
         }, 1000 / Rooms[room].settings.speed);
@@ -343,112 +380,128 @@ function Run(io) {
     }
 
     io.on('connection', function (s) {
-        let uid = s.handshake.session.uid;
-        let uname = s.handshake.session.username;
-        if (connectedUsers[uid] != undefined) s.disconnect();// 断开一个用户的多个连接
-        connectedUsers[uid] = { socket: s.id };
+        let uid, uname;
+        db.sessionStore.get(s.handshake.signedCookies.client_session, (err, dat) => {
+            uid = dat.uid;
+            uname = dat.username;
 
-        // 世界房间,用于聊天
-        s.join('World');
-
-        // 加入房间
-        s.on('joinRoom', function (room) {
-            if (room == undefined) return;
-            room = String(room);
-            if (room == 'World') return;
-            s.join(room);
-            if (Rooms[room] == undefined) {
-                Rooms[room] = {
-                    game: undefined, start: false, player: {}, playedPlayer: {},
-                    interval: undefined,
-                    settings: { speed: 4, private: false }
-                };
+            if (connectedUsers[uid] != undefined) {
+                s.emit('execute', `Swal.fire("加入房间失败:已有加入的房间", '', "error")`);
+                s.disconnect();// 断开一个用户的多个连接
             }
-            Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, color: 0, movement: [] };
-            playerRoom[uid] = room;
-            t = preparedPlayerCount(playerRoom[uid]);
-            bc(playerRoom[uid], 'LoggedUserCount', t);
-            s.emit('UpdateSettings', Rooms[room].settings);
-        });
+            connectedUsers[uid] = { socket: s.id };
 
-        // 退出
-        s.on('disconnect', function () {
-            delete connectedUsers[uid];
-            if (Rooms[playerRoom[uid]] == undefined) return;
-            if (Rooms[playerRoom[uid]].gaming) {
-                let place = 0;
-                for (let temp in Rooms[playerRoom[uid]].playedPlayer) if (Rooms[playerRoom[uid]].playedPlayer[temp].place == 0) place++;
-                Rooms[playerRoom[uid]].playedPlayer[uid].place = place;
-                Rooms[playerRoom[uid]].player[uid].gaming = false;
-                Rooms[playerRoom[uid]].player[uid].connect = false;
-            } else {
-                delete Rooms[playerRoom[uid]].player[uid];
-                for (let k in Rooms[playerRoom[uid]].player) {
-                    if (Rooms[playerRoom[uid]].player[k].connect == false) delete Rooms[playerRoom[uid]].player[k];
+            // 退出
+            s.on('disconnect', function () {
+                delete connectedUsers[uid];
+                if (Rooms[playerRoom[uid]] == undefined) return;
+                if (Rooms[playerRoom[uid]].player[uid].gaming) {
+                    let place = 0;
+                    for (let temp in Rooms[playerRoom[uid]].playedPlayer)
+                        if (Rooms[playerRoom[uid]].playedPlayer[temp].place == 0) place++;
+                    Rooms[playerRoom[uid]].playedPlayer[uid].place = place;
+                    Rooms[playerRoom[uid]].player[uid].gaming = false;
+                    Rooms[playerRoom[uid]].player[uid].connect = false;
+                } else {
+                    delete Rooms[playerRoom[uid]].player[uid];
+                    for (let k in Rooms[playerRoom[uid]].player) {
+                        if (Rooms[playerRoom[uid]].player[k].connect == false) delete Rooms[playerRoom[uid]].player[k];
+                    }
                 }
-            }
-            if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 && Rooms[playerRoom[uid]].game == undefined) {
-                delete Rooms[playerRoom[uid]];
-            }
-            if (Rooms[playerRoom[uid]] != undefined) {
+                if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 && Rooms[playerRoom[uid]].game == undefined) {
+                    delete Rooms[playerRoom[uid]];
+                }
+                if (Rooms[playerRoom[uid]] != undefined) {
+                    t = preparedPlayerCount(playerRoom[uid]);
+                    bc(playerRoom[uid], 'LoggedUserCount', t);
+                }
+                delete playerRoom[uid];
+            });
+
+            // 世界房间,用于聊天
+            s.join('World');
+
+            // 加入房间
+            s.on('joinRoom', function (room) {
+                if (connectedUsers[uid] == undefined) {
+                    s.emit('swal', makeSwal('加入房间失败 原因未知', 'error', 3000, false))
+                    return;
+                }
+                room = String(room);
+                if (room == 'World') {
+                    s.emit('swal', makeSwal('本房间不能被加入', 'error', 3000, false))
+                    return;
+                }
+                s.join(room);
+                if (Rooms[room] == undefined) {
+                    Rooms[room] = {
+                        game: undefined, start: false, player: {}, playedPlayer: {},
+                        interval: undefined,
+                        settings: { speed: 4, private: false }
+                    };
+                }
+                Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, color: 0, movement: [] };
+                playerRoom[uid] = room;
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
-            }
-            delete playerRoom[uid];
-        });
+                s.emit('UpdateSettings', Rooms[room].settings);
+            });
 
-        // 投票开始/结束
-        s.on('VoteStart', function (dat) {
-            try {
-                if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]] == undefined) return;
-                if (Rooms[playerRoom[uid]].start) return;
-                Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
-                t = preparedPlayerCount(playerRoom[uid]);
-                bc(playerRoom[uid], 'LoggedUserCount', t);
-                if (t[0] >= 2 && t[1] > (t[0] / 2))
-                    startGame(playerRoom[uid]);
-            } catch (err) {
-                console.log("CORE ERROR", "VOTESTART", err);
-            }
-        })
 
-        s.on('changeSettings', function (dat) {
-            if (dat.speed) {
-                let speed = Number(dat.speed);
-                if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
-                    Rooms[playerRoom[uid]].settings.speed = dat.speed;
+
+            // 投票开始/结束
+            s.on('VoteStart', function (dat) {
+                try {
+                    if (connectedUsers[uid] == undefined || Rooms[playerRoom[uid]] == undefined) return;
+                    if (Rooms[playerRoom[uid]].start) return;
+                    Rooms[playerRoom[uid]].player[uid].prepare = dat ? true : false;
+                    t = preparedPlayerCount(playerRoom[uid]);
+                    bc(playerRoom[uid], 'LoggedUserCount', t);
+                    if (t[0] >= 2 && t[1] > (t[0] / 2))
+                        startGame(playerRoom[uid]);
+                } catch (err) {
+                    console.log("CORE ERROR", "VOTESTART", err);
                 }
-            }
-            if (dat.private != undefined) {
-                if (Rooms[playerRoom[uid]] != undefined)
-                    Rooms[playerRoom[uid]].settings.private = dat.private;
-            }
-            bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
-        })
+            })
 
-        s.on('AskSize', function () {
-            if (Rooms[playerRoom[uid]].game != undefined)
-                ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
-            ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
-        })
+            s.on('changeSettings', function (dat) {
+                if (dat.speed) {
+                    let speed = Number(dat.speed);
+                    if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
+                        Rooms[playerRoom[uid]].settings.speed = dat.speed;
+                    }
+                }
+                if (dat.private != undefined) {
+                    if (Rooms[playerRoom[uid]] != undefined)
+                        Rooms[playerRoom[uid]].settings.private = dat.private;
+                }
+                bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+            })
 
-        s.on('UploadMovement', function (dat) {
-            if (connectedUsers[uid] == undefined || playerRoom[uid] == undefined) return;
-            if (!Rooms[playerRoom[uid]].start || !Rooms[playerRoom[uid]].player[uid].gaming) return;
-            Rooms[playerRoom[uid]].player[uid].movement = dat;
-            s.emit('ReceiveMovement', dat);
-        })
+            s.on('AskSize', function () {
+                if (Rooms[playerRoom[uid]].game != undefined)
+                    ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
+                ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
+            })
 
-        s.on('SendWorldMessage', function (dat) {
-            if (dat == "") {
-                return;
-            }
-            dat = xss(dat);
-            bc('World', 'WorldMessage', uname + ': ' + dat);
-        })
+            s.on('UploadMovement', function (dat) {
+                if (connectedUsers[uid] == undefined || playerRoom[uid] == undefined) return;
+                if (!Rooms[playerRoom[uid]].start || !Rooms[playerRoom[uid]].player[uid].gaming) return;
+                Rooms[playerRoom[uid]].player[uid].movement = dat;
+                s.emit('ReceiveMovement', dat);
+            })
 
-        s.on('eval', function (dat) {
-            if (uid == 1 || uid == 2) eval(dat);
+            s.on('SendWorldMessage', function (dat) {
+                if (dat == "") {
+                    return;
+                }
+                dat = xss(dat);
+                bc('World', 'WorldMessage', uname + ': ' + dat);
+            })
+
+            s.on('eval', function (dat) {
+                if (uid == 1) eval(dat);
+            })
         })
     })
 }

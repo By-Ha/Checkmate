@@ -1,9 +1,7 @@
 "use strict";
 $(() => {
-    let s = io.connect('ws://175.24.85.24:3001/');
+    let s = io.connect('ws://175.24.85.24:3001/'); // 请改变这里的内容
 
-    let nick = "";
-    let roomName = "";
     let User;
     let colorNick = [];
     let myColor;
@@ -12,13 +10,16 @@ $(() => {
     let start = false;
 
     let size = 20;
+    let exit = false;
+    let exitcnt = 0;
     const color = ['grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon'];
+    const tp = [null, 'crown', null, 'city', 'mountain', 'empty-city', 'obstacle']
     let movement = [];
     let selectNode = [0, 0];
-    let playerInfo = [];
+    let symbolStatus = [];
     let gm = [];
+    let patch_tmp = [];
     let round;
-    let isThirdPerson = false;
     let halfTag = false;
     let scrollSize = 30;
 
@@ -30,7 +31,6 @@ $(() => {
     s.on('connect', function () {
         s.emit('joinRoom', room);
     });
-
     s.on('LoggedUserCount', function (dat) {
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
@@ -54,28 +54,68 @@ $(() => {
     s.on('UpdateSize', function (dat) {
         size = dat;
         makeBoard();
+        for (let i = 1; i <= size; ++i) {
+            symbolStatus[i] = [];
+            for (let j = 1; j <= size; ++j) {
+                symbolStatus[i][j] = { ele: document.getElementById("td-" + String((i - 1) * size + j)) };
+            }
+        }
         init = true;
     });
     s.on('GameStart', function () {
+        start = true; exit = true;
         round = 0; movement = [];
-        start = true;
-        movementUploader = setInterval(() => {
-            if (start == false) clearInterval(movementUploader);
-            if (movement != undefined && movement != 0) {
-                if (movement[0][0] == 0)
-                    s.emit('UploadMovement', movement[0].slice(1));
-            }
-        }, 50);
     });
-    s.on('ReceiveMovement', function (dat) {
-        if (movement != undefined && movement != 0) {
-            if (dat[0] == movement[1] && dat[1] == movement[2] && dat[2] == movement[3] && dat[3] == movement[4])
-                movement[0][0]++;
+    s.on('Rank_Update', (playerInfo) => {
+        let t = document.getElementById("info-content");
+        t.innerHTML = "";
+        let str = "";
+        for (var i = 0; i < playerInfo.length; ++i) {
+            if (playerInfo[i] == undefined) break;
+            str += "<tr><td style='color: " + color[playerInfo[i][2]] + ";'>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
         }
-    });
-    s.on('UpdateRound', function (dat) {
-        round = dat;
-    });
+        t.innerHTML = str;
+    })
+    function Upload_Movement() {
+        if (movement != undefined && movement != 0) {
+            if (movement[0][0] == 0) {
+                s.emit('UploadMovement', movement[0].slice(1));
+                movement[0][0]++;
+            }
+        }
+    }
+    function patch(dat) {
+        $("#l").css('visibility', 'hidden');
+        if (!init) s.emit('AskSize', null);
+        if (init) illu();
+        for (let i = 0; i < dat.length; ++i) {
+            let e = dat[i];
+            if (gm[e[0]] == undefined) gm[e[0]] = [];
+            gm[e[0]][e[1]] = JSON.parse(e[2]);
+        }
+        illu();
+    }
+    function Map_Update(rnd) {
+        if (patch_tmp[rnd]) {
+            let upd_road = (rnd % 10 == 0);
+            for (let i = 1; i <= size; ++i) {
+                for (let j = 1; j <= size; ++j) {
+                    if (upd_road && gm[i][j].type == 2) gm[i][j].amount++;
+                    if (gm[i][j].type == 1 || gm[i][j].type == 3) gm[i][j].amount++;
+                }
+            }
+
+            patch(patch_tmp[rnd]);
+            ++round;
+            Map_Update(rnd + 1);
+        }
+    }
+    s.on('Map_Update', (dat) => {
+        patch_tmp[dat[0]] = dat[1];
+        if (dat[0] == round + 1) {
+            Map_Update(round + 1);
+        }
+    })
     s.on('ClearMovement', function () {
         while (movement.length) {
             if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) movement = movement.slice(1);
@@ -95,9 +135,17 @@ $(() => {
             }
             else break;
         }
+        Upload_Movement();
     });
     s.on('WinAnction', function (dat) {
+        if (exit) {
+            exitcnt++;
+            if (exitcnt >= 2) {
+                window.location.href = '/';
+            }
+        } else exitcnt = 0;
         start = false;
+        gm = []; symbolStatus = []; movement = []; patch_tmp = []; init = false;
         Swal.fire("欢呼", dat + "赢了", "success");
         $("#l").css('visibility', 'unset');
     });
@@ -129,31 +177,6 @@ $(() => {
         let t = $("<p></p>").appendTo("#msg-container");
         t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp" + String(String(msg));
         $("#msg-container")[0].scrollTop = 99999999;
-    });
-    $("#ready")[0].onclick = function () {
-        if (this.innerHTML == "准备") {
-            voteStart(1);
-            this.innerHTML = "取消准备";
-        } else {
-            voteStart(0);
-            this.innerHTML = "准备";
-        }
-    };
-    $(() => {
-        $("#settings-gamespeed-input input").on('input propertychange', () => {
-            let speed = $("#settings-gamespeed-input input")[0].value;
-            if (speed != 1 && speed != 2 && speed != 3 && speed != 4) return;
-            $("#settings-gamespeed-input-display")[0].innerHTML = speed;
-            s.emit('changeSettings', { speed: speed });
-        });
-        $("#settings-gameprivate input").on("change", function () {
-            s.emit('changeSettings', { private: $("#settings-gameprivate input")[0].checked });
-        });
-        s.on('UpdateSettings', function (dat) {
-            $("#settings-gamespeed-input input")[0].value = dat.speed;
-            $("#settings-gamespeed-input-display")[0].innerHTML = dat.speed;
-            $("#settings-gameprivate input")[0].checked = dat.private;
-        });
     });
     function changeHalf(half = true) {
         halfTag = half;
@@ -190,6 +213,9 @@ $(() => {
         else movement.push([0, selectNode[0], selectNode[1], t1, t2, 1]);
         clearSelect();
         makeSelect(t1, t2);
+        if (movement.length == 1) {
+            Upload_Movement();
+        }
     }
     function makeBoard() {
         let m = document.getElementById("m");
@@ -197,9 +223,9 @@ $(() => {
         var str = "";
         str += "<tbody>";
         for (var i = 1; i <= size; ++i) {
-            str += "<tr >";
+            str += "<tr>";
             for (var j = 1; j <= size; ++j) {
-                str += "<td id=\"td-" + ((i - 1) * size + j) + "\">" + String((i - 1) * size + j) + "</td>";
+                str += "<td id=\"td-" + ((i - 1) * size + j) + "\" class=\"unshown\"></td>";
             }
             str += "</tr>";
         }
@@ -229,110 +255,116 @@ $(() => {
         if (i - 1 >= 1 && j - 1 >= 1 && gm[i - 1][j - 1].color == myColor) return true;
         return false;
     }
-    function reloadSymbol(i, j, clear = false) {
-        let c = "";
-        if (!clear) c = $("#td-" + String((i - 1) * size + j)).css('background-image');
-        if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
-        else c = c + ',';
-        if (gm[i][j].type == 1) {//crown
-            if (c.indexOf("crown.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/crown.png')");
-        } else if (gm[i][j].type == 3) {//city
-            if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        } else if (gm[i][j].type == 4) {//mountain
-            if (c.indexOf("mountain.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/mountain.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        } else if (gm[i][j].type == 5) {//empty city
-            if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        }
-    }
-    function showSymbol(onlyLast = false) {
-        if (!onlyLast) // 10%
-            $("#m td").css('background-image', "");
-        for (let i = (onlyLast ? Math.max(movement.length - 1, 0) : 0); i < movement.length; ++i) {
-            let t = movement[i];
-            let id = "#td-" + String((t[1] - 1) * size + t[2]);
-            var c = $(id).css('background-image');
-            if (c == "null" || c == "none" || !c || c == 0 || c == undefined) c = "";
-            else c = c + ',';
-            if (t[1] == t[3] + 1) {
-                if (c.indexOf('arrow-up.png') != -1) continue;
-                $(id).css('background-image', c + "url('/img/arrow-up.png')");
-            } else if (t[1] == t[3] - 1) {
-                if (c.indexOf('arrow-down.png') != -1) continue;
-                $(id).css('background-image', c + "url('/img/arrow-down.png')");
-            } else if (t[2] == t[4] - 1) {
-                if (c.indexOf('arrow-right.png') != -1) continue;
-                $(id).css('background-image', c + "url('/img/arrow-right.png')");
-            } else if (t[2] == t[4] + 1) {
-                if (c.indexOf('arrow-left.png') != -1) continue;
-                $(id).css('background-image', c + "url('/img/arrow-left.png')");
+    function reloadSymbol(i, j) {
+        if (judgeShown(i, j) || !start) {
+            if (gm[i][j].type != symbolStatus[i][j].type) {
+                let t = document.getElementById("td-" + String((i - 1) * size + j));
+                if (symbolStatus[i][j].type != undefined)
+                    t.classList.remove(tp[symbolStatus[i][j].type]);
+                t.classList.add(tp[gm[i][j].type]);
+                symbolStatus[i][j].type = gm[i][j].type;
             }
-        }
-        if (!onlyLast) {
-            for (var i = 1; i <= size; ++i) {
-                if (gm[i] == undefined) continue;
-                for (var j = 1; j <= size; ++j) {
-                    reloadSymbol(i, j);
+        } else {
+            if (symbolStatus[i][j].type != 6) {
+                let t = document.getElementById("td-" + String((i - 1) * size + j));
+                if (symbolStatus[i][j].type != undefined)
+                    t.classList.remove(tp[symbolStatus[i][j].type]);
+                symbolStatus[i][j].type = undefined;
+                if (gm[i][j].type >= 3 && gm[i][j].type <= 5) {
+                    t.classList.add(tp[6]);
+                    symbolStatus[i][j].type = 6;
                 }
             }
         }
     }
+    function showSymbol() {
+        for (let i = 0; i < movement.length; ++i) {
+            let t = movement[i];
+            let td = "#td-" + String((t[1] - 1) * size + t[2]);
+            if (t[1] == t[3] + 1) {// up
+            } else if (t[1] == t[3] - 1) {// down
+            } else if (t[2] == t[4] - 1) {// right
+            } else if (t[2] == t[4] + 1) {// left
+            }
+        }
+        for (var i = 1; i <= size; ++i) {
+            if (gm[i] == undefined) continue;
+            for (var j = 1; j <= size; ++j) {
+                reloadSymbol(i, j);
+            }
+        }
+    }
     function illu() {
-        playerInfo = [];// 12%
-        let doc = document;
-        for (let t1 = 1; t1 <= size; ++t1) {
-            for (let t2 = 1; t2 <= size; ++t2) {
-                setTimeout(() => {
-                    let i = t1, j = t2;
-                    if (gm == 0) return;
-                    if (gm[i][j].color != 0) {
-                        if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
-                        playerInfo[gm[i][j].color][0] += 1;
-                        playerInfo[gm[i][j].color][1] += gm[i][j].amount;
-                        playerInfo[gm[i][j].color][2] = gm[i][j].color;
-                    }
-                    let d = doc.getElementById("td-" + String((i - 1) * size + j));
-                    d.innerHTML = "";
-                    if (d.classList.contains("selected")) {
-                        d.classList = "selected";
-                    } else {
-                        d.classList = "";
-                    }
-                    if (gm[i][j].color == myColor) d.classList.add("own");
-                    if (!start || judgeShown(i, j)) {
+        for (let i = 1; i <= size; ++i) {
+            for (let j = 1; j <= size; ++j) {
+                if (gm == 0) return;
+                let d = symbolStatus[i][j].ele;
+                if (gm[i][j].color == myColor && !symbolStatus[i][j].own) {
+                    d.classList.add("own");
+                } else {
+                    d.classList.remove("own");
+                }
+                if (!start || judgeShown(i, j)) {
+                    if (symbolStatus[i][j].amount != gm[i][j].amount) {
                         d.innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
-                        d.classList.add("shown");
-                        d.classList.add(color[gm[i][j].color]);
-                    } else {
-                        d.classList.add("unshown");
+                        symbolStatus[i][j].amount = gm[i][j].amount;
                     }
-                }, 0);
+                    if (symbolStatus[i][j].shown == undefined || symbolStatus[i][j].shown == false) {
+                        d.classList.remove("unshown");
+                        d.classList.add("shown");
+                        symbolStatus[i][j].shown = true;
+                    }
+                    if (symbolStatus[i][j].color != gm[i][j].color) {
+                        d.classList.remove('grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon');
+                        d.classList.add(color[gm[i][j].color]);
+                        symbolStatus[i][j].color = gm[i][j].color;
+                    }
+                } else {
+                    if (symbolStatus[i][j].shown == undefined || symbolStatus[i][j].shown == true) {
+                        d.classList.remove("shown");
+                        d.classList.add("unshown");
+                        symbolStatus[i][j].shown = false;
+                    }
+                    if (symbolStatus[i][j].color != undefined) {
+                        d.classList.remove('grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon');
+                        symbolStatus[i][j].color = undefined;
+                    }
+                    if (symbolStatus[i][j].amount != undefined) {
+                        d.innerHTML = "";
+                        symbolStatus[i][j].amount = undefined;
+                    }
+                }
             }
         }
         showSymbol(false);
-        $("#info-content")[0].innerHTML = "";
-        playerInfo.sort(function (a, b) {
-            if (a == undefined) return (b == undefined) ? 0 : -1;
-            if (b == undefined) return 1;
-            if (a[1] == b[1]) return b[0] - a[0];
-            return b[1] - a[1];
-        });
-        for (var i = 0; i < playerInfo.length; ++i) {
-            if (playerInfo[i] == undefined) break;
-            $("#info-content")[0].innerHTML += "<tr style='color: " + color[playerInfo[i][2]] + ";'><td>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
-        }
     }
+    $("#ready")[0].onclick = function () {
+        if (this.innerHTML == "准备") {
+            voteStart(1);
+            this.innerHTML = "取消准备";
+        } else {
+            voteStart(0);
+            this.innerHTML = "准备";
+        }
+    };
+    $(() => {
+        $("#settings-gamespeed-input input").on('input propertychange', () => {
+            let speed = $("#settings-gamespeed-input input")[0].value;
+            if (speed != 1 && speed != 2 && speed != 3 && speed != 4) return;
+            $("#settings-gamespeed-input-display")[0].innerHTML = speed;
+            s.emit('changeSettings', { speed: speed });
+        });
+        $("#settings-gameprivate input").on("change", function () {
+            s.emit('changeSettings', { private: $("#settings-gameprivate input")[0].checked });
+        });
+        s.on('UpdateSettings', function (dat) {
+            $("#settings-gamespeed-input input")[0].value = dat.speed;
+            $("#settings-gamespeed-input-display")[0].innerHTML = dat.speed;
+            $("#settings-gameprivate input")[0].checked = dat.private;
+        });
+    });
     document.onkeydown = function (event) {
+        exit = false;
         var e = event || window.event || arguments.callee.caller.arguments[0];
         if (!e) return;
         if (e.keyCode == 87) { // W
@@ -414,7 +446,6 @@ $(() => {
             $(m).css('margin-top', t2 + "px");
         }
     });
-
     $(document).ready(() => {
         var box = document.getElementById('m');
         document.onmousedown = function (e) {
@@ -432,5 +463,4 @@ $(() => {
             };
         }
     });
-
 });

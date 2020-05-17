@@ -1,0 +1,7 @@
+{
+    "cos_data": "new COS({SecretId: 'FillInYourSecretIdHere',SecretKey: 'FillInYourSecretKeyHere'});",
+    "cos_appid": "FillInYourAppid(like 1020000002)",
+    "cos_bucket": "FillInYourBucket(withoutAppid, like kana)",
+    "cos_region": "FillInYourRegion(like ap-shanghai)",
+    "db_data": "mysql.createConnection({ host: 'FillInYourHOSTHere', user: 'FillInYourDBUsernameHere', password: 'FillInYourDBpassword', database: 'FillInYourDBNameHere' });"
+}

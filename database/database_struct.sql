@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 2020-05-11 16:49:17
+-- Generation Time: 2020-05-16 16:13:38
 -- 服务器版本： 5.6.47-log
 -- PHP Version: 5.6.40
 
@@ -30,10 +30,24 @@ USE `Kana`;
 
 CREATE TABLE IF NOT EXISTS `battle` (
   `id` int(11) NOT NULL,
-  `battle_id` varchar(64) NOT NULL,
+  `battle_id` varchar(65) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `player` int(11) NOT NULL,
-  `rating` int(11) NOT NULL
+  `rating` int(11) NOT NULL,
+  `delta_rating` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `battle_data`
+--
+
+CREATE TABLE IF NOT EXISTS `battle_data` (
+  `id` int(11) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `battle_id` varchar(65) NOT NULL,
+  `battle_data` mediumtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -50,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `username` varchar(64) NOT NULL,
   `comment` text NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -65,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `content` (
   `user_id` int(11) NOT NULL,
   `user_name` varchar(64) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hidden` tinyint(1) NOT NULL DEFAULT '0',
   `content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -105,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `username` varchar(64) NOT NULL,
   `password` varchar(32) NOT NULL COMMENT 'password',
   `exp` int(11) NOT NULL COMMENT 'experience',
-  `rating` int(11) unsigned NOT NULL DEFAULT '5000'
+  `rating` int(11) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -117,9 +131,15 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 ALTER TABLE `battle`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `BATTLE_ID` (`battle_id`),
   ADD KEY `PLAYER` (`player`),
-  ADD KEY `RATING` (`rating`);
+  ADD KEY `RATING` (`rating`),
+  ADD KEY `BATTLE_ID` (`battle_id`);
+
+--
+-- Indexes for table `battle_data`
+--
+ALTER TABLE `battle_data`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `comment`
@@ -137,8 +157,7 @@ ALTER TABLE `content`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `modified` (`modified`),
-  ADD KEY `created` (`created`),
-  ADD FULLTEXT KEY `content` (`content`);
+  ADD KEY `created` (`created`);
 
 --
 -- Indexes for table `session`
@@ -169,6 +188,11 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `battle`
 --
 ALTER TABLE `battle`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `battle_data`
+--
+ALTER TABLE `battle_data`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `comment`
