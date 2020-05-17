@@ -38,7 +38,7 @@ function handleError() {
     connection.connect(function (err, dat) {
         if (err) {
             console.log('error when connecting to db:', err);
-            delete connection;
+            connection.destroy();
             setTimeout(handleError, 2000);
         }
     });
@@ -546,16 +546,20 @@ function gameRatingCalc(data, battle_data) {
                         let firstRating = data[p[1]].rating;
                         let firstBounce = 0;
                         for (let it = 2; it <= Object.keys(data).length; ++it) {
-                            if (data[p[it]].rating >= firstRating) {
-                                firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
-                                let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
-                                changeRating(p[it], dr);
-                                addBattle(p[it], bid, dr);
-                            } else {
-                                firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
-                                let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
-                                changeRating(p[it], dr);
-                                addBattle(p[it], bid, dr);
+                            try {
+                                if (data[p[it]].rating >= firstRating) {
+                                    firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
+                                    let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
+                                    changeRating(p[it], dr);
+                                    addBattle(p[it], bid, dr);
+                                } else {
+                                    firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
+                                    let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
+                                    changeRating(p[it], dr);
+                                    addBattle(p[it], bid, dr);
+                                }
+                            } catch (e) {
+                                console.log('it:', it, '\np:', p, '\ndata:', data);
                             }
                         }
                         changeRating(p[1], Math.min(12, firstBounce + 1));
