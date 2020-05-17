@@ -5,12 +5,11 @@ var router = express.Router();
 router.post('/', function (req, res) {
     req.session.username = null; // 删除session
     req.session.uid = null;
-    res.redirect('login');
+    req.session.destroy();
+    res.json({ "status": 'success', "msg": 'ok' });
 });
 router.get('/', function (req, res) {
-    req.session.username = null; // 删除session
-    req.session.uid = null;
-    res.redirect('login');
+    res.render('logout');
 });
 
 module.exports = router;

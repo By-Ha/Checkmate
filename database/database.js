@@ -588,6 +588,15 @@ function getUserBattle(uid, page, callback) {
     })
 }
 
+function getReplay(rid, callback) {
+    let SQL = 'SELECT * FROM `battle_data` WHERE battle_id=?;';
+    let SQLDATA = [rid];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) callback(err);
+        else callback(null, dat);
+    })
+}
+
 module.exports = {
     sessionStore,
     login, register,
@@ -598,5 +607,5 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc, getRatingList, getUserBattle
+    gameRatingCalc, getRatingList, getUserBattle, getReplay
 }

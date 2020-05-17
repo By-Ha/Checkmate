@@ -21,16 +21,6 @@ var adminRouter = require('./routes/admin');
 
 var app = express();
 
-
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-
-/* socket.io */
-
-server.listen(3001, function () {
-  console.log('listening on *:3001');
-});
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -46,20 +36,34 @@ app.use(bodyparser.urlencoded({ extended: true }));
 /* cookie */
 
 const sessionOptions = {
-  key: 'client_session',
-  secret: "wobuyaonijuedewoyaowojuedezhegemimabuxinga",
-  store: db.sessionStore,
-  resave: false,
-  saveUninitialized: true,
-  cookie: ('name', 'value', {
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: false,
-    name: "KanaSession",
-    resave: false
-  })
+    key: 'client_session',
+    secret: "wobuyaonijuedewoyaowojuedezhegemimabuxinga",
+    store: db.sessionStore,
+    resave: false,
+    saveUninitialized: true,
+    cookie: ('name', 'value', {
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: false,
+        name: "KanaSession",
+        resave: false
+    })
 };
 
 app.use(session(sessionOptions));
+
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
+/* socket.io */
+
+io.use(function (socket, next) {
+    cookieParser("wobuyaonijuedewoyaowojuedezhegemimabuxinga")(socket.handshake, socket.request.res, next);
+});
+
+server.listen(3001, function () {
+    console.log('listening on *:3001');
+});
+
 
 /* routers */
 
@@ -75,23 +79,20 @@ app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
-io.use(function (socket, next) {
-  session(sessionOptions)(socket.handshake, {}, next);
-});
 
 game.Run(io);
 

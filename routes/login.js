@@ -12,8 +12,8 @@ router.post('/', function (req, res) {
     db.login(req.body.username, req.body.pwd, function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; };
         if (dat[0] == 0) {
-            req.session.username = req.body.username;
-            req.session.uid = dat[2].id;
+            req.session.username = String(req.body.username);
+            req.session.uid = String(dat[2].id);
         }
         res.json({ status: (dat[0] == 0 ? 'success' : 'error'), msg: dat[1] });
     })

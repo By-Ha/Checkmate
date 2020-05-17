@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var db = require('../database/database')
 var game = require('../game/core')
+var createError = require('http-errors');
+
 
 router.get('/room/:rid', function (req, res, next) {
     if (req.session.username != undefined) {
@@ -19,9 +21,12 @@ router.get('/room', function (req, res, next) {
     res.render('checkmateHall', { username: req.session.username, uid: req.session.uid, r: game.Rooms });
 })
 
-router.get('/replay', function (req, res, next) {
+router.get('/replay/:rid', function (req, res, next) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    res.render('game/replay');
+    db.getReplay(req.params.rid, (err, dat) => {
+        if (dat == 0) next(createError(404));
+        else { res.render('game/replay', { game_data: dat[0].battle_data }); }
+    })
 })
 
 module.exports = router;

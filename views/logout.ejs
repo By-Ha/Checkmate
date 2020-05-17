@@ -1,0 +1,27 @@
+<%- include('header', { title: '注销' }); -%>
+<%- include('navi'); -%>
+
+<link rel="stylesheet" href="/css/login.css">
+<script>
+    function post(url, data, callback) {
+        $.ajax({
+            url: url, data: data, type: "post",
+            error: function (request) { callback(request.msg); },
+            success: function (data) {
+                if (data.status == 'error') callback(data.msg);
+                else callback(null, data);
+            }
+        });
+    }
+</script>
+<div id="container">
+    <div id="loginBox">
+        <h3>Logout</h3>
+        <form id="loginForm">
+            <button type="button" id="submitButton"
+                onclick="post('/logout',null, ()=>{window.location.href='/'});">点击注销</button>
+        </form>
+    </div>
+</div>
+
+<% - include('footer'); -%>

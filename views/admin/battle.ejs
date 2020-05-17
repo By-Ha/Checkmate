@@ -4,8 +4,9 @@
 </div>
 <% dat.forEach(e=>{ %>
 <div class="admincard">
-    <div class="admincard-content battle" bid="<%= e.id %>">
-        <div class="time">时间:<%- dateFormat("YYYY-mm-dd HH:MM", e.time) %></div>
+    <div class="admincard-content battle" bid="<%= e.id %>" battle_id="<%= e.battle_id %>">
+        <div class="time">时间:<%- dateFormat("YYYY-mm-dd HH:MM", e.time) %><a
+                href="/checkmate/replay/<%= e.battle_id %>">播放回放</a></div>
         <div class="rating">Rating:<a><%= e.rating %></a></div>
         <div class="delta-rating">Rating差值:<%= e.delta_rating %></div>
     </div>
