@@ -60,8 +60,8 @@ io.use(function (socket, next) {
     cookieParser("wobuyaonijuedewoyaowojuedezhegemimabuxinga")(socket.handshake, socket.request.res, next);
 });
 
-server.listen(3001, function () {
-    console.log('listening on *:3001');
+server.listen(444, function () {
+    console.log('listening on *:444');
 });
 
 

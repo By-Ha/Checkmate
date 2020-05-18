@@ -484,6 +484,14 @@ function Run(io) {
                 ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
             })
 
+            s.on('Ask_GM', function () {
+                if (Rooms[playerRoom[uid]].game != undefined) {
+                    ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
+                    ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
+                    ue(uid, 'Update_Round', Rooms[playerRoom[uid]].game.round);
+                }
+            })
+
             s.on('UploadMovement', function (dat) {
                 if (connectedUsers[uid] == undefined || playerRoom[uid] == undefined) return;
                 if (!Rooms[playerRoom[uid]].start || !Rooms[playerRoom[uid]].player[uid].gaming) return;

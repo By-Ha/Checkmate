@@ -1,7 +1,6 @@
 "use strict";
 $(() => {
-    let s = io.connect('http://' + window.location.hostname + ':3001/'); // 请改变这里的内容,现在不用改了
-    // let s = io.connect(':3001/'); // 请改变这里的内容,现在不用改了
+    let s = io.connect('http://' + window.location.hostname + ':444/'); // 请改变这里的内容,现在不用改了
 
     let User;
     let colorNick = [];
@@ -28,10 +27,13 @@ $(() => {
     function voteStart(i) {
         s.emit('VoteStart', i);
     }
-
     s.on('connect', function () {
         s.emit('joinRoom', room);
     });
+    s.on('disconnect', function () {
+        $("#l").css('visibility', 'unset');
+        Swal.fire("错误", "连接断开", "error");
+    })
     s.on('LoggedUserCount', function (dat) {
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
@@ -53,6 +55,7 @@ $(() => {
         myColor = dat;
     });
     s.on('UpdateSize', function (dat) {
+        init = true;
         size = dat;
         makeBoard();
         for (let i = 1; i <= size; ++i) {
@@ -61,8 +64,8 @@ $(() => {
                 symbolStatus[i][j] = { ele: document.getElementById("td-" + String((i - 1) * size + j)) };
             }
         }
-        init = true;
     });
+    s.on('Update_Round', (dat) => { round = dat; })
     s.on('GameStart', function () {
         start = true; exit = true;
         round = 0; movement = [];
@@ -112,6 +115,9 @@ $(() => {
         }
     }
     s.on('Map_Update', (dat) => {
+        if (dat[0] >= 2 && init == false) {
+            s.emit('Ask_GM');
+        }
         patch_tmp[dat[0]] = dat[1];
         if (dat[0] == round + 1) {
             Map_Update(round + 1);
@@ -145,7 +151,7 @@ $(() => {
                 window.location.href = '/';
             }
         } else exitcnt = 0;
-        start = false;
+        start = false; init = false;
         gm = []; symbolStatus = []; movement = []; patch_tmp = []; init = false;
         Swal.fire("欢呼", dat + "赢了", "success");
         $("#l").css('visibility', 'unset');
@@ -156,14 +162,11 @@ $(() => {
             $("#ready").css('visibility', 'hidden');
         }
     });
-    s.on('ForceThird', function () {
-        $.cookie("third", "1", { expires: 1 });
-        location.reload();
-    });
     s.on('die', function () {
         Swal.fire("您死了!", "", 'warning');
         setTimeout(() => {
-            location.reload();
+            start = false;
+            s.emit('Ask_GM');
         }, 500);
     });
     s.on('swal', function (dat, func) {
