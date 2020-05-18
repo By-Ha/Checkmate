@@ -7,9 +7,11 @@ router.post('/', function (req, res) {
     req.session.uid = null;
     req.session.destroy();
     res.json({ "status": 'success', "msg": 'ok' });
+    return;
 });
 router.get('/', function (req, res) {
     res.render('logout');
+    return;
 });
 
 module.exports = router;

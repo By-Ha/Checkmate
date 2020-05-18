@@ -142,7 +142,7 @@ function Run(io) {
             var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
             cnt -= 1; // cannot move all
-            if (f.color != player[k].color || cnt <= 0 || t.tpye == 4) { // wrong movement
+            if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
                 ue(k, 'ClearMovement');
                 continue;
             }
@@ -236,7 +236,7 @@ function Run(io) {
             return;
         }
 
-        if ((round % size) == 0) addAmountRoad();
+        if ((round % 10) == 0) addAmountRoad();
         addAmountCity(), addAmountCrown();
 
         updateMap(room);
@@ -347,6 +347,7 @@ function Run(io) {
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
             Rooms[room].player[k].color = i;
+            ue(k, 'UpdateColor', i);
             ue(k, 'UpdateColor', i);
             ++i;
         }
