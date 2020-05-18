@@ -8,6 +8,8 @@ var bodyparser = require('body-parser');
 var session = require('express-session');
 var db = require('./database/database');
 var game = require('./game/core');
+var config = require('./config');
+
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
@@ -60,8 +62,8 @@ io.use(function (socket, next) {
     cookieParser("wobuyaonijuedewoyaowojuedezhegemimabuxinga")(socket.handshake, socket.request.res, next);
 });
 
-server.listen(444, function () {
-    console.log('listening on *:444');
+server.listen(config.websocket_port, function () {
+    console.log('Websocket listening on *:' + config.websocket_port);
 });
 
 
