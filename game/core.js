@@ -149,7 +149,6 @@ function Run(io) {
             combineBlock(room, f, t, cnt);
             player[k].movement = [];
         }
-        Rooms[room].game.gamelog[Rooms[room].game.round][0] = generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm);
         bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         bc(room, 'Rank_Update', Rank(room));
         for (var i = 0; i < needDeleteMovement.length; ++i)
@@ -237,7 +236,7 @@ function Run(io) {
             return;
         }
 
-        if ((round % size) == 0) addAmountRoad();
+        if ((round % 10) == 0) addAmountRoad();
         addAmountCity(), addAmountCrown();
 
         updateMap(room);
@@ -348,6 +347,7 @@ function Run(io) {
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
             Rooms[room].player[k].color = i;
+            ue(k, 'UpdateColor', i);
             ue(k, 'UpdateColor', i);
             ++i;
         }
