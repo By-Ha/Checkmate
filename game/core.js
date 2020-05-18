@@ -487,6 +487,7 @@ function Run(io) {
 
             s.on('Ask_GM', function () {
                 if (Rooms[playerRoom[uid]].game != undefined) {
+                    ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
                     ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
                     ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
                     ue(uid, 'Update_Round', Rooms[playerRoom[uid]].game.round);

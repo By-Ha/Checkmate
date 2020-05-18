@@ -160,7 +160,8 @@ function getTypePost(type, page, pagesize, callback) {
                 if (finish == results.length * 2) { callback(null, results); return; }
             })
         })
-        callback(null, results);
+        if (results == 0)
+            callback(null, results);
         return;
     });
 }
