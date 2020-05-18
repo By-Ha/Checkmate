@@ -5,7 +5,7 @@ var db = require('../database/database');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (req.session.username != undefined) res.redirect('/');
-    else res.render('login', { username: undefined });
+    else { res.render('login', { username: undefined }); return; }
 });
 
 router.post('/', function (req, res) {
@@ -16,6 +16,7 @@ router.post('/', function (req, res) {
             req.session.uid = String(dat[2].id);
         }
         res.json({ status: (dat[0] == 0 ? 'success' : 'error'), msg: dat[1] });
+        return;
     })
 });
 

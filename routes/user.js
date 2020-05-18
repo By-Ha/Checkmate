@@ -17,7 +17,7 @@ router.get("/:uid", function (req, res, next) {
                     res.send('404');
                     return;
                 }
-                else res.render('user', { title: dat.username, username: req.session.username, uid: req.session.uid, userInfo: dat3, userInfo2: dat, userPost: dat2, page: 1 });
+                else { res.render('user', { title: dat.username, username: req.session.username, uid: req.session.uid, userInfo: dat3, userInfo2: dat, userPost: dat2, page: 1 }); return; }
             })
         })
     })
@@ -36,7 +36,7 @@ router.get("/:uid/page/:page", function (req, res, next) {
                     res.send('404');
                     return;
                 }
-                else res.render('user', { title: dat.username, username: req.session.username, uid: req.session.uid, userInfo: dat3, userInfo2: dat, userPost: dat2, page: req.params.page });
+                else { res.render('user', { title: dat.username, username: req.session.username, uid: req.session.uid, userInfo: dat3, userInfo2: dat, userPost: dat2, page: req.params.page }); return; }
             })
         })
     })

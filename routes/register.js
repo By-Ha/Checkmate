@@ -6,7 +6,7 @@ var cos = require('../cos/cos');
 /* GET home page. */
 router.get('/', function (req, res, next) {
   if (req.session.username != undefined) res.redirect('/');
-  else res.render('register', { username: undefined });
+  else { res.render('register', { username: undefined }); return; }
 });
 
 router.post('/', function (req, res) {
@@ -20,6 +20,7 @@ router.post('/', function (req, res) {
       cos.uploadFile('./public/img/', 'banner.jpg', '/img/user/banner/', dat[2] + '.webp');
     }
     res.json({ status: (dat[0] == 0 ? 'success' : 'error'), msg: dat[1] });
+    return;
   })
 });
 

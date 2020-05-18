@@ -65,9 +65,9 @@ function login(username, password, callback) {
     var SQL = 'SELECT * FROM `user` WHERE BINARY username=? AND BINARY password=?';
     var SQLDATA = [username, password];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) callback(error);
-        if (results == 0) callback(null, [-1, '错误的用户名或密码', { username: "ERRUSER", id: -1 }]);
-        else callback(null, [0, '成功登录', { username: results[0].username, id: results[0].id }])
+        if (error) { callback(error); return; }
+        if (results == 0) { callback(null, [-1, '错误的用户名或密码', { username: "ERRUSER", id: -1 }]); return; }
+        else { callback(null, [0, '成功登录', { username: results[0].username, id: results[0].id }]); return; }
     });
 }
 
@@ -88,19 +88,20 @@ function register(username, password, callback) {
     var SQLDATA = [username];
 
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) callback('error');
+        if (error) { callback('error'); return; }
         if (results == 0) {
             SQL = "INSERT INTO user (`username`, `password`, `exp`, `rating`) VALUES (?, ?, 0, 0)";
             SQLDATA = [username, password];
             connection.query(SQL, SQLDATA, function (error, results) {
-                if (error) callback('error');
+                if (error) { callback('error'); return; }
                 else getUserId(username, function (err, dat) {
-                    if (err) callback(err);
+                    if (err) { callback(err); return; }
                     callback(null, [0, "注册成功", dat]);
+                    return;
                 })
             });
         }
-        else callback(null, [-1, "该用户名已被注册"]);;
+        else { callback(null, [-1, "该用户名已被注册"]); return; }
     });
 }
 
@@ -112,8 +113,8 @@ function modifyExp(uid, amount, callback) {
         var SQL = 'SELECT * FROM `user` WHERE id=?';
         var SQLDATA = [uid];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) callback(error);
-            else callback(null, [0, '', { exp: results[0].exp }])
+            if (error) { callback(error); return; }
+            else { callback(null, [0, '', { exp: results[0].exp }]); return; }
         });
     });
 }
@@ -124,6 +125,7 @@ function querySubmission(uid, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         callback(null, [0, results]);
+        return;
     });
 }
 
@@ -133,6 +135,7 @@ function addSubmission(uid, dat, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         callback(null, [0]);
+        return;
     });
 }
 
@@ -145,19 +148,20 @@ function getTypePost(type, page, pagesize, callback) {
         results.forEach(e => {
             e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 e.comment = dat;
                 finish++;
                 if (finish == results.length * 2) { callback(null, results); return; }
             });
             getUserLevelById(e.user_id, function (err, dat) {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 e.level = dat;
                 finish++;
                 if (finish == results.length * 2) { callback(null, results); return; }
             })
         })
         callback(null, results);
+        return;
     });
 }
 
@@ -166,16 +170,11 @@ function getPost(pid, callback) {
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
         let result = results[0];
-        if (error) {
-            callback(error, null);
-            return;
-        }
-        if (result == undefined) {
-            callback('被删除');
-            return;
-        }
+        if (error) { callback(error, null); return; }
+        if (result == undefined) { callback('被删除'); return; }
         result.content = xss(md.render(result.content));
         callback(null, result);
+        return;
     });
 }
 
@@ -183,8 +182,9 @@ function getSourcePost(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error) callback(error, results);
+        if (error) { callback(error, results); return; }
         callback(null, results[0]);
+        return;
     });
 }
 
@@ -192,18 +192,13 @@ function updatePost(pid, username, content, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (username != results[0].user_name && username != "admin") {
-            callback("Permission Denied", null);
-            return;
-        }
+        if (username != results[0].user_name && username != "admin") { callback("Permission Denied", null); return; }
         var SQL = `UPDATE content SET content=? WHERE id=?;`
         var SQLDATA = [content, pid];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) {
-                callback(error, null);
-                return;
-            }
+            if (error) { callback(error, null); return; }
             callback(null, "成功修改");
+            return;
         });
     });
 }
@@ -212,17 +207,11 @@ function deletePost(pid, username, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (username != results[0].user_name && username != "admin") {
-            callback("Permission Denied", null);
-            return;
-        }
+        if (username != results[0].user_name && username != "admin") { callback("Permission Denied", null); return; }
         var SQL = `UPDATE content SET hidden=? WHERE id=?;`
         var SQLDATA = [true, pid];
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) {
-                callback(error, null);
-                return;
-            }
+            if (error) { callback(error, null); return; }
             callback(null, "成功删除");
             let SQL2 = `select * from content where id=?`;
             let SQLDATA2 = [pid];
@@ -230,7 +219,6 @@ function deletePost(pid, username, callback) {
                 if (err) return;
                 addUserExperienceById(dat[0].user_id, -10);
             })
-
         });
     });
 }
@@ -242,7 +230,7 @@ function getUserPost(uid, page, pagesize, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         let finish = 0;
-        if (results.length == 0) callback(null, results);
+        if (results.length == 0) { callback(null, results); return; }
         results.forEach(e => {
             e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
@@ -251,14 +239,16 @@ function getUserPost(uid, page, pagesize, callback) {
                 finish++;
                 if (finish == (results.length * 2)) {
                     callback(null, results);
+                    return;
                 }
             });
             getUserLevelById(e.user_id, function (err, dat) {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 e.level = dat;
                 finish++;
                 if (finish == (results.length * 2)) {
                     callback(null, results);
+                    return;
                 }
             })
         })
@@ -273,23 +263,25 @@ function getUserPostByPID(uid, PID, pagesize, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         let finish = 0;
-        if (results.length == 0) callback(null, results);
+        if (results.length == 0) { callback(null, results); return; }
         results.forEach(e => {
             e.content = xss(md.render(e.content));
             getCommentAmount(e.id, -1, function (err, dat) {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 e.comment = dat;
                 finish++;
                 if (finish == (results.length * 2)) {
                     callback(null, results);
+                    return;
                 }
             });
             getUserLevelById(e.user_id, function (err, dat) {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 e.level = dat;
                 finish++;
                 if (finish == (results.length * 2)) {
                     callback(null, results);
+                    return;
                 }
             })
         })
@@ -303,6 +295,7 @@ function getUserSourcePost(uid, page, pagesize, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         callback(null, results);
+        return;
     });
 }
 
@@ -312,9 +305,8 @@ function getUserId(username, callback) {
 
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
-        if (results[0] != undefined)
-            callback(null, results[0].id);
-        else callback("No Such User", null);
+        if (results[0] != undefined) { callback(null, results[0].id); return; }
+        else { callback("No Such User", null); return; }
     });
 }
 
@@ -323,9 +315,8 @@ function getUsername(userid, callback) {
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
-        if (results[0] != undefined)
-            callback(null, results[0].username);
-        else callback("No Such User", null);
+        if (results[0] != undefined) { callback(null, results[0].username); return; }
+        else { callback("No Such User", null); return; }
     });
 }
 
@@ -333,16 +324,17 @@ function getUserInfo(userid, callback) {
     var SQL = `SELECT * FROM user WHERE id=?`;
     var SQLDATA = [userid];
     connection.query(SQL, SQLDATA, function (error, results) {
-        if (error || results.length == 0) callback('No Such User');
+        if (error || results.length == 0) { callback('No Such User'); return; }
         else {
-            if (results[0] == undefined) callback('No Such User', null);
+            if (results[0] == undefined) { callback('No Such User', null); return; }
             else getUserCommentAmount(userid, (err, dat) => {
-                if (err) callback(err);
+                if (err) { callback(err); return; }
                 else {
                     results[0].comment = dat;
                     getUserPostAmount(userid, (err, dat) => {
                         results[0].post = dat;
                         callback(null, results[0]);
+                        return;
                     })
                 }
 
@@ -354,34 +346,34 @@ function getUserInfo(userid, callback) {
 
 function getUserExperienceById(userid, callback) {
     getUserInfo(userid, function (err, dat) {
-        if (err) callback(err, null);
-        else callback(null, dat.exp);
+        if (err) { callback(err, null); return; }
+        else { callback(null, dat.exp); return; }
     })
 }
 
 function getUserExperienceByUsername(username, callback) {
     getUserId(username, function (err, userid) {
         getUserInfo(userid, function (err, dat) {
-            if (err) callback(err, null);
-            else callback(null, dat.exp);
+            if (err) { callback(err, null); return; }
+            else { callback(null, dat.exp); return; }
         })
     })
 }
 
 function getUserLevelById(userid, callback) {
     getUserExperienceById(userid, function (err, dat) {
-        if (err) callback(err);
-        else callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0))))))));
+        if (err) { callback(err); return; }
+        else { callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0)))))))); return; }
     });
 }
 
 function getUserLevelByUsername(username, callback) {
     getUserId(username, (err, dat) => {
-        if (err) callback(err);
+        if (err) { callback(err); return; }
         else {
             getUserExperienceById(dat, function (err, dat) {
-                if (err) callback(err);
-                else callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0))))))));
+                if (err) { callback(err); return; }
+                else { callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0)))))))); return; }
             });
         }
     })
@@ -393,14 +385,16 @@ function addUserExperienceById(userid, exp, callback = () => { }) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         callback(null, 'success');
+        return;
     });
 }
 
 function addUserExperienceByUsername(username, exp, callback = () => { }) {
     getUserId(username, function (err, dat) {
-        if (err) callback(err);
+        if (err) { callback(err); return; }
         else {
             addUserExperienceById(dat, exp, callback);
+            return;
         }
     });
 }
@@ -414,7 +408,7 @@ function post(username, type, content, callback = () => { }) {
         var SQLDATA = [type, dat, username, content];
         connection.query(SQL, SQLDATA, function (error, results) {
             if (error) { callback(error); return; }
-            callback(null, [0]);
+            else callback(null, [0]);
         });
         addUserExperienceById(dat, 10);
     })
@@ -425,8 +419,8 @@ function getComment(pid, parent, page, callback = () => { }) {
     let SQL = 'SELECT * FROM `comment` WHERE pid=? AND parent=? order by id desc limit ?,?;';
     let SQLDATA = [pid, parent, (page - 1) * pagesize, pagesize];
     connection.query(SQL, SQLDATA, function (err, dat) {
-        if (err) callback(err);
-        else callback(null, JSON.parse(JSON.stringify(dat)));
+        if (err) { callback(err); return; }
+        else { callback(null, JSON.parse(JSON.stringify(dat))); return; }
     })
 }
 
@@ -434,8 +428,8 @@ function getUserPostAmount(uid, callback) {
     let SQL = 'SELECT COUNT(*) as total FROM `content` WHERE user_id=? AND hidden=0';
     let SQLDATA = [uid];
     connection.query(SQL, SQLDATA, function (err, dat) {
-        if (err) callback(err);
-        else callback(null, dat[0].total);
+        if (err) { callback(err); return; }
+        else { callback(null, dat[0].total); return; }
     })
 }
 
@@ -451,8 +445,8 @@ function getCommentAmount(pid, parent, callback = () => { }) {
     }
 
     connection.query(SQL, SQLDATA, function (err, dat) {
-        if (err) callback(err);
-        else callback(null, dat[0].total);
+        if (err) { callback(err); return; }
+        else { callback(null, dat[0].total); return; }
     })
 }
 
@@ -461,35 +455,29 @@ function getUserCommentAmount(uid, callback = () => { }) {
     let SQLDATA = [uid];
 
     connection.query(SQL, SQLDATA, function (err, dat) {
-        if (err) callback(err);
-        else callback(null, dat[0].total);
+        if (err) { callback(err); return; }
+        else { callback(null, dat[0].total); return; }
     })
 }
 
 function postCommentByUsername(pid, parent, uname, comment, callback = () => { }) {
     let SQL = 'INSERT INTO `comment`(`pid`, `parent`, `uid`, `username`, `comment`) \
     VALUES (?, ?, ?, ?, ?)';
-    if (comment.length <= 2) {
-        callback("评论长度有误");
-        return;
-    }
+    if (comment.length <= 0) { callback("评论长度有误"); return; }
     getUserId(uname, function (err, dat) {
-        if (err) {
-            callback(err);
-            return;
-        }
+        if (err) { callback(err); return; }
         let SQLDATA = [pid, parent, dat, uname, comment];
         connection.query(SQL, SQLDATA, function (err, dat) {
-            if (err) callback(err);
-            else callback(null, "success");
+            if (err) { callback(err); return; }
+            else { callback(null, "success"); return; }
         })
     })
 }
 
 function getRating(uid, callback = () => { }) {
     getUserInfo(uid, (err, dat) => {
-        if (err) callback(err);
-        else callback(null, dat.rating);
+        if (err) { callback(err); return; }
+        else { callback(null, dat.rating); return; }
     })
 }
 
@@ -587,8 +575,8 @@ function getUserBattle(uid, page, callback) {
     else SQL = 'SELECT * FROM `battle` WHERE (1 OR player=?) ORDER BY id DESC LIMIT ?, 100';
     let SQLDATA = [uid, (--page) * 10];
     connection.query(SQL, SQLDATA, (err, dat) => {
-        if (err) callback(err);
-        else callback(null, dat);
+        if (err) { callback(err); return; }
+        else { callback(null, dat); return; }
     })
 }
 
@@ -596,8 +584,8 @@ function getReplay(rid, callback) {
     let SQL = 'SELECT * FROM `battle_data` WHERE battle_id=?;';
     let SQLDATA = [rid];
     connection.query(SQL, SQLDATA, (err, dat) => {
-        if (err) callback(err);
-        else callback(null, dat);
+        if (err) { callback(err); return; }
+        else { callback(null, dat); return; }
     })
 }
 
