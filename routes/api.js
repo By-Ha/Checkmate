@@ -17,13 +17,14 @@ var upload = multer({
 
 router.post('/', function (req, res) {
     res.json({ 'status': 'success' });
+    return;
 })
 
 router.post('/user/post', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getUserPost(req.body.uid, req.body.page, 10, (err, dat) => {
-        if (err) res.json({ status: 'error', msg: '超出范围' });
-        else res.json({ status: 'success', dat: dat });
+        if (err) { res.json({ status: 'error', msg: '超出范围' }); return; }
+        else { res.json({ status: 'success', dat: dat }); return; }
     })
 })
 
@@ -31,13 +32,13 @@ router.post('/user/level', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     if (req.body.uid != undefined) {
         db.getUserLevelById(req.body.uid, (err, dat) => {
-            if (err) res.json({ status: 'error', msg: err });
-            else res.json({ status: 'success', msg: dat });
+            if (err) { res.json({ status: 'error', msg: err }); return; }
+            else { res.json({ status: 'success', msg: dat }); return; }
         })
     }
     else db.getUserLevelByUsername(req.body.uname, (err, dat) => {
-        if (err) res.json({ status: 'error', msg: err });
-        else res.json({ status: 'success', msg: dat });
+        if (err) { res.json({ status: 'error', msg: err }); return; }
+        else { res.json({ status: 'success', msg: dat }); return; }
     })
 })
 
@@ -45,13 +46,13 @@ router.post('/user/exp', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     if (req.body.uid != undefined) {
         db.getUserExperienceById(req.body.uid, (err, dat) => {
-            if (err) res.json({ status: 'error', msg: err });
-            else res.json({ status: 'success', msg: dat });
+            if (err) { res.json({ status: 'error', msg: err }); return; }
+            else { res.json({ status: 'success', msg: dat }); return; }
         })
     }
     else db.getUserExperienceByUsername(req.body.uname, (err, dat) => {
-        if (err) res.json({ status: 'error', msg: err });
-        else res.json({ status: 'success', msg: dat });
+        if (err) { res.json({ status: 'error', msg: err }); return; }
+        else { res.json({ status: 'success', msg: dat }); return; }
     })
 })
 
@@ -61,8 +62,8 @@ router.get('/user/commentAmount', function (req, res) {
     if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
     db.getUserCommentAmount(uid, (err, dat) => {
-        if (err) res.json({ status: error, msg: '数据库错误' });
-        else res.json({ status: 'success', msg: dat });
+        if (err) { res.json({ status: error, msg: '数据库错误' }); return; }
+        else { res.json({ status: 'success', msg: dat }); return; }
     })
 })
 
@@ -72,118 +73,79 @@ router.get('/user/postAmount', function (req, res) {
     if (req.query.uid == undefined) uid = req.session.uid;
     else uid = req.query.uid;
     db.getUserPostAmount(uid, (err, dat) => {
-        if (err) res.json({ status: error, msg: '数据库错误' });
-        else res.json({ status: 'success', msg: dat });
+        if (err) { res.json({ status: error, msg: '数据库错误' }); return; }
+        else { res.json({ status: 'success', msg: dat }); return; }
     })
 })
 
 router.post('/page', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getTypePost(0, req.body.page, 10, (err, dat) => {
-        if (err) res.json({ status: 'error', msg: '超出范围' });
-        else res.json({ status: 'success', dat: dat });
+        if (err) { res.json({ status: 'error', msg: '超出范围' }); return; }
+        else { res.json({ status: 'success', dat: dat }); return; }
     })
 })
 
 router.post('/post', function (req, res) {
-    if (req.session.username == undefined) {
-        res.json({ status: ('error'), msg: '请先登录' });
-        return;
-    }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) {
-        res.json({ status: ('error'), msg: '内容长度不符合规范' });
-        return;
-    }
-    if (req.body.type != 0) {
-        res.json({ status: ('error'), msg: '类型错误' });
-        return;
-    }
+    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
+    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.type != 0) { res.json({ status: ('error'), msg: '类型错误' }); return; }
     db.post(req.session.username, req.body.type, req.body.content, function (err, dat) {
-        if (err) res.json({ status: ('error'), msg: '数据库错误' });
-        else res.json({ status: ('success'), msg: '发送成功' });
+        if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
+        else { res.json({ status: ('success'), msg: '发送成功' }); return; }
     })
 });
 
 router.get('/comment', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    if (req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) {
-        res.json({ status: 'error', msg: '非法请求' });
-        return;
-    }
+    if (req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) { res.json({ status: 'error', msg: '非法请求' }); return; }
     db.getComment(req.query.pid, req.query.parent, req.query.page, (err, dat) => {
-        if (err) {
-            res.json({ status: 'error', msg: '数据库错误' });
-            return;
-        }
+        if (err) { res.json({ status: 'error', msg: '数据库错误' }); return; }
         else res.json({ status: 'success', dat: dat });
     })
 })
 
 router.post('/comment', function (req, res) {
-    if (req.session.username == undefined) {
-        res.json({ status: ('error'), msg: '请先登录' });
-        return;
-    }
-    if (req.body.comment == undefined || req.body.comment.length <= 2 || req.body.comment.length >= 1000) {
-        res.json({ status: ('error'), msg: '内容长度不符合规范' });
-        return;
-    }
-    if (req.body.pid == undefined || req.body.parent == undefined) {
-        res.json({ status: ('error'), msg: '请求非法' });
-        return;
-    }
+    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
+    if (req.body.comment == undefined || req.body.comment.length <= 2 || req.body.comment.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }
     db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment, function (err, dat) {
-        if (err) res.json({ status: ('error'), msg: '数据库错误' });
-        else res.json({ status: ('success'), msg: '发送成功' });
+        if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
+        else { res.json({ status: ('success'), msg: '发送成功' }); return; }
     })
 })
 
 router.get('/commentAmount', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
-    if (req.query.pid == undefined || req.query.parent == undefined) {
-        res.json({ status: 'error', msg: '非法请求' });
-        return;
-    }
+    if (req.query.pid == undefined || req.query.parent == undefined) { res.json({ status: 'error', msg: '非法请求' }); return; }
     db.getCommentAmount(req.query.pid, req.query.parent, (err, dat) => {
-        if (err) {
-            res.json({ status: 'error', msg: '数据库错误' });
-            return;
-        }
-        else res.json({ status: 'success', dat: dat });
+        if (err) { res.json({ status: 'error', msg: '数据库错误' }); return; }
+        else { res.json({ status: 'success', dat: dat }); return; }
     })
 })
 
 router.post('/getSourcePost', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getSourcePost(req.body.pid, (err, dat) => {
-        if (err) res.json({ 'status': 'error', 'msg': 'No Such User' });
-        else res.json({ 'status': 'success', 'msg': dat[0].content });
+        if (err) { res.json({ 'status': 'error', 'msg': 'No Such User' }); return; }
+        else { res.json({ 'status': 'success', 'msg': dat[0].content }); return; }
     })
 })
 
 router.post('/updatepost', function (req, res) {
-    if (req.session.username == undefined) {
-        res.json({ status: ('error'), msg: '请先登录' });
-        return;
-    }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) {
-        res.json({ status: ('error'), msg: '内容长度不符合规范' });
-        return;
-    }
+    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
+    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     db.updatePost(req.body.pid, req.session.username, req.body.content, function (err, dat) {
-        if (err) res.json({ status: ('error'), msg: err });
-        else res.json({ status: ('success'), msg: '修改成功' });
+        if (err) { res.json({ status: ('error'), msg: err }); return; }
+        else { res.json({ status: ('success'), msg: '修改成功' }); return; }
     })
 })
 
 router.post('/deletepost', function (req, res) {
-    if (req.session.username == undefined) {
-        res.json({ status: ('error'), msg: '请先登录' });
-        return;
-    }
+    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     db.deletePost(req.body.pid, req.session.username, function (err, dat) {
-        if (err) res.json({ status: ('error'), msg: err });
-        else res.json({ status: ('success'), msg: '删除成功' });
+        if (err) { res.json({ status: ('error'), msg: err }); return; }
+        else { res.json({ status: ('success'), msg: '删除成功' }); return; }
     })
 })
 
@@ -206,6 +168,7 @@ router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
         })
     }
     res.send({ ret_code: '0' });
+    return;
 })
 
 router.post('/upload/banner', upload.single('banner'), function (req, res) {
@@ -231,6 +194,7 @@ router.post('/upload/banner', upload.single('banner'), function (req, res) {
         })
     }
     res.send({ ret_code: '0' });
+    return;
 })
 
 router.post('/template', function (req, res) {
