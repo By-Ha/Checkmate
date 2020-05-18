@@ -142,13 +142,14 @@ function Run(io) {
             var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
             cnt -= 1; // cannot move all
-            if (f.color != player[k].color || cnt <= 0 || t.tpye == 4) { // wrong movement
+            if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
                 ue(k, 'ClearMovement');
                 continue;
             }
             combineBlock(room, f, t, cnt);
             player[k].movement = [];
         }
+        Rooms[room].game.gamelog[Rooms[room].game.round][0] = generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm);
         bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         bc(room, 'Rank_Update', Rank(room));
         for (var i = 0; i < needDeleteMovement.length; ++i)
