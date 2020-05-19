@@ -54,7 +54,9 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 
 var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, {
+    path: '/ws/checkmate'
+});
 
 /* socket.io */
 
