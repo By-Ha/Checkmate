@@ -385,6 +385,10 @@ function Run(io) {
         db.sessionStore.get(s.handshake.signedCookies.client_session, (err, dat) => {
             uid = dat.uid;
             uname = dat.username;
+            if (uid == null || uname == null) {
+                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
+                s.disconnect();
+            }
 
             if (connectedUsers[uid] != undefined) {
                 s.emit('execute', `Swal.fire("加入房间失败:已有加入的房间", '', "error")`);
