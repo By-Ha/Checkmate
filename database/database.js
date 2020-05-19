@@ -516,7 +516,7 @@ function changeRating(uid, rating) {
 
 }
 
-function gameRatingCalc(data, battle_data) {
+function gameRatingCalc(room, data, battle_data) {
     console.log("PLACE_DATA:", data);
     try {
         let bid = stringRandom(64);
@@ -539,20 +539,33 @@ function gameRatingCalc(data, battle_data) {
                                 if (data[p[it]].rating >= firstRating) {
                                     firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
                                     let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
-                                    changeRating(p[it], dr);
-                                    addBattle(p[it], bid, dr);
+                                    if (room == "Bot房,无Rating") {
+                                        addBattle(p[it], bid, 0);
+                                    } else {
+                                        changeRating(p[it], dr);
+                                        addBattle(p[it], bid, dr);
+                                    }
                                 } else {
                                     firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
                                     let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
-                                    changeRating(p[it], dr);
-                                    addBattle(p[it], bid, dr);
+                                    if (room == "Bot房,无Rating") {
+                                        addBattle(p[it], bid, 0);
+                                    } else {
+                                        changeRating(p[it], dr);
+                                        addBattle(p[it], bid, dr);
+                                    }
                                 }
                             } catch (e) {
                                 console.log('it:', it, '\np:', p, '\ndata:', data);
                             }
                         }
-                        changeRating(p[1], Math.min(12, firstBounce + 1));
-                        addBattle(p[1], bid, Math.min(12, firstBounce + 1));
+                        if (room == "Bot房,无Rating") {
+                            addBattle(p[1], bid, 0);
+                        } else {
+                            changeRating(p[1], Math.min(12, firstBounce + 1));
+                            addBattle(p[1], bid, Math.min(12, firstBounce + 1));
+                        }
+
                     }
                 }
             })

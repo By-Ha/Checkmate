@@ -126,6 +126,16 @@ function Run(io) {
         var needDeleteMovement = []; // players that finish movement below
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
+        /**
+         * add for bot
+         */
+        for (let i = 1; i <= size; ++i) {
+            for (let j = 1; j <= size; ++j) {
+                if (gm[i][j].type == 1 && player[Rooms[room].game.color2Id[gm[i][j].color]] && player[Rooms[room].game.color2Id[gm[i][j].color]].uname == "Bot") {
+                    gm[i][j].amount += 10;
+                }
+            }
+        }
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].gaming) { // maybe disconnected
                 continue;
@@ -165,7 +175,7 @@ function Run(io) {
                     Rooms[room].playedPlayer[k].place = 2;
                 }
             }
-            db.gameRatingCalc(Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
+            db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
             for (let k in Rooms[room].player) {
                 if (Rooms[room].player[k].connect == false) {
                     delete Rooms[room].player[k];
