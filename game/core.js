@@ -382,17 +382,23 @@ function Run(io) {
 
     io.on('connection', function (s) {
         let uid, uname;
+        if (!s.handshake.signedCookies || !s.handshake.signedCookies.client_session) {
+            s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
+            s.disconnect();
+            return;
+        }
         db.sessionStore.get(s.handshake.signedCookies.client_session, (err, dat) => {
+            if (dat.uid == null || dat.username == null) {
+                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
+                return;
+            }
             uid = dat.uid;
             uname = dat.username;
-            if (uid == null || uname == null) {
-                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
-                s.disconnect();
-            }
 
             if (connectedUsers[uid] != undefined) {
                 s.emit('execute', `Swal.fire("加入房间失败:已有加入的房间", '', "error")`);
                 s.disconnect();// 断开一个用户的多个连接
+                return;
             }
             connectedUsers[uid] = { socket: s.id };
 
