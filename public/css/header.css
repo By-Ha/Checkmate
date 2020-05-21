@@ -48,6 +48,19 @@ html::-webkit-scrollbar-track {
   position: relative;
 }
 
+article object h1,
+article object h2,
+article object h3,
+article object h4 {
+  font-size: 1.25rem;
+}
+
+.size9,
+.size10,
+.size11 {
+  font-size: 1.25rem !important;
+}
+
 :root {
   --color-lv6: #ff3131;
   --color-lv5: #ff7631;
