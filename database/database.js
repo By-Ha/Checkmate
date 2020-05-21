@@ -74,8 +74,8 @@ function login(username, password, callback) {
 function register(username, password, callback) {
     password = String(password);
     username = String(username);
-    if (username.indexOf('<') != -1 || username.length < 3) {
-        callback(null, [-2, '用户名不能小于3位且不能包含"<"号']);
+    if (username.indexOf('<') != -1 || username.length < 3 || username.length > 16) {
+        callback(null, [-2, '用户名不能小于3位或超过16位且不能包含"<"与">"']);
         return;
     } else if (password.length < 8) {
         callback(null, [-2, '密码不能小于八位']);
