@@ -392,11 +392,21 @@ function Run(io) {
 
     io.on('connection', function (s) {
         let uid, uname;
+        if (!s.handshake.signedCookies.client_session) {
+            s.emit('execute', `Swal.fire("看到此消息请尝试重新登录,如果无法解决请联系管理员", 'ERRCODE: PRE_SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
+            s.disconnect();
+            return;
+        }
         db.sessionStore.get(s.handshake.signedCookies.client_session, (err, dat) => {
+            if (!dat) {
+                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录",
+                 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL_OF_SESSION_DATA:` + s.handshake.signedCookies + `', "error")`);
+                s.disconnect();
+            }
             uid = dat.uid;
             uname = dat.username;
             if (uid == null || uname == null) {
-                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
+                s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录", 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL` + dat + `', "error")`);
                 s.disconnect();
             }
 
