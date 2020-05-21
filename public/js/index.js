@@ -8,7 +8,7 @@ $(() => {
                 $('.icon-like', ele).addClass('iconfont-like-fill');
             }
         }
-        $('.post-like-num').unbind("click", "sendLike");
+        $('.post-like-num').unbind("click", sendLike);
         $('.post-like-num').click(sendLike);
     }
     function sendLike() {

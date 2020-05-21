@@ -6,10 +6,8 @@ $(function () {
             updatePost();
             return;
         }
-        var content = $("#writepost")[0].innerHTML;
-        content = content.replace(/<div>/g, '\n');
-        content = content.replace(/<\/div>/g, '');
-        content = content.replace(/<br>/g, '\n');
+        var content = $("#writepost")[0].value;
+        content = content.replace(/<\/?[^>]*>/g, '');
         $.ajax({
             type: "post",
             url: "/api/post",
