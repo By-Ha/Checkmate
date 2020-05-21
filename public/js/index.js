@@ -26,8 +26,8 @@ $(() => {
         });
 
     }
-    addEventLike();
 
+    addEventLike();
     KaTeXReRender();
     $("#getMore a").click(function (e) {
         e.preventDefault();
@@ -41,6 +41,7 @@ $(() => {
             success: function (data) {
                 var $result = $(data).find("#container article");
                 $('#container').append($result.fadeIn(1000));
+                addEventLike()
                 KaTeXReRender();
                 if ($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != "") {
                     $("#getMore a").show();
