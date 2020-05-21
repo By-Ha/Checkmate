@@ -236,7 +236,7 @@ button.btnv2:hover {
   color: white;
 }
 .green {
-  background-color: green !important;
+  background-color: rgb(0, 180, 0) !important;
   color: white;
 }
 .orange {
@@ -259,27 +259,23 @@ button.btnv2:hover {
   background-color: maroon !important;
   color: white;
 }
-.maroon {
-  background-color: grey !important;
-  color: white;
+.crown {
+  background-image: url("/img/crown.png") !important;
 }
-.crown{
-  background-image: url('/img/crown.png') !important;
+.city {
+  background-image: url("/img/city.png") !important;
 }
-.city{
-  background-image: url('/img/city.png') !important;
-}
-.mountain{
-  background-image: url('/img/mountain.png') !important;
+.mountain {
+  background-image: url("/img/mountain.png") !important;
   background-color: gray !important;
 }
-.empty-city{
-  background-image: url('/img/city.png') !important;
+.empty-city {
+  background-image: url("/img/city.png") !important;
   background-color: gray !important;
   color: white;
 }
-.obstacle{
-  background-image: url('/img/obstacle.png') !important;
+.obstacle {
+  background-image: url("/img/obstacle.png") !important;
 }
 * {
   padding: 0px;
