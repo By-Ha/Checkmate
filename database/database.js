@@ -140,8 +140,13 @@ function addSubmission(uid, dat, callback) {
 }
 
 function getTypePost(type, page, pagesize, callback) {
-    var SQL = `select * from content where type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?;`
-    var SQLDATA = [type, (page - 1) * pagesize, pagesize];
+    let SQL = `select * from content where type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?;`
+    let SQLDATA = [type, (page - 1) * pagesize, pagesize];
+    let SQL2 = `UPDATE content SET view=view+1 where id in (SELECT t.id FROM (SELECT * FROM content WHERE type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?) as t);`
+    let SQLDATA2 = [type, (page - 1) * pagesize, pagesize];
+    connection.query(SQL2, SQLDATA2, (err) => {
+        if (err) console.error(err);
+    })
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         let finish = 0;
@@ -170,6 +175,10 @@ function getPost(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
+        let SQL2 = `UPDATE content SET view=view+1 WHERE id=?;`
+        connection.query(SQL2, SQLDATA, (err) => {
+            if (err) console.error(err);
+        })
         let result = results[0];
         if (error) { callback(error, null); return; }
         if (result == undefined) { callback('被删除'); return; }
@@ -475,6 +484,26 @@ function postCommentByUsername(pid, parent, uname, comment, callback = () => { }
     })
 }
 
+function sendPostLike(pid, callback) {
+    let SQL = 'UPDATE `content` SET `favor`=`favor`+1 WHERE id=? AND hidden=0';
+    let SQLDATA = [pid];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) { console.error(err); callback(err); return; }
+        else { callback(null, "success"); return; }
+    })
+}
+
+function sendCommentLike(cid, callback) {
+    let SQL = 'UPDATE `comment` SET `favor`=`favor`+1 WHERE id=? AND hidden=0';
+    let SQLDATA = [cid];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) { console.error(err); callback(err); return; }
+        else { callback(null, "success"); return; }
+    })
+}
+
+// FOR GAME
+
 function getRating(uid, callback = () => { }) {
     getUserInfo(uid, (err, dat) => {
         if (err) { callback(err); return; }
@@ -613,5 +642,6 @@ module.exports = {
     querySubmission, addSubmission,
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
-    gameRatingCalc, getRatingList, getUserBattle, getReplay
+    gameRatingCalc, getRatingList, getUserBattle, getReplay,
+    sendPostLike
 }

@@ -40,8 +40,6 @@ $(() => {
             dropZoneEnabled: true,
             minImageWidth: 752,
             minImageHeight: 188,
-            // maxImageWidth: 1000,
-            // maxImageHeight: 1000,
             maxFileSize: 5120,
             minFileCount: 1,
             maxFileCount: 1,

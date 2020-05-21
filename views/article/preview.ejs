@@ -19,10 +19,14 @@
         <div class="post-info-meta">
             <time title="<%= dateFtt("yyyy-MM-dd hh:mm:ss", art.created); %>"><%= delta(art.created); %></time>
         </div>
-        <div class="post-info-content"><a><object><%- art.content %></object></a></div>
+        <div class="post-info-content"><a href="/post/<%= art.id %>"
+                style="text-decoration: none; color: unset;"><object><%- art.content %></object></a></div>
         <div class="post-toolbar">
             <span class="post-comment-num"><a href="/post/<%= art.id %>"><i
+                        class="iconfont icon-view"></i><%= (art.view>=1000000?(Math.round(art.view/10000)/100)+"m":(art.view>=1000)?Math.round(art.view/10)/100+"k":(art.view)) %></a></span>
+            <span class="post-view-num"><a href="/post/<%= art.id %>"><i
                         class="iconfont icon-comment"></i><%= art.comment %></a></span>
+            <span class="post-like-num"><a><i class="iconfont icon-like"></i><%= art.favor %></a></span>
         </div>
     </div>
 </article>

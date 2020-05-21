@@ -130,9 +130,30 @@ article .post-info-content object {
   margin-top: 5px;
   display: flex;
 }
-.post-toolbar .post-comment-num a:hover {
+.post-toolbar span a:hover {
   text-decoration: none;
-  color: pink;
+  color: #fb7299;
+}
+.post-toolbar > span {
+  margin-right: 40px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #99a2aa;
+  cursor: pointer;
+  display: flex;
+}
+.post-toolbar > span > a {
+  user-select: none;
+  color: #99a2aa;
+  font-size: 15px;
+  line-height: 15px;
+}
+.post-toolbar > span > a > i {
+  font-size: 15px;
+  margin-right: 3px;
+}
+.post-toolbar > span > a > i.icon-like.iconfont-like-fill {
+  color: #fb7299;
 }
 .center {
   text-align: center;
@@ -152,12 +173,6 @@ article .post-info-content object {
   text-decoration: none;
 }
 #sRight .rating .rank-box {
-  /* height: 55px;
-  padding: 5px;
-  line-height: 45px;
-  border-radius: 8px;
-  box-sizing: border-box;
-  margin-bottom: 10px; */
   background-image: repeating-linear-gradient(
     45deg,
     hsla(0, 0%, 100%, 0.3),

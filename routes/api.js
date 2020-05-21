@@ -20,6 +20,8 @@ router.post('/', function (req, res) {
     return;
 })
 
+// User
+
 router.post('/user/post', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getUserPost(req.body.uid, req.body.page, 10, (err, dat) => {
@@ -78,6 +80,7 @@ router.get('/user/postAmount', function (req, res) {
     })
 })
 
+// page(index)
 router.post('/page', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getTypePost(0, req.body.page, 10, (err, dat) => {
@@ -86,6 +89,7 @@ router.post('/page', function (req, res) {
     })
 })
 
+// sendpost
 router.post('/post', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
@@ -96,6 +100,7 @@ router.post('/post', function (req, res) {
     })
 });
 
+// comment
 router.get('/comment', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     if (req.query.pid == undefined || req.query.page == undefined || req.query.parent == undefined) { res.json({ status: 'error', msg: '非法请求' }); return; }
@@ -149,6 +154,16 @@ router.post('/deletepost', function (req, res) {
     })
 })
 
+router.post('/post/sendfavor', function (req, res) {
+    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
+    if (req.body.id == undefined) { res.json({ status: ('error'), msg: '非法请求' }); return; }
+    db.sendPostLike(req.body.id, (err, dat) => {
+        if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
+        else { res.json({ status: ('success'), msg: '点赞成功' }); return; }
+    })
+})
+
+// images
 router.post('/upload/avatar', upload.single('avatar'), function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     var imgType = req.file.mimetype; // 图片类型
