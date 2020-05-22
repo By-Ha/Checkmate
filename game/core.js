@@ -399,8 +399,9 @@ function Run(io) {
         }
         db.sessionStore.get(s.handshake.signedCookies.client_session, (err, dat) => {
             if (!dat) {
+                console.error('SOCKET_LOGIN_UNEXPECTED_NULL_OF_SESSION_DATA', s.handshake.signedCookies);
                 s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录",
-                 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL_OF_SESSION_DATA:` + s.handshake.signedCookies + `', "error")`);
+                 'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL_OF_SESSION_DATA:` + `', "error")`);
                 s.disconnect();
             }
             uid = dat.uid;
