@@ -36,10 +36,14 @@
     <!-- chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"
         integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-167397902-1"></script>
+
     <!-- other static -->
     <link href="//at.alicdn.com/t/font_1809497_lz3xy04cuxr.css" rel="stylesheet">
     <link href="/css/admin.css" rel="stylesheet">
     <script>
+        window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'UA-167397902-1');
         function toast(status, heading, text) { $.toast({ text: text, heading: heading, icon: status, showHideTransition: 'slide', hideAfter: 1000, position: 'bottom-right' }); }
         function KaTeXReRender() { renderMathInElement(document.body, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] }); }
     </script>
