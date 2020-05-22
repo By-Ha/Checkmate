@@ -403,6 +403,7 @@ function Run(io) {
                 s.emit('execute', `Swal.fire("看到此消息请联系管理员,也可以尝试重新登录",
                  'ERRCODE: SOCKET_LOGIN_UNEXPECTED_NULL_OF_SESSION_DATA:` + `', "error")`);
                 s.disconnect();
+                return;
             }
             uid = dat.uid;
             uname = dat.username;
