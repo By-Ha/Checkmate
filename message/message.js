@@ -23,7 +23,7 @@ function Run(io) {
         })
     });
     messageEmitter.on('comment', (postDat, comment) => {
-        bc(postDat.user_id, 'notice', { title: '你的说说收到了一条评论:', body: comment, url: config.website + "/post/" + postDat.id });
+        bc(postDat.user_id, 'notice', { title: '你的说说收到了一条评论,点击查看:', body: comment, url: config.website + "/post/" + postDat.id });
     })
 }
 
