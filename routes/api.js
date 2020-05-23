@@ -1,11 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var db = require('../database/database');
-var multer = require('multer')
-var webp = require('webp-converter');
-var fs = require('fs');
-var cos = require('../cos/cos');
-var sharp = require('sharp');
+let express = require('express');
+let router = express.Router();
+let db = require('../database/database');
+let multer = require('multer')
+let webp = require('webp-converter');
+let fs = require('fs');
+let cos = require('../cos/cos');
+let sharp = require('sharp');
+let msg = require('../message/message').messageEmitter;
 
 var upload = multer({
     dest: '/tmp/Kana/upload',
@@ -115,8 +116,18 @@ router.post('/comment', function (req, res) {
     if (req.body.comment == undefined || req.body.comment.length <= 2 || req.body.comment.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }
     db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment, function (err, dat) {
-        if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
-        else { res.json({ status: ('success'), msg: '发送成功' }); return; }
+        if (err) { res.json({ status: ('error'), msg: '数据库错误' }); console.error(err); return; }
+        else {
+            res.json({ status: ('success'), msg: '发送成功' });
+            db.getPost(req.body.pid, (err, dat) => {
+                if (err) return;
+                else {
+                    msg.emit('comment', dat, req.body.comment);
+                    return;
+                }
+            })
+
+        }
     })
 })
 

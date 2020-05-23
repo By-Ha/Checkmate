@@ -8,6 +8,7 @@ var bodyparser = require('body-parser');
 var session = require('express-session');
 var db = require('./database/database');
 var game = require('./game/core');
+var message = require('./message/message');
 var config = require('./config');
 
 
@@ -57,6 +58,11 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server, {
     path: '/ws/checkmate'
 });
+
+var messageio = require('socket.io')(server, {
+    path: '/ws/message'
+});
+message.Run(messageio);
 
 /* socket.io */
 
