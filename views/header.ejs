@@ -43,7 +43,7 @@
   <script>
     window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'UA-167397902-1');
     $(() => { $('a').smoothScroll({}); });
-    function toast(status, heading, text) { $.toast({ text: text, heading: heading, icon: status, showHideTransition: 'slide', hideAfter: 1000, position: 'bottom-right' }); }
+    function toast(status, heading, text, time = 1000) { $.toast({ text: text, heading: heading, icon: status, showHideTransition: 'slide', hideAfter: time, position: 'bottom-right' }); }
     function KaTeXReRender() { renderMathInElement(document.body, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] }); }
   </script>
 </head>
