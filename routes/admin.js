@@ -3,11 +3,17 @@ var router = express.Router();
 var db = require('../database/database');
 var ejs = require('ejs');
 var createError = require('http-errors');
+var config = require('../config.json');
+
+function rnd(seed) {
+    seed = (seed * config.rnd.arg1 + config.rnd.arg2) % config.rnd.arg3;
+    return seed;
+};
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (req.session.username) {
-        res.render('admin.ejs', { username: req.session.username, uid: req.session.uid });
+        res.render('admin.ejs', { username: req.session.username, uid: req.session.uid, rnd_pwd: rnd(req.session.uid) });
         return;
     } else {
         res.redirect('/login');
