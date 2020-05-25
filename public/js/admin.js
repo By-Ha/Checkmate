@@ -10,11 +10,13 @@ $(() => {
         $(".preloader").addClass("animate__animated animate__fadeOut");
         setTimeout(() => { $(".preloader").css('display', 'none'); }, 1000);
     }
+
     function hide() {
         $(".preloader").css('display', 'unset');
         $(".preloader").removeClass("animate__fadeOut");
         $(".preloader").addClass("animate__animated animate__fadeIn");
     }
+
     function confirm(type, title, content, callback) {
         $.confirm({
             type: type, title: title, content: content, theme: 'supervan', useBootstrap: false, draggable: false, backgroundDismiss: true, autoClose: 'close|10000',
@@ -52,6 +54,7 @@ $(() => {
     }
 
     function postPageAnction() {
+        addAtUsername();
         $(".loading-dot-container").css("display", "unset");
         $(".page-wrap .post i.ad-del").unbind("click");
         $(".page-wrap .post i.ad-del").click(function () {
@@ -105,6 +108,15 @@ $(() => {
                         })
                     })
                 }
+            })
+        })
+    }
+
+    function addAtUsername() {
+        $(".admincard-content object .user.at.unfinish").each(function (e) {
+            $.get('/api/user/info', { uid: this.getAttribute("uid") }, (dat) => {
+                this.innerHTML = "@" + dat.msg.username;
+                this.classList.remove("unfinish");
             })
         })
     }

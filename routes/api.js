@@ -81,6 +81,20 @@ router.get('/user/postAmount', function (req, res) {
     })
 })
 
+router.get('/user/info', function (req, res) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    let uid = 0;
+    if (req.query.uid == undefined) uid = req.session.uid;
+    else uid = req.query.uid;
+    db.getUserInfo(uid, (err, dat) => {
+        if (err) { res.json({ status: error, msg: '数据库错误' }); return; }
+        else {
+            delete dat.password;
+            res.json({ status: 'success', msg: dat }); return;
+        }
+    })
+})
+
 // page(index)
 router.post('/page', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }

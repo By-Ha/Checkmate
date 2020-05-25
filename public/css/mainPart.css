@@ -155,6 +155,25 @@ article .post-info-content object {
 .post-toolbar > span > a > i.icon-like.iconfont-like-fill {
   color: #fb7299;
 }
+article object .user.at {
+  color: #fb7299;
+}
+article object .user.at:hover {
+  color: #66ccff;
+  text-decoration: none;
+}
+article object .gr {
+  display: block;
+  margin: 0 auto;
+  width: 214px;
+  height: auto;
+}
+article object .gp {
+  display: block;
+  margin: 0 auto;
+  width: 62px;
+  height: auto;
+}
 .center {
   text-align: center;
 }

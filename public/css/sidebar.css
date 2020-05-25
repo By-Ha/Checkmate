@@ -90,3 +90,48 @@
   text-align: center;
   width: 33.33%;
 }
+
+.sponsor {
+  text-align: center;
+}
+
+.sponsor > a {
+  color: grey;
+}
+
+.sponsor > a:hover {
+  cursor: pointer;
+  text-decoration: none;
+  background: url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/sponsor/thank.gif);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.payment-hover {
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 20;
+  background: rgba(26, 26, 26, 0.5);
+}
+.payment-hover > img {
+  height: 75%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.payment-hover > i.icon-close {
+  line-height: 1;
+  cursor: pointer;
+  font-size: 300%;
+  right: 0px;
+  top: 0px;
+  position: absolute;
+}
+
+.payment-hover > i.icon-close:hover {
+  background: red;
+}

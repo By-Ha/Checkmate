@@ -63,7 +63,16 @@ $(() => {
     })
 })
 $(() => {
+    function addAtUsername() {
+        $("article object .user.at.unfinish").each(function (e) {
+            $.get('/api/user/info', { uid: this.getAttribute("uid") }, (dat) => {
+                this.innerHTML = "@" + dat.msg.username;
+                this.classList.remove("unfinish");
+            })
+        })
+    }
     KaTeXReRender();
+    addAtUsername();
     $("#getMore a").click(function (e) {
         e.preventDefault();
         $("#getMore a").hide();
@@ -77,6 +86,7 @@ $(() => {
                 var $result = $(data).find("#container article");
                 $('#userpost').append($result.fadeIn(1000));
                 KaTeXReRender();
+                addAtUsername();
                 if ($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != "") {
                     $("#getMore a").show();
                     $("#getMore a").text('(｡・`ω´･)点我查看更多！');

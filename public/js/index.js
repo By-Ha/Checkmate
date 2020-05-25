@@ -11,6 +11,14 @@ $(() => {
         $('.post-like-num').unbind("click", sendLike);
         $('.post-like-num').click(sendLike);
     }
+    function addAtUsername() {
+        $("article object .user.at.unfinish").each(function (e) {
+            $.get('/api/user/info', { uid: this.getAttribute("uid") }, (dat) => {
+                this.innerHTML = "@" + dat.msg.username;
+                this.classList.remove("unfinish");
+            })
+        })
+    }
     function sendLike() {
         let pid = this.parentElement.parentElement.parentElement.getAttribute("pid");
         if (pid == undefined) { return; }
@@ -28,6 +36,7 @@ $(() => {
     }
 
     addEventLike();
+    addAtUsername();
     KaTeXReRender();
     $("#getMore a").click(function (e) {
         e.preventDefault();
@@ -43,6 +52,7 @@ $(() => {
                 $('#container').append($result.fadeIn(1000));
                 addEventLike()
                 KaTeXReRender();
+                addAtUsername();
                 if ($(data).find("#getMore a").attr('href') != undefined && $(data).find("#getMore a").attr('href') != "") {
                     $("#getMore a").show();
                     $("#getMore a").text('(｡・`ω´･)点我查看更多！');

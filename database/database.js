@@ -57,6 +57,17 @@ function handleError() {
 
 handleError();
 
+function renderMD(content) {
+    content = xss(md.render(content));
+    content = content.replace(/\[at,uid=([0-9]{1,10})\]/g, (match, key) => {
+        if (isNaN(Number(key))) return match;
+        else { return "<a class='user at unfinish' href='/user/" + Number(key) + "' uid='" + Number(key) + "'>@</a>"; }
+    });
+    content = content.replace(/\[gp\]/g, '<img src="/img/gp.png" class="gp">');
+    content = content.replace(/\[gr\]/g, '<img src="/img/gr.png" class="gr">');
+    return content;
+}
+
 function login(username, password, callback) {
     password = String(password);
     username = String(username);
@@ -151,7 +162,7 @@ function getTypePost(type, page, pagesize, callback) {
         if (error) { callback(error); return; }
         let finish = 0;
         results.forEach(e => {
-            e.content = xss(md.render(e.content));
+            e.content = renderMD(e.content);
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) { callback(err); return; }
                 e.comment = dat;
@@ -182,7 +193,7 @@ function getPost(pid, callback) {
         let result = results[0];
         if (error) { callback(error, null); return; }
         if (result == undefined) { callback('被删除'); return; }
-        result.content = xss(md.render(result.content));
+        result.content = renderMD(result.content);
         callback(null, result);
         return;
     });
@@ -242,7 +253,7 @@ function getUserPost(uid, page, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) { callback(null, results); return; }
         results.forEach(e => {
-            e.content = xss(md.render(e.content));
+            e.content = renderMD(e.content);
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) callback(err);
                 e.comment = dat;
@@ -275,7 +286,7 @@ function getUserPostByPID(uid, PID, pagesize, callback) {
         let finish = 0;
         if (results.length == 0) { callback(null, results); return; }
         results.forEach(e => {
-            e.content = xss(md.render(e.content));
+            e.content = renderMD(e.content);
             getCommentAmount(e.id, -1, function (err, dat) {
                 if (err) { callback(err); return; }
                 e.comment = dat;
