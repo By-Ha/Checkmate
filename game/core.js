@@ -422,7 +422,7 @@ function Run(io) {
                 }
                 if (dat.map) {
                     let mp = Number(dat.map);
-                    if (Rooms[playerRoom[uid]] && mp == 1 || mp == 2)
+                    if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
                         Rooms[playerRoom[uid]].settings.map = mp;
                 }
                 bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
