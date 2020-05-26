@@ -259,7 +259,7 @@ function generateEmptyMap(player) {
         } else {
             let flag = 0;
             for (let j = 0; j < last.length; ++j) {
-                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > (size == 10 ? 6 : 15)) {
+                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > (size == 10 ? 6 : 8)) {
                     continue;
                 }
                 flag = 1;
