@@ -425,7 +425,7 @@ function Run(io) {
                     if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
                         Rooms[playerRoom[uid]].settings.map = mp;
                 }
-                if (Rooms[playerRoom[uid]].settings) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
             })
 
             s.on('AskSize', function () {
