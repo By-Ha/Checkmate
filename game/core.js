@@ -140,6 +140,8 @@ function Run(io) {
                             gm[i][j].color = 0;
                             if (gm[i][j].type == 1) {
                                 gm[i][j].type = 5;
+                            } else if (gm[i][j].type == 3) {
+                                gm[i][j].type = 5;
                             }
                         }
                     }
@@ -152,7 +154,7 @@ function Run(io) {
             if (mv == 0 || mv == undefined) continue; // the movement is empty
             needDeleteMovement.push(k);
             if (mv[0] > size || mv[1] > size || mv[2] > size || mv[3] > size
-                || mv[0] < 1 || mv[1] < 1 || mv[2] < 1 || mv[3] < 1) {
+                || mv[0] < 1 || mv[1] < 1 || mv[2] < 1 || mv[3] < 1 || (Math.abs(mv[0] - mv[2]) + Math.abs(mv[1] - mv[3])) > 1) {
                 player[k].movement = [];
                 continue;
             }
@@ -419,9 +421,12 @@ function Run(io) {
                         Rooms[playerRoom[uid]].settings.speed = dat.speed;
                     }
                 }
-                if (dat.private) {
-                    if (Rooms[playerRoom[uid]] != undefined)
-                        Rooms[playerRoom[uid]].settings.private = dat.private;
+                if (dat.private != undefined) {
+                    if (Rooms[playerRoom[uid]] != undefined) {
+                        if (String(dat.private) == "true")
+                            Rooms[playerRoom[uid]].settings.private = true;
+                        else Rooms[playerRoom[uid]].settings.private = false;
+                    }
                 }
                 if (dat.map) {
                     let mp = Number(dat.map);

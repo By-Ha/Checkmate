@@ -71,7 +71,7 @@ function generateRandomMap(player) {
         } else {
             let flag = 0;
             for (let j = 0; j < last.length; ++j) {
-                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > (size == 10 ? 6 : 15)) {
+                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > (size == 10 ? 6 : 8)) {
                     continue;
                 }
                 flag = 1;
@@ -113,8 +113,6 @@ function generateMazeMap(player) {
     gm[0][0] = { size: size };
     for (let i = 1; i <= size; ++i) {
         for (let j = 1; j <= size; ++j) {
-            let tmp1 = i - 1, tmp3 = j - 1, tmp4 = j + 1;
-            let tmp2 = i + 1;
             if (i % 2 == 0 && j % 2 == 0) {
                 gm[i][j].type = 4;
             }
@@ -122,6 +120,13 @@ function generateMazeMap(player) {
                 venum[i][j] = vtot;
                 ++vtot;
             }
+        }
+    }
+    for (let i = 1; i <= size; ++i) {
+        for (let j = 1; j <= size; ++j) {
+            let tmp1 = i - 1, tmp3 = j - 1, tmp4 = j + 1;
+            let tmp2 = i + 1;
+
             if (i % 2 == 0 && j % 2 == 1) {
                 venum[i][j] = etot;
                 edges[etot] = { "a": venum[tmp1][j], "b": venum[tmp2][j], "w": Number(rnd(10)) + 40, "posa": i, "posb": j };
@@ -188,17 +193,6 @@ function generateMazeMap(player) {
         gm[t1][t2].color = i;
         gm[t1][t2].amount = 1;
         gm[t1][t2].type = 1;
-
-    }
-    for (let i = 0; i <= size; ++i) {
-        let t = String(i);
-        for (let j = 0; j <= size; ++j) {
-            if (gm[i][j].type == 1) t += 'o';
-            else if (gm[i][j].type == 4) t += '#';
-            else if (gm[i][j].type == 5) t += 'x';
-            else t += ' ';
-        }
-        console.log(t);
     }
     return gm;
 }
@@ -278,13 +272,21 @@ function generateEmptyMap(player) {
 }
 
 function generateMap(type, player) {
+    console.log(type, player);
+    let ti = new Date().getTime()
     if (type == 1) {
+        console.log(new Date().getTime() - ti);
         return generateRandomMap(player);
     } else if (type == 2) {
+        console.log(new Date().getTime() - ti);
         return generateMazeMap(player);
     } else if (type == 3) {
+        console.log(new Date().getTime() - ti);
         return generateEmptyMap(player);
-    } else return generateRandomMap(player);
+    } else {
+        console.log(new Date().getTime() - ti);
+        return generateRandomMap(player);
+    }
 }
 
 module.exports = {
