@@ -132,18 +132,19 @@ function Run(io) {
         var needDeleteMovement = []; // players that finish movement below
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
-        /**
-         * add for bot
-         */
-        for (let i = 1; i <= size; ++i) {
-            for (let j = 1; j <= size; ++j) {
-                if (gm[i][j].type == 1 && player[Rooms[room].game.color2Id[gm[i][j].color]] && player[Rooms[room].game.color2Id[gm[i][j].color]].uname == "Bot") {
-                    gm[i][j].amount += 10;
-                }
-            }
-        }
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].gaming) { // maybe disconnected
+                for (let i = 1; i <= size; ++i) {
+                    for (let j = 1; j <= size; ++j) {
+                        if (gm[i][j].color == player[k].color) {
+                            gm[i][j].color = 0;
+                            if (gm[i][j].type == 1) {
+                                gm[i][j].type = 5;
+                            }
+                        }
+                    }
+                }
+                // delete player[k];
                 continue;
             }
             var mv = player[k].movement;
@@ -197,6 +198,8 @@ function Run(io) {
             clearInterval(Rooms[room].interval);
             delete Rooms[room].game;
             Rooms[room].start = false;
+            t = preparedPlayerCount(room);
+            bc(room, 'LoggedUserCount', t);
             if (Object.keys(Rooms[room].player).length == 0) {
                 delete Rooms[room];
             }
@@ -353,7 +356,7 @@ function Run(io) {
                         if (Rooms[playerRoom[uid]].player[k].connect == false) delete Rooms[playerRoom[uid]].player[k];
                     }
                 }
-                if (Object.keys(Rooms[playerRoom[uid]].player).length == 0 && Rooms[playerRoom[uid]].game == undefined) {
+                if (Object.keys(Rooms[playerRoom[uid]].player).length == 0) {
                     delete Rooms[playerRoom[uid]];
                 }
                 if (Rooms[playerRoom[uid]] != undefined) {
