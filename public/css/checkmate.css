@@ -179,9 +179,27 @@ button.btnv2:hover {
   box-shadow: 0px 0px;
 }
 #msg-sender {
-  width: 100%;
+  width: 85%;
   transition: all 0.25s;
   filter: opacity(0.5);
+}
+#msg-sender-container btn {
+  filter: opacity(0.5);
+  width: 50px;
+}
+#msg-sender-container {
+  display: flex;
+}
+#btn-view-grp {
+  width: 15%;
+}
+#view {
+  text-align: center;
+  width: 100%;
+  /* font-size: small; */
+  max-height: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 #msg-container {
   -moz-user-select: none;

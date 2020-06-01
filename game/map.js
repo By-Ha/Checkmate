@@ -129,12 +129,12 @@ function generateMazeMap(player) {
 
             if (i % 2 == 0 && j % 2 == 1) {
                 venum[i][j] = etot;
-                edges[etot] = { "a": venum[tmp1][j], "b": venum[tmp2][j], "w": Number(rnd(10)) + 40, "posa": i, "posb": j };
+                edges[etot] = { "a": venum[tmp1][j], "b": venum[tmp2][j], "w": 10 + Number(rnd(10)), "posa": i, "posb": j };
                 ++etot;
             }
             if (i % 2 == 1 && j % 2 == 0) {
                 venum[i][j] = etot;
-                edges[etot] = { "a": venum[i][tmp3], "b": venum[i][tmp4], "w": Number(rnd(10)) + 40, "posa": i, "posb": j };
+                edges[etot] = { "a": venum[i][tmp3], "b": venum[i][tmp4], "w": 10 + Number(rnd(10)), "posa": i, "posb": j };
                 ++etot;
             }
         }

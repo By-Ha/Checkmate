@@ -133,7 +133,8 @@ function Run(io) {
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
         for (let k in player) {//var i = 0; i < player.length; ++i
-            if (!player[k].gaming) { // maybe disconnected
+            if (!player[k].connect || player[k].view) { // maybe disconnected
+                console.log(k, player[k].gaming);
                 for (let i = 1; i <= size; ++i) {
                     for (let j = 1; j <= size; ++j) {
                         if (gm[i][j].color == player[k].color) {
@@ -146,7 +147,6 @@ function Run(io) {
                         }
                     }
                 }
-                // delete player[k];
                 continue;
             }
             var mv = player[k].movement;
@@ -200,10 +200,11 @@ function Run(io) {
             clearInterval(Rooms[room].interval);
             delete Rooms[room].game;
             Rooms[room].start = false;
-            t = preparedPlayerCount(room);
-            bc(room, 'LoggedUserCount', t);
             if (Object.keys(Rooms[room].player).length == 0) {
                 delete Rooms[room];
+            } else {
+                t = preparedPlayerCount(room);
+                bc(room, 'LoggedUserCount', t);
             }
         }
         catch (e) {
@@ -271,6 +272,7 @@ function Run(io) {
         let i = 1;
         for (var k in Rooms[room].player) {
             if (i > 8) break;
+            if (Rooms[room].player[k].view == true) continue;
             Rooms[room].playedPlayer[k] = {};
             Rooms[room].playedPlayer[k].place = 0;
             Rooms[room].player[k].prepare = false;
@@ -300,8 +302,10 @@ function Run(io) {
     }
 
     function preparedPlayerCount(room) {
+        if (!Rooms[room] || !Rooms[room].player) return [0, 0];
         var pre = 0, all = 0;
         for (let k in Rooms[room].player) {
+            if (Rooms[room].player[k].view) continue;
             if (Rooms[room].player[k].prepare) {
                 pre++;
             }
@@ -390,14 +394,25 @@ function Run(io) {
                         settings: { speed: 4, private: false, map: 1 }
                     };
                 }
-                Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, color: 0, movement: [] };
+                Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, view: false, color: 0, movement: [] };
                 playerRoom[uid] = room;
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
                 s.emit('UpdateSettings', Rooms[room].settings);
             });
 
-
+            s.on('view', (dat) => {
+                if (playerRoom[uid] != undefined && Rooms[playerRoom[uid]] != undefined && Rooms[playerRoom[uid]].player[uid] != undefined) {
+                    Rooms[playerRoom[uid]].player[uid].view = dat;
+                    Rooms[playerRoom[uid]].player[uid].gaming = false;
+                    Rooms[playerRoom[uid]].player[uid].prepare = false;
+                    s.emit('view_status', Rooms[playerRoom[uid]].player[uid].view);
+                }
+                t = preparedPlayerCount(playerRoom[uid]);
+                bc(playerRoom[uid], 'LoggedUserCount', t);
+                if (t[0] >= 2 && t[1] > (t[0] / 2))
+                    startGame(playerRoom[uid]);
+            })
 
             // 投票开始/结束
             s.on('VoteStart', function (dat) {
