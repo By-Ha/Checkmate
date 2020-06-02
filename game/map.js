@@ -35,7 +35,8 @@ function generateRandomMap(player) {
         }
     }
     gm[0][0] = { size: size };
-    for (var i = 1; i <= 0.2 * size * size; ++i) {
+    for (var i = 1; i <= 0.13 * size * size; ++i) {
+        for (var tt = 1; tt <= 10; ++tt) rnd(size);
         var t1 = rnd(size),
             t2 = rnd(size);
         while (gm[t1][t2].type != 0) {
@@ -43,7 +44,8 @@ function generateRandomMap(player) {
         }
         gm[t1][t2].type = 4
     }
-    for (var i = 1; i <= 0.1 * size * size; ++i) {
+    for (var i = 1; i <= 0.05 * size * size; ++i) {
+        for (var tt = 1; tt <= 10; ++tt) rnd(size);
         var t1 = rnd(size),
             t2 = rnd(size);
         while (gm[t1][t2].type != 0) {

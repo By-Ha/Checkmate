@@ -12,7 +12,10 @@ router.get('/', function (req, res, next) {
     }
     if (req.session.username) {
         db.getTypePost(0, 1, 10, function (err, dat) {
-            if (err) next(createError(500));
+            if (err) {
+                next(createError(500));
+                console.log(err);
+            }
             else {
                 db.getUserInfo(req.session.uid, (err2, dat2) => {
                     if (err2) next(createError(500));
