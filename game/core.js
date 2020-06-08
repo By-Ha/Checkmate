@@ -134,7 +134,8 @@ function Run(io) {
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].connect || player[k].view) { // maybe disconnected
-                console.log(k, player[k].gaming);
+                if (!player[k].gaming) continue;
+                console.log(k, player[k].connect, player[k].view, player[k].gaming);
                 for (let i = 1; i <= size; ++i) {
                     for (let j = 1; j <= size; ++j) {
                         if (gm[i][j].color == player[k].color) {
@@ -345,6 +346,15 @@ function Run(io) {
             }
             connectedUsers[uid] = { socket: s.id };
 
+            s.on('reconnect', function () {
+                if (connectedUsers[uid] == s.id) {
+                    console.log('grant reconnect');
+                } else {
+                    s.disconnect();
+                    console.log('denied reconnect');
+                }
+            })
+
             // 退出
             s.on('disconnect', function () {
                 delete connectedUsers[uid];
@@ -435,6 +445,9 @@ function Run(io) {
                     if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
                         Rooms[playerRoom[uid]].settings.speed = dat.speed;
                     }
+                    if (speed <= 3) {
+                        bc('World', 'WorldMessage', uname + '将速度设置为' + speed);
+                    }
                 }
                 if (dat.private != undefined) {
                     if (Rooms[playerRoom[uid]] != undefined) {
@@ -447,6 +460,9 @@ function Run(io) {
                     let mp = Number(dat.map);
                     if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
                         Rooms[playerRoom[uid]].settings.map = mp;
+                    if (mp == 2) {
+                        bc('World', 'WorldMessage', uname + '将地图设置为迷宫');
+                    }
                 }
                 if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
             })

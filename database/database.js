@@ -209,37 +209,43 @@ function getSourcePost(pid, callback) {
     });
 }
 
-function updatePost(pid, username, content, callback) {
+function updatePost(pid, uid, content, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
-    connection.query(SQL, SQLDATA, function (error, results) {
-        if (username != results[0].user_name && username != "admin") { callback("Permission Denied", null); return; }
-        var SQL = `UPDATE content SET content=? WHERE id=?;`
-        var SQLDATA = [content, pid];
+    getUserInfo(uid, (err, dat) => {
+        if (err) { callback("数据库错误", null); return; }
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) { callback(error, null); return; }
-            callback(null, "成功修改");
-            return;
+            if (uid != results[0].user_id && dat.type <= 0) { callback("Permission Denied", null); return; }
+            var SQL = `UPDATE content SET content=? WHERE id=?;`
+            var SQLDATA = [content, pid];
+            connection.query(SQL, SQLDATA, function (error, results) {
+                if (error) { callback(error, null); return; }
+                callback(null, "成功修改");
+                return;
+            });
         });
-    });
+    })
 }
 
-function deletePost(pid, username, callback) {
+function deletePost(pid, uid, callback) {
     var SQL = `select * from content where id=?;`
     var SQLDATA = [pid];
-    connection.query(SQL, SQLDATA, function (error, results) {
-        if (username != results[0].user_name && username != "admin") { callback("Permission Denied", null); return; }
-        var SQL = `UPDATE content SET hidden=? WHERE id=?;`
-        var SQLDATA = [true, pid];
+    getUserInfo(uid, (err, dat) => {
+        if (err) { callback("数据库错误", null); return; }
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (error) { callback(error, null); return; }
-            callback(null, "成功删除");
-            let SQL2 = `select * from content where id=?`;
-            let SQLDATA2 = [pid];
-            connection.query(SQL2, SQLDATA2, function (err, dat) {
-                if (err) return;
-                addUserExperienceById(dat[0].user_id, -10);
-            })
+            if (uid != results[0].user_id && dat.type <= 0) { callback("Permission Denied", null); return; }
+            var SQL = `UPDATE content SET hidden=? WHERE id=?;`
+            var SQLDATA = [true, pid];
+            connection.query(SQL, SQLDATA, function (error, results) {
+                if (error) { callback(error, null); return; }
+                callback(null, "成功删除");
+                let SQL2 = `select * from content where id=?`;
+                let SQLDATA2 = [pid];
+                connection.query(SQL2, SQLDATA2, function (err, dat) {
+                    if (err) return;
+                    addUserExperienceById(dat[0].user_id, -10);
+                })
+            });
         });
     });
 }

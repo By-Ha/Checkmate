@@ -141,6 +141,8 @@ $(() => {
         })
     }
 
+    // click 事件
+
     $("#left-bar .nav-link.post").click(() => {
         $(".loading-dot-container").css("display", "unset");
         clearPage();
@@ -176,6 +178,62 @@ $(() => {
                     }
                 }
             });
+        })
+    })
+
+    $("#post-id-delete").click(() => {
+        confirm('red', '确认删除?', '', () => {
+            post('/api/deletepost', { pid: Number($("#post-id-input")[0].value) }, (err, dat) => {
+                if (err) toast('error', '删除失败', '请重试或联系管理员');
+                else {
+                    toast('success', '删除成功', '地球上又少了一点东西');
+                    try {
+                        $(".admincard-content[pid=" + Number($("#post-id-input")[0].value) + "]")[0].parentNode.remove();
+                    } catch (e) { }
+                }
+            })
+        })
+    })
+
+    $("#post-id-edit").click(() => {
+        hide();
+        get('/admin/edit', { pid: Number($("#post-id-input")[0].value) }, (err, dat) => {
+            if (err) { toast('error', '获取失败', '请重试或联系管理员'); show(); }
+            else {
+                $(".loading-dot-container").css("display", "none");
+                toast('success', '获取成功', '改成啥好呢?');
+                content = $(".page-wrap")[0].innerHTML;
+                $(".page-wrap")[0].innerHTML = dat;
+                show();
+                let md = window.markdownit();
+                let pre = $(".preview")[0];
+                pre.innerHTML = md.render($(".edit textarea")[0].value);
+                KaTeXReRender();
+                $(".edit textarea").bind('input propertychange', function () {
+                    pre.innerHTML = md.render(this.value);
+                    KaTeXReRender();
+                })
+                $(".edit .back").unbind("click");
+                $(".edit .back").click(() => {
+                    hide();
+                    if (content != "")
+                        $(".page-wrap")[0].innerHTML = content;
+                    else {
+                        window.location.reload();
+                        return;
+                    }
+                    content = "";
+                    show();
+                    postPageAnction();
+                })
+                $(".edit .save").unbind("click");
+                $(".edit .save").click(() => {
+                    post('/api/updatepost', { pid: $(".edit").attr('pid'), content: $(".edit textarea")[0].value }, (err, dat) => {
+                        if (err) toast('error', '保存失败', err);
+                        else { toast('success', '保存成功', '好像还是没什么人看的样子'); content = ""; }
+                    })
+                })
+            }
         })
     })
 

@@ -13,4 +13,13 @@
             </li>
         </ul>
     </nav>
+    <br>
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="输入文章/说说id" id="post-id-input"
+            onchange="value=value.replace(/[^\d]/g,'')">
+        <div class="input-group-append">
+            <button type="button" class="btn btn-outline-danger" id="post-id-delete">删除</button>
+            <button type="button" class="btn btn-outline-primary" id="post-id-edit">修改</button>
+        </div>
+    </div>
 </aside>

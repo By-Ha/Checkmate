@@ -121,10 +121,10 @@ router.post('/post', function (req, res) {
 });
 
 router.post('/updatepost', function (req, res) {
-    if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
+    if (req.session.uid == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.content.match(/[\u0600-\u06FF]/) != null) { res.json({ status: ('error'), msg: '包含不允许的阿拉伯字符' }); return; }
-    db.updatePost(req.body.pid, req.session.username, req.body.content, function (err, dat) {
+    db.updatePost(req.body.pid, req.session.uid, req.body.content, function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; }
         else { res.json({ status: ('success'), msg: '修改成功' }); return; }
     })
@@ -179,7 +179,7 @@ router.post('/getSourcePost', function (req, res) {
 
 router.post('/deletepost', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    db.deletePost(req.body.pid, req.session.username, function (err, dat) {
+    db.deletePost(req.body.pid, req.session.uid, function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; }
         else { res.json({ status: ('success'), msg: '删除成功' }); return; }
     })
