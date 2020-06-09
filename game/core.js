@@ -460,8 +460,14 @@ function Run(io) {
                     let mp = Number(dat.map);
                     if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
                         Rooms[playerRoom[uid]].settings.map = mp;
-                    if (mp == 2) {
+                    if (mp == 1) {
+                        bc('World', 'WorldMessage', uname + '将地图设置为随机');
+                    }
+                    else if (mp == 2) {
                         bc('World', 'WorldMessage', uname + '将地图设置为迷宫');
+                    }
+                    else {
+                        bc('World', 'WorldMessage', uname + '将地图设置为空白');
                     }
                 }
                 if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
