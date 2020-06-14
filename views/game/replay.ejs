@@ -1,4 +1,4 @@
-<%- include('../header', {title: 'test'}); -%>
+<%- include('../header', {title: '回放'}); -%>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.js"
     integrity="sha256-uEFhyfv3UgzRTnAZ+SEgvYepKKB0FW6RqZLrqfyUNug=" crossorigin="anonymous"></script>
@@ -10,17 +10,10 @@
 <div id="cover">
 </div>
 <div id="main">
-    <table id="m">
+    <table id="click-listener">
     </table>
+    <canvas id="main-canvas" height="1000" width="1000"></canvas>
 </div>
-<style id="font-size-control">
-    #m td {
-        width: 30px;
-        max-width: 30px;
-        height: 30px;
-        max-height: 30px;
-    }
-</style>
 <script>let dat = `<%- game_data %>`;</script>
 <script src="/js/game/replay.js"></script>
 <%- include('../footer'); -%>

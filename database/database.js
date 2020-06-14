@@ -233,7 +233,7 @@ function deletePost(pid, uid, callback) {
     getUserInfo(uid, (err, dat) => {
         if (err) { callback("数据库错误", null); return; }
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (uid != results[0].user_id && dat.type <= 0) { callback("Permission Denied", null); return; }
+            if (results == undefined || results[0] == undefined || uid != results[0].user_id && dat.type <= 0) { callback("Permission Denied", null); return; }
             var SQL = `UPDATE content SET hidden=? WHERE id=?;`
             var SQLDATA = [true, pid];
             connection.query(SQL, SQLDATA, function (error, results) {

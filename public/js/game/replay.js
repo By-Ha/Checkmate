@@ -1,75 +1,97 @@
 "use strict";
 $(() => {
 
-    let nick = "";
-    let roomName = "";
-    let User;
-    let colorNick = [];
-    let myColor;
-    let movementUploader;
-    let init = false;
-    let start = false;
-
     let size = 20;
     const color = ['grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon'];
+    const tp = ['', 'crown', '', 'city', 'mountain', 'city', 'obstacle'];
     let gameData;
     let playerInfo = [];
     let gm = [];
     let player = [];
     let round;
-    let isThirdPerson = false;
-    let halfTag = false;
     let scrollSize = 30;
 
-    function makeBoard() {
-        let m = document.getElementById("m");
-        m.innerHTML = "";
-        var str = "";
-        str += "<tbody>";
-        for (var i = 1; i <= size; ++i) {
-            str += "<tr >";
-            for (var j = 1; j <= size; ++j) {
-                str += "<td id=\"td-" + ((i - 1) * size + j) + "\">" + String((i - 1) * size + j) + "</td>";
-            }
-            str += "</tr>";
-        }
-        str += "</tbody>";
-        $(m).append(str);
-        for (var i = 1; i <= size; ++i) {
-            for (var j = 1; j <= size; ++j) {
-                $("#td-" + String((i - 1) * size + j))[0].onclick = function () {
-                    var id = Number(this.id.substr(3));
-                    var ln = Math.floor((id - 1) / size) + 1, col = Number((((id % size) == 0) ? size : (id % size)));
-                    if (gm[ln][col].color == myColor) {
-                        makeSelect(ln, col);
-                    }
-                }
-            }
+    // canvas 相关运行函数
+    let c_size = 1000;
+    let c = document.getElementById("main-canvas")
+    let ctx = c.getContext("2d");
+
+    function drawBoard() {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, c_size, c_size);
+        ctx.lineCap = "square";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= size; ++i) {
+            let h = (c_size / size) * i;
+            ctx.moveTo(h, 0);
+            ctx.lineTo(h, c_size);
+            ctx.stroke();
+            ctx.moveTo(0, h);
+            ctx.lineTo(c_size, h);
+            ctx.stroke();
         }
     }
 
+    function drawIcon(type, x, y) {
+        if (!tp[type] || tp[type] == '') return;
+        let img = new Image();
+        img.src = `/img/${tp[type]}.png`;
+        ctx.drawImage(img, (c_size / size) * (x - 1), (c_size / size) * (y - 1), c_size / size, c_size / size);
+    }
+
+    function drawColor(c, x, y) {
+        ctx.fillStyle = color[c];
+        ctx.fillRect((c_size / size) * (x - 1) + 1, (c_size / size) * (y - 1) + 1, c_size / size - 2, c_size / size - 2);
+    }
+
+    function drawClear() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        drawBoard();
+    }
+
+    function drawClearBlock(x, y) {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect((c_size / size) * (x - 1) + 1, (c_size / size) * (y - 1) + 1, c_size / size - 2, c_size / size - 2);
+    }
+
+    function drawText(text, x, y) {
+        ctx.font = 'bold 36px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'white';
+        ctx.shadowColor = 'rgba(0, 0, 0, 1)';
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.fillText(text, (c_size / size) * (x - 0.5), (c_size / size) * (y - 0.25), c_size / size - 2);
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    }
+
+    // canvas 结束
+
+
+    function makeBoard() {
+        drawBoard();
+        c.addEventListener('click', function () {
+            var x = event.clientX - c.getBoundingClientRect().left;
+            var y = event.clientY - c.getBoundingClientRect().top;
+            console.log(x, y);
+        });
+        // let table = document.getElementById("click-listener");
+        // table.innerHTML = "";
+        // for (let i = 1; i <= size; ++i) {
+        //     let tr = table.appendChild(document.createElement('tr'));
+        //     for (let j = 1; j <= size; ++j) {
+        //         let td = tr.appendChild(document.createElement('td'));
+        //         console.log(td);
+        //     }
+        // }
+        // $("#click-listener td").css('width', `calc( min( 100vw / ${size} , 100vh / ${size} ) )`);
+        // $("#click-listener td").css('height', `calc( min( 100vw / ${size} , 100vh / ${size} ) )`);
+    }
+
     function reloadSymbol(i, j) {
-        let c = "";
-        if (gm[i][j].type == 1) {//crown
-            if (c.indexOf("crown.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/crown.png')");
-        } else if (gm[i][j].type == 3) {//city
-            if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        } else if (gm[i][j].type == 4) {//mountain
-            if (c.indexOf("mountain.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/mountain.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        } else if (gm[i][j].type == 5) {//empty city
-            if (c.indexOf("city.png") != -1 || c.indexOf("obstacle.png") != -1) return;
-            if (!start || judgeShown(i, j))
-                $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/city.png')");
-            else $("#td-" + String((i - 1) * size + j)).css('background-image', c + "url('/img/obstacle.png')");
-        }
+        drawIcon(gm[i][j].type, i, j);
     }
 
     function addAmountCrown() {
@@ -131,10 +153,8 @@ $(() => {
 
     function illu() {
         playerInfo = [];// 12%
-        let doc = document;
-        for (let t1 = 1; t1 <= size; ++t1) {
-            for (let t2 = 1; t2 <= size; ++t2) {
-                let i = t1, j = t2;
+        for (let i = 1; i <= size; ++i) {
+            for (let j = 1; j <= size; ++j) {
                 if (gm == 0) return;
                 if (gm[i][j].color != 0) {
                     if (playerInfo[gm[i][j].color] == undefined) playerInfo[gm[i][j].color] = [0, 0, 0];
@@ -142,16 +162,17 @@ $(() => {
                     playerInfo[gm[i][j].color][1] += gm[i][j].amount;
                     playerInfo[gm[i][j].color][2] = gm[i][j].color;
                 }
-                let d = doc.getElementById("td-" + String((i - 1) * size + j));
-                d.classList = "";
-                d.innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
-                d.classList.add("shown");
-                d.classList.add(color[gm[i][j].color]);
+                if (gm[i][j].color != 0 || gm[i][j].type != 0) {
+                    drawColor(gm[i][j].color, i, j);
+                }
             }
         }
-        for (let t1 = 1; t1 <= size; ++t1) {
-            for (let t2 = 1; t2 <= size; ++t2) {
-                reloadSymbol(t1, t2);
+        for (let i = 1; i <= size; ++i) {
+            for (let j = 1; j <= size; ++j) {
+                reloadSymbol(i, j);
+                if (gm[i][j].amount != 0) {
+                    drawText(String(gm[i][j].amount), i, j);
+                }
             }
         }
     }
@@ -188,6 +209,8 @@ $(() => {
     setInterval(next, 250);
 
     $(document).ready(() => {
+        // 改用canvas暂时取消
+        return;
         //兼容性写法，该函数也是网上别人写的，不过找不到出处了，蛮好的，所有我也没有必要修改了
         //判断鼠标滚轮滚动方向
         if (window.addEventListener)//FF,火狐浏览器会识别该方法
@@ -224,6 +247,7 @@ $(() => {
     });
 
     $(document).ready(() => {
+        return;
         var box = document.getElementById('m');
         document.onmousedown = function (e) {
             if (!$(e.target).hasClass('unshown') && e.target.id != 'main') return;

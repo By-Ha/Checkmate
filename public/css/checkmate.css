@@ -70,6 +70,26 @@ button.btnv2:hover {
   border-spacing: 0px !important;
   z-index: -5;
 }
+#click-listener {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -4;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+#main-canvas {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: black 1px;
+  border-spacing: 0px !important;
+  z-index: -5;
+  max-width: 100vw;
+  max-height: 100vh;
+}
 #m td {
   overflow: hidden;
   border: 1px solid black;
