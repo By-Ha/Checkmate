@@ -223,3 +223,22 @@ article.preview object {
 #sRight .rating .rank-link:nth-child(5n + 5) .rank-box {
   background-color: #fef4ff;
 }
+
+.colorbox .colorbox-content:nth-child(5n + 1) {
+  background-color: #fff8e1;
+}
+.colorbox .colorbox-content:nth-child(5n + 2) {
+  background-color: #fff0e6;
+}
+.colorbox .colorbox-content:nth-child(5n + 3) {
+  background-color: #f7fdde;
+}
+.colorbox .colorbox-content:nth-child(5n + 4) {
+  background-color: #f4f6fe;
+}
+.colorbox .colorbox-content:nth-child(5n + 5) {
+  background-color: #fef4ff;
+}
+.sponsor-amount {
+  float: right;
+}
