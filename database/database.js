@@ -169,9 +169,11 @@ function getTypePost(type, page, pagesize, callback) {
                 finish++;
                 if (finish == results.length * 2) { callback(null, results); return; }
             });
-            getUserLevelById(e.user_id, function (err, dat) {
+            getUserInfo(e.user_id, function (err, dat) {
                 if (err) { callback(err); return; }
-                e.level = dat;
+                e.userinfo = dat;
+                e.level = getLevelByExp(dat.exp);
+                delete e.userinfo.password;
                 finish++;
                 if (finish == results.length * 2) { callback(null, results); return; }
             })
@@ -269,14 +271,13 @@ function getUserPost(uid, page, pagesize, callback) {
                     return;
                 }
             });
-            getUserLevelById(e.user_id, function (err, dat) {
+            getUserInfo(e.user_id, function (err, dat) {
                 if (err) { callback(err); return; }
-                e.level = dat;
+                e.userinfo = dat;
+                e.level = getLevelByExp(dat.exp);
+                delete e.userinfo.password;
                 finish++;
-                if (finish == (results.length * 2)) {
-                    callback(null, results);
-                    return;
-                }
+                if (finish == results.length * 2) { callback(null, results); return; }
             })
         })
     });
@@ -387,10 +388,14 @@ function getUserExperienceByUsername(username, callback) {
     })
 }
 
+function getLevelByExp(exp) {
+    return ((exp >= 28800) ? 6 : ((exp >= 10800) ? 5 : ((exp >= 4500) ? 4 : ((exp >= 1500) ? 3 : ((exp >= 200 ? 2 : ((exp >= 100) ? 1 : 0)))))));
+}
+
 function getUserLevelById(userid, callback) {
     getUserExperienceById(userid, function (err, dat) {
         if (err) { callback(err); return; }
-        else { callback(null, ((dat >= 28800) ? 6 : ((dat >= 10800) ? 5 : ((dat >= 4500) ? 4 : ((dat >= 1500) ? 3 : ((dat >= 200 ? 2 : ((dat >= 100) ? 1 : 0)))))))); return; }
+        else { callback(null, getLevelByExp(dat)); return; }
     });
 }
 

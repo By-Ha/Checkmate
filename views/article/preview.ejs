@@ -4,17 +4,23 @@
 <article class="<%= (art.type==0)?'shuoshuo':'blog' %> kana-item preview" pid="<%= art.id %>">
     <div class="post-info">
         <div class="post-info-author">
-            <img class="avatar"
-                src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= art.user_id %>.webp!50x50"
-                height="48px" width="48px">
+            <div>
+                <img class="avatar"
+                    src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= art.user_id %>.webp!50x50"
+                    height="48px" width="48px">
+                <% if(art.userinfo.type==1){ %>
+                <a class="verify-orange verify" title="站长"></a>
+                <% }else if(art.userinfo.type==2){ %>
+                <a class="verify-orange verify" title="超级管理员"></a>
+                <% }else if(art.userinfo.type==3){ %>
+                <a class="verify-blue verify" title="管理员"></a>
+                <% } %>
+                <!-- <a class="verify-yellow verify"></a> -->
+            </div>
             <div class="post-info-author-username">
                 <a rel="author" href="/user/<%= art.user_id %>"><%= art.user_name %></a>
                 <i class="iconfont icon-level-<%= art.level %>"></i>
             </div>
-            <% if(false) {//if(username == art.user_name || username == "admin") {%>
-            <a class="delete" href="#" pid="<%= art.id %>" style="color: red;">删除</a>
-            <a class="edit" href="#write" pid="<%= art.id %>">编辑</a>
-            <% } %>
         </div>
         <div class="post-info-meta">
             <time title="<%= dateFtt("yyyy-MM-dd hh:mm:ss", art.created); %>"><%= delta(art.created); %></time>

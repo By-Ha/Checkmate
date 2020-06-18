@@ -12,6 +12,26 @@
   border: 2px solid #fff;
 }
 
+#main-part #container article .verify {
+  background: #fff center/14px no-repeat;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  top: 56px;
+  left: 56px;
+}
+
+#main-part #container article .verify-orange {
+  background-image: url(/img/verify/verify_orange.svg);
+}
+
+#main-part #container article .verify-blue {
+  background-image: url(/img/verify/verify_blue.svg);
+}
+
 .post-info-author {
   padding: 17px 0 0;
   color: #222;
