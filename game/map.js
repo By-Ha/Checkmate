@@ -103,8 +103,7 @@ function generateMazeMap(player) {
     let edges = [];
     let vtot = [];
     let venum = [];
-    if (player == 2) size = 9;
-    else size = 19;
+    size = Math.round((-256.5)/(player+2.5)+66)
     for (let i = 0; i <= size; ++i) {
         gm[i] = [];
         venum[i] = [];
