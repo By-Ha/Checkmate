@@ -33,14 +33,14 @@ $(() => {
         }
     }
 
-    function drawIcon(type, x, y) {
+    function drawIcon(type, y, x) {
         if (!tp[type] || tp[type] == '') return;
         let img = new Image();
         img.src = `/img/${tp[type]}.png`;
         ctx.drawImage(img, (c_size / size) * (x - 1), (c_size / size) * (y - 1), c_size / size, c_size / size);
     }
 
-    function drawColor(c, x, y) {
+    function drawColor(c, y, x) {
         ctx.fillStyle = color[c];
         ctx.fillRect((c_size / size) * (x - 1) + 1, (c_size / size) * (y - 1) + 1, c_size / size - 2, c_size / size - 2);
     }
@@ -50,12 +50,12 @@ $(() => {
         drawBoard();
     }
 
-    function drawClearBlock(x, y) {
+    function drawClearBlock(y, x) {
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect((c_size / size) * (x - 1) + 1, (c_size / size) * (y - 1) + 1, c_size / size - 2, c_size / size - 2);
     }
 
-    function drawText(text, x, y) {
+    function drawText(text, y, x) {
         ctx.font = 'bold 36px Arial';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'white';
@@ -75,7 +75,6 @@ $(() => {
         c.addEventListener('click', function () {
             var x = event.clientX - c.getBoundingClientRect().left;
             var y = event.clientY - c.getBoundingClientRect().top;
-            console.log(x, y);
         });
         // let table = document.getElementById("click-listener");
         // table.innerHTML = "";
