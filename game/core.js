@@ -265,6 +265,23 @@ function Run(io) {
         updateMap(room);
     }
 
+    function getClientIp(s) {
+        return s.handshake.headers["x-real-ip"];
+    }
+
+    function getVotedMap(room) {
+        let votedMap = [null, 0, 0, 0];
+        for (var k in Rooms[room].player) {
+            votedMap[Rooms[room].player[k].settings.map]++;
+        }
+        let max = 0, maxPlc = 1;
+        for (let i = 1; i < votedMap.length; ++i) {
+            if (votedMap[i] > max) maxPlc = i, max = votedMap[i];
+        }
+        votedMap[0] = maxPlc;
+        return votedMap;
+    }
+
     function startGame(room) {
         if (Rooms[room].start) return;
         Rooms[room].game = new Room();
@@ -284,7 +301,7 @@ function Run(io) {
             ue(k, 'UpdateColor', i);
             ++i;
         }
-        Rooms[room].game.gm = mp.generateMap(Rooms[room].settings.map, --i);
+        Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
         Rooms[room].game.evalcmd = Rooms[room].game.gm[0][0].cmd;
@@ -401,13 +418,25 @@ function Run(io) {
                     Rooms[room] = {
                         game: undefined, start: false, player: {}, playedPlayer: {},
                         interval: undefined,
-                        settings: { speed: 4, private: false, map: 1 }
+                        settings: { speed: 4, private: false, map: [] }
                     };
                 }
-                Rooms[room].player[uid] = { uname: uname, prepare: false, gaming: false, connect: true, view: false, color: 0, movement: [] };
+                Rooms[room].player[uid] = {
+                    uname: uname, prepare: false, gaming: false, connect: true, view: false, color: 0, movement: [],
+                    settings: {
+                        map: 1
+                    },
+                    ip: getClientIp(s)
+                };
+                for (let k in Rooms[room].player) {
+                    if (Rooms[room].player[uid].ip == Rooms[room].player[k].ip && k != uid) {
+                        bc(room, 'WorldMessage', `${uname}和${Rooms[room].player[k].uname}使用相同ip进行游戏.`);
+                    }
+                }
                 playerRoom[uid] = room;
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
+                Rooms[room].settings.map = getVotedMap(room);
                 s.emit('UpdateSettings', Rooms[room].settings);
             });
 
@@ -445,9 +474,7 @@ function Run(io) {
                     if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
                         Rooms[playerRoom[uid]].settings.speed = dat.speed;
                     }
-                    if (speed <= 3) {
-                        bc('World', 'WorldMessage', uname + '将速度设置为' + speed);
-                    }
+                    bc(room, 'WorldMessage', uname + '将速度设置为' + speed);
                 }
                 if (dat.private != undefined) {
                     if (Rooms[playerRoom[uid]] != undefined) {
@@ -459,17 +486,9 @@ function Run(io) {
                 if (dat.map) {
                     let mp = Number(dat.map);
                     if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
-                        Rooms[playerRoom[uid]].settings.map = mp;
-                    if (mp == 1) {
-                        bc('World', 'WorldMessage', uname + '将地图设置为随机');
-                    }
-                    else if (mp == 2) {
-                        bc('World', 'WorldMessage', uname + '将地图设置为迷宫');
-                    }
-                    else {
-                        bc('World', 'WorldMessage', uname + '将地图设置为空白');
-                    }
+                        Rooms[playerRoom[uid]].player[uid].settings.map = mp;
                 }
+                Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
                 if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
             })
 
