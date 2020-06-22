@@ -129,7 +129,6 @@ function Run(io) {
         let player = Rooms[room].player;
         let gm = Rooms[room].game.gm;
         let size = Rooms[room].game.size;
-        var needDeleteMovement = []; // players that finish movement below
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
         for (let k in player) {//var i = 0; i < player.length; ++i
@@ -150,10 +149,10 @@ function Run(io) {
                 }
                 continue;
             }
-            var mv = player[k].movement;
+            var mv = player[k].movement[0];
+            if (mv == undefined) mv = [];
             Rooms[room].game.gamelog[Rooms[room].game.round][k] = mv.concat();
             if (mv == 0 || mv == undefined) continue; // the movement is empty
-            needDeleteMovement.push(k);
             if (mv[0] > size || mv[1] > size || mv[2] > size || mv[3] > size
                 || mv[0] < 1 || mv[1] < 1 || mv[2] < 1 || mv[3] < 1 || (Math.abs(mv[0] - mv[2]) + Math.abs(mv[1] - mv[3])) > 1) {
                 player[k].movement = [];
@@ -163,16 +162,14 @@ function Run(io) {
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
             cnt -= 1; // cannot move all
             if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
-                ue(k, 'ClearMovement');
+                player[k].movement = [];
                 continue;
             }
             combineBlock(room, f, t, cnt);
-            player[k].movement = [];
+            player[k].movement.shift();
         }
         bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         bc(room, 'Rank_Update', Rank(room));
-        for (var i = 0; i < needDeleteMovement.length; ++i)
-            ue(needDeleteMovement[i], 'DeleteMovement');
     }
 
     function playerWinAnction(room) {
@@ -297,7 +294,6 @@ function Run(io) {
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
             Rooms[room].player[k].color = i;
-            ue(k, 'UpdateColor', i);
             ue(k, 'UpdateColor', i);
             ++i;
         }
@@ -469,24 +465,26 @@ function Run(io) {
             })
 
             s.on('changeSettings', function (dat) {
-                if (dat.speed) {
-                    let speed = Number(dat.speed);
-                    if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
-                        Rooms[playerRoom[uid]].settings.speed = dat.speed;
+                if (dat) {
+                    if (dat.speed) {
+                        let speed = Number(dat.speed);
+                        if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
+                            Rooms[playerRoom[uid]].settings.speed = dat.speed;
+                        }
+                        bc(room, 'WorldMessage', uname + '将速度设置为' + speed);
                     }
-                    bc(room, 'WorldMessage', uname + '将速度设置为' + speed);
-                }
-                if (dat.private != undefined) {
-                    if (Rooms[playerRoom[uid]] != undefined) {
-                        if (String(dat.private) == "true")
-                            Rooms[playerRoom[uid]].settings.private = true;
-                        else Rooms[playerRoom[uid]].settings.private = false;
+                    if (dat.private != undefined) {
+                        if (Rooms[playerRoom[uid]] != undefined) {
+                            if (String(dat.private) == "true")
+                                Rooms[playerRoom[uid]].settings.private = true;
+                            else Rooms[playerRoom[uid]].settings.private = false;
+                        }
                     }
-                }
-                if (dat.map) {
-                    let mp = Number(dat.map);
-                    if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
-                        Rooms[playerRoom[uid]].player[uid].settings.map = mp;
+                    if (dat.map) {
+                        let mp = Number(dat.map);
+                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
+                            Rooms[playerRoom[uid]].player[uid].settings.map = mp;
+                    }
                 }
                 Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
                 if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
@@ -510,8 +508,11 @@ function Run(io) {
             s.on('UploadMovement', function (dat) {
                 if (connectedUsers[uid] == undefined || playerRoom[uid] == undefined) return;
                 if (!Rooms[playerRoom[uid]].start || !Rooms[playerRoom[uid]].player[uid].gaming) return;
-                Rooms[playerRoom[uid]].player[uid].movement = dat;
-                s.emit('ReceiveMovement', dat);
+                Rooms[playerRoom[uid]].player[uid].movement.push(dat);
+            })
+
+            s.on('ClearMovement', function () {
+                Rooms[playerRoom[uid]].player[uid].movement = [];
             })
 
             s.on('SendWorldMessage', function (dat) {
