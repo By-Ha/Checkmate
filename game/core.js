@@ -465,6 +465,7 @@ function Run(io) {
             })
 
             s.on('changeSettings', function (dat) {
+                if (!Rooms[playerRoom[uid]]) return;
                 if (dat) {
                     if (dat.speed) {
                         let speed = Number(dat.speed);
