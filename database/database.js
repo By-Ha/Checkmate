@@ -614,8 +614,8 @@ function gameRatingCalc(room, data, battle_data) {
                         if (room == "Bot房,无Rating") {
                             addBattle(p[1], bid, 0);
                         } else {
-                            changeRating(p[1], 12, firstBounce + 1);
-                            addBattle(p[1], bid, 12, firstBounce + 1);
+                            changeRating(p[1], firstBounce + 1);
+                            addBattle(p[1], bid, firstBounce + 1);
                         }
 
                     }
