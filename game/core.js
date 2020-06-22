@@ -472,7 +472,7 @@ function Run(io) {
                         if (speed == 1 || speed == 2 || speed == 3 || speed == 4) {
                             Rooms[playerRoom[uid]].settings.speed = dat.speed;
                         }
-                        bc(room, 'WorldMessage', uname + '将速度设置为' + speed);
+                        bc(playerRoom[uid], 'WorldMessage', uname + '将速度设置为' + speed);
                     }
                     if (dat.private != undefined) {
                         if (Rooms[playerRoom[uid]] != undefined) {
