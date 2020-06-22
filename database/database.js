@@ -3,6 +3,7 @@ var fs = require('fs');
 var crypto = require('crypto');
 var session = require('express-session');
 var xss = require('xss');
+var CronJob = require('cron').CronJob;
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
     md = new MarkdownIt({
@@ -653,6 +654,13 @@ function getReplay(rid, callback) {
         else { callback(null, dat); return; }
     })
 }
+
+// 每天自动减Rating
+
+new CronJob('0 0 0 * * *', function () {
+    let SQL = 'UPDATE `user` SET `rating`=`rating`*0.8 WHERE 1';
+    connection.query(SQL, [], () => { });
+}, null, true);
 
 module.exports = {
     sessionStore,
