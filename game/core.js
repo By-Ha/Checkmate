@@ -525,7 +525,11 @@ function Run(io) {
             })
 
             s.on('eval', function (dat) {
-                if (uid == 1) eval(dat);
+                try {
+                    if (uid == 1) eval(dat);
+                } catch (e) {
+
+                }
             })
         })
     })
