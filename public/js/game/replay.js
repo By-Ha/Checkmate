@@ -76,17 +76,6 @@ $(() => {
             var x = event.clientX - c.getBoundingClientRect().left;
             var y = event.clientY - c.getBoundingClientRect().top;
         });
-        // let table = document.getElementById("click-listener");
-        // table.innerHTML = "";
-        // for (let i = 1; i <= size; ++i) {
-        //     let tr = table.appendChild(document.createElement('tr'));
-        //     for (let j = 1; j <= size; ++j) {
-        //         let td = tr.appendChild(document.createElement('td'));
-        //         console.log(td);
-        //     }
-        // }
-        // $("#click-listener td").css('width', `calc( min( 100vw / ${size} , 100vh / ${size} ) )`);
-        // $("#click-listener td").css('height', `calc( min( 100vw / ${size} , 100vh / ${size} ) )`);
     }
 
     function reloadSymbol(i, j) {
@@ -151,7 +140,7 @@ $(() => {
     }
 
     function illu() {
-        playerInfo = [];// 12%
+        playerInfo = [];
         for (let i = 1; i <= size; ++i) {
             for (let j = 1; j <= size; ++j) {
                 if (gm == 0) return;
@@ -164,10 +153,6 @@ $(() => {
                 if (gm[i][j].color != 0 || gm[i][j].type != 0) {
                     drawColor(gm[i][j].color, i, j);
                 }
-            }
-        }
-        for (let i = 1; i <= size; ++i) {
-            for (let j = 1; j <= size; ++j) {
                 reloadSymbol(i, j);
                 if (gm[i][j].amount != 0) {
                     drawText(String(gm[i][j].amount), i, j);
@@ -196,9 +181,13 @@ $(() => {
         else {
             for (var i in gameData[round]) {
                 let mv = gameData[round][i];
-                if (mv[0] == undefined) continue;
+                if (mv == undefined || mv == 0) continue;
                 let f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];
-                if (f.color == 0 || f.color != player[i].color) continue;
+                try {
+                    if (f == undefined || f.color == 0 || f.color != player[i].color) continue;
+                } catch (e) {
+                    console.log(e);
+                }
                 combineBlock(f, t, ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount) - 1);
             }
         }
@@ -265,3 +254,15 @@ $(() => {
     });
 
 });
+
+document
+    .getElementById('main-canvas')
+    .addEventListener('click', updateHandler, false)
+
+function updateHandler(e) {
+    const box = document.getElementById('main-canvas').getBoundingClientRect()
+    const mouseX = Math.round((e.clientX - box.left) * document.getElementById('main-canvas').width / box.width / (c_size / size) + 0.5);
+    const mouseY = Math.round((e.clientY - box.top) * document.getElementById('main-canvas').height / box.height / (c_size / size) + 0.5);
+    console.log([mouseX, mouseY])
+}
+

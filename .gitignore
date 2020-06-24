@@ -83,3 +83,4 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+public/js/game/checkmate.v2.js

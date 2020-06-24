@@ -162,7 +162,11 @@ function Run(io) {
             var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
             cnt -= 1; // cannot move all
             if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
-                player[k].movement = [];
+                while (player[k].movement.length != 0) {
+                    let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
+                    if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
+                    else break;
+                }
                 continue;
             }
             combineBlock(room, f, t, cnt);
@@ -280,11 +284,24 @@ function Run(io) {
     }
 
     function startGame(room) {
+        let ips = {};
         if (Rooms[room].start) return;
         Rooms[room].game = new Room();
         Rooms[room].start = true;
         Rooms[room].playedPlayer = {};
         let i = 1;
+        for (let k in Rooms[room].player) {
+            if (ips[Rooms[room].player[k].ip] != undefined) {
+                ips[Rooms[room].player[k].ip].push(Rooms[room].player[k].uname);
+            } else {
+                ips[Rooms[room].player[k].ip] = [Rooms[room].player[k].uname];
+            }
+        }
+        for (let k in ips) {
+            if (ips[k].length > 1) {
+                bc(room, 'WorldMessage', ips[k].join() + "使用相同ip游戏");
+            }
+        }
         for (var k in Rooms[room].player) {
             if (i > 8) break;
             if (Rooms[room].player[k].view == true) continue;
