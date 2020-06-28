@@ -371,8 +371,10 @@ function Run(io) {
 
             if (connectedUsers[uid] != undefined) {
                 s.emit('execute', `Swal.fire("旧连接已经被删除!", '', "info")`);
-                if (io.sockets.connected[connectedUsers[uid]])
-                    io.sockets.connected[connectedUsers[uid]].disconnect();// 断开一个用户的多个连接
+                if (io.sockets.connected[connectedUsers[uid].socket]) {
+                    io.sockets.connected[connectedUsers[uid].socket].emit('closeTab');
+                    io.sockets.connected[connectedUsers[uid].socket].conn.close();
+                }
             }
             connectedUsers[uid] = { socket: s.id };
 
