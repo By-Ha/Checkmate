@@ -1,4 +1,5 @@
 let express = require('express');
+let createError = require('http-errors');
 let router = express.Router();
 let db = require('../database/database');
 let multer = require('multer')
@@ -7,6 +8,7 @@ let fs = require('fs');
 let cos = require('../cos/cos');
 let sharp = require('sharp');
 let msg = require('../message/message').messageEmitter;
+let cp = require('child_process');
 
 var upload = multer({
     dest: '/tmp/Kana/upload',
@@ -241,6 +243,35 @@ router.post('/upload/banner', upload.single('banner'), function (req, res) {
     }
     res.send({ ret_code: '0' });
     return;
+})
+
+//superadmin
+
+router.get('/superadmin/*', function (req, res, next) {
+    db.getUserInfo(req.session.uid, (err, dat) => {
+        if (err || !dat || !dat.type || dat.type <= 0 || dat.type >= 4) {
+            next(createError(403));
+            return;
+        } else if (dat.type > 0 && dat.type < 4) {
+            next();
+        }
+    })
+})
+
+router.post('/superadmin/*', function (req, res, next) {
+    db.getUserInfo(req.session.uid, (err, dat) => {
+        if (err || !dat || !dat.type || dat.type <= 0 || dat.type >= 4) {
+            next(createError(403));
+            return;
+        } else if (dat.type > 0 && dat.type < 4) {
+            next();
+        }
+    })
+})
+
+router.post('/superadmin/restart', function (req, res) {
+    res.json({ status: 'success', msg: "重启中..." });
+    cp.exec('sudo pm2 restart 0');
 })
 
 router.post('/template', function (req, res) {

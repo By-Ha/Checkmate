@@ -1,0 +1,16 @@
+<%- include('header', { title: '注销' }); -%>
+<%- include('navi'); -%>
+
+<% if(userInfo.type>0&&userInfo.type<4) { %>
+<button id="restart-server">
+    点击重启服务端
+</button>
+<% } %>
+
+<script>
+    $("#restart-server").click(() => {
+        $.post('/api/superadmin/restart', {}, (dat) => { alert(`状态:${dat.status},信息:${dat.msg}`); });
+    })
+</script>
+
+<% - include('footer'); -%>

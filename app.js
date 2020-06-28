@@ -21,6 +21,7 @@ var postRouter = require('./routes/post');
 var apiRouter = require('./routes/api');
 var checkmateRouter = require('./routes/checkmate');
 var adminRouter = require('./routes/admin');
+var superadminRouter = require('./routes/superadmin');
 
 var app = express();
 
@@ -86,6 +87,7 @@ app.use('/post', postRouter);
 app.use('/api', apiRouter);
 app.use('/checkmate', checkmateRouter);
 app.use('/admin', adminRouter);
+app.use('/superadmin', superadminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
