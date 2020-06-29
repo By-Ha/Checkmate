@@ -271,7 +271,7 @@ function Run(io) {
     }
 
     function getVotedMap(room) {
-        let votedMap = [null, 0, 0, 0, 0];
+        let votedMap = [null, 0, 0, 0];
         for (var k in Rooms[room].player) {
             votedMap[Rooms[room].player[k].settings.map]++;
         }
@@ -502,7 +502,7 @@ function Run(io) {
                     }
                     if (dat.map) {
                         let mp = Number(dat.map);
-                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 4))
+                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
                             Rooms[playerRoom[uid]].player[uid].settings.map = mp;
                     }
                 }
@@ -540,7 +540,11 @@ function Run(io) {
                     return;
                 }
                 dat = xss(dat);
-                bc('World', 'WorldMessage', uname + ': ' + dat);
+                if (dat.indexOf('sur') != -1 || dat.indexOf('viv') != -1) {
+                    try {
+                        ue(uid, 'WorldMessage', uname + ': ' + dat)
+                    } catch (e) { }
+                } else { bc('World', 'WorldMessage', uname + ': ' + dat); }
             })
 
             s.on('eval', function (dat) {
