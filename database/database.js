@@ -535,7 +535,6 @@ function getRating(uid, callback = () => { }) {
 }
 
 function addBattle(uid, battle_id, dr) {
-    console.log('ADD_BATTLE', uid, battle_id);
     let SQL = 'INSERT INTO `battle`(`battle_id`, `player`, `rating`, `delta_rating`) VALUES (?, ?, ?, ?)'
     getRating(uid, (err, dat) => {
         if (err) {
@@ -556,20 +555,20 @@ function addBattleData(battle_id, data) {
     connection.query(SQL, SQLDATA, () => { });
 }
 
-function changeRating(uid, rating) {
-    console.log('RATING_CHANGE', uid, rating);
+function changeRating(uid, rating, nowRating, place) {
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
+    if (rating > 0) rating = Math.round(rating * (Math.abs(49.5 - 0.01 * nowRating) + 50.5 - 0.01 * nowRating) / 10);
+    else rating = rating * Math.round(0.002 * nowRating + 1);
     let SQLDATA = [rating, uid];
     try {
         connection.query(SQL, SQLDATA, (err, dat) => { });
     } catch (e) {
         console.log('changeRatingError:', e);
     }
-
+    return rating;
 }
 
 function gameRatingCalc(room, data, battle_data) {
-    console.log("PLACE_DATA:", data);
     try {
         let bid = stringRandom(64);
         let amount = 0;
@@ -587,37 +586,15 @@ function gameRatingCalc(room, data, battle_data) {
                         let firstRating = data[p[1]].rating;
                         let firstBounce = 0;
                         for (let it = 2; it <= Object.keys(data).length; ++it) {
-                            try {
-                                if (data[p[it]].rating >= firstRating) {
-                                    firstBounce += Math.ceil((data[p[it]].rating - firstRating) / 100) + 3;
-                                    let dr = -5 - 1 * Math.min(Math.ceil((data[p[it]].rating - firstRating) / 100), 8);
-                                    if (room == "Bot房,无Rating") {
-                                        addBattle(p[it], bid, 0);
-                                    } else {
-                                        changeRating(p[it], dr);
-                                        addBattle(p[it], bid, dr);
-                                    }
-                                } else {
-                                    firstBounce += Math.max(3 - Math.ceil((firstRating - data[p[it]].rating) / 100), 1);
-                                    let dr = -1 * Math.max(Math.floor(5 - (firstRating - data[p[it]].rating) / 100), 1);
-                                    if (room == "Bot房,无Rating") {
-                                        addBattle(p[it], bid, 0);
-                                    } else {
-                                        changeRating(p[it], dr);
-                                        addBattle(p[it], bid, dr);
-                                    }
-                                }
-                            } catch (e) {
-                                console.log('it:', it, '\np:', p, '\ndata:', data);
-                            }
+                            let score = Math.round((data[p[it]].rating - firstRating) / 1000) + 3;
+                            if (score <= 0) score = 1;
+                            if (score > 10) score = 10;
+                            firstBounce += score;
+                            let deltaRating = changeRating(p[it], -score, data[p[it]].rating, it);
+                            addBattle(p[it], bid, deltaRating);
                         }
-                        if (room == "Bot房,无Rating") {
-                            addBattle(p[1], bid, 0);
-                        } else {
-                            changeRating(p[1], firstBounce + 1);
-                            addBattle(p[1], bid, firstBounce + 1);
-                        }
-
+                        let deltaRating = changeRating(p[1], firstBounce, data[p[1]].rating, 1);
+                        addBattle(p[1], bid, deltaRating);
                     }
                 }
             })
@@ -655,12 +632,12 @@ function getReplay(rid, callback) {
     })
 }
 
-// 每天自动减Rating
+// 每天自动减Rating, 取消了
 
-new CronJob('0 0 0 * * *', function () {
-    let SQL = 'UPDATE `user` SET `rating`=`rating`*0.8 WHERE 1';
-    connection.query(SQL, [], () => { });
-}, null, true);
+// new CronJob('0 0 0 * * *', function () {
+//     let SQL = 'UPDATE `user` SET `rating`=`rating`*0.8 WHERE 1';
+//     connection.query(SQL, [], () => { });
+// }, null, true);
 
 module.exports = {
     sessionStore,
