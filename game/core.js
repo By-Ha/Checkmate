@@ -533,7 +533,11 @@ function Run(io) {
             })
 
             s.on('ClearMovement', function () {
-                Rooms[playerRoom[uid]].player[uid].movement = [];
+                try {
+                    Rooms[playerRoom[uid]].player[uid].movement = [];
+                } catch (e) {
+
+                }
             })
 
             s.on('SendWorldMessage', function (dat) {
