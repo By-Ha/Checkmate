@@ -88,6 +88,7 @@ function generateRandomMap(player) {
         }
         last.push([t1, t2]);
     }
+    gm[0][0].type = 1;
     return gm;
 }
 
@@ -226,6 +227,7 @@ function generateMazeMap(player) {
             }
         }
     }
+    gm[0][0].type = 1;
     return gm;
 }
 
@@ -300,6 +302,7 @@ function generateEmptyMap(player) {
         }
         last.push([t1, t2]);
     }
+    gm[0][0].type = 1;
     return gm;
 }
 
@@ -393,6 +396,7 @@ function generateDragonBoatFestivalMap(player) {
             }
         }
     }
+    gm[0][0].type = 1;
     return gm;
 }
 

@@ -11,7 +11,6 @@ function Run(io) {
             this.color2Id = [];
             this.gameInterval;
             this.round = 0;
-            this.evalcmd;
             this.size;
             this.gamelog = [];
         }
@@ -317,16 +316,18 @@ function Run(io) {
         Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
-        Rooms[room].game.evalcmd = Rooms[room].game.gm[0][0].cmd;
-        Rooms[room].game.gm[0][0].cmd = "";
+        Rooms[room].game.gamelog[0][0][0].version = 1;
+
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;
+        Rooms[room].game.type = Rooms[room].game.gm[0][0].type;
+
         bc(room, 'UpdateSize', Rooms[room].game.size);
         bc(room, 'LoggedUserCount', [0, 0]); // just clear it
         bc(room, 'execute', "$('#ready')[0].innerHTML = '准备'");
-
         bc(room, 'UpdateUser', Rooms[room].player);
         bc(room, 'GameStart');
         bc(room, 'UpdateGM', Rooms[room].game.gm);
+
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
         }, 1000 / Rooms[room].settings.speed);
