@@ -450,7 +450,7 @@ function generatePUBGMap(player) {
     let calcTimes = 0;
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
-        if (calcTimes >= 100) return generateRandomMap(player);
+        if (calcTimes >= 100) return generatePUBGMap(player);
         var t1 = rnd(size - 2) + 1,
             t2 = rnd(size - 2) + 1;
         // 至少留一个方位有空

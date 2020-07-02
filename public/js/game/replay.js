@@ -195,8 +195,8 @@ $(() => {
     }
 
     if (gameData[0][0][0].version != undefined && gameData[0][0][0].version > 1) {
-        alert('回放版本过高,暂不支持.');
-        return;
+        alert('回放版本过高,暂不支持.您看到的画面可能错乱而并不能反应真实的回放.');
+        // return;
     }
 
     setInterval(next, 250);

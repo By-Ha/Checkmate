@@ -101,10 +101,10 @@ function Run(io) {
                         Rooms[room].playedPlayer[color2Id[f.color]].place = place;
                         if (color2Id[f.color] && User[color2Id[f.color]])
                             User[color2Id[f.color]].gaming = false;
+                        t.amount = Math.round(t.amount - f.amount * (game.colorVars[fc].sword + 10) / (game.colorVars[tc].sword + 10));
                         f.amount = 0;
                         f.color = 0;
                         f.type = 0;
-                        t.amount = Math.round(t.amount - f.amount * game.colorVars[fc].sword / game.colorVars[tc].sword);
                     } else if (t.amount * (game.colorVars[tc].sword + 10) < f.amount * (game.colorVars[fc].sword + 10)) {
                         // 'to'玩家 死了
                         ue(color2Id[t.color], 'die');
@@ -113,17 +113,17 @@ function Run(io) {
                         Rooms[room].playedPlayer[color2Id[t.color]].place = place;
                         if (color2Id[t.color] && User[color2Id[t.color]])
                             User[color2Id[t.color]].gaming = false;
+                        f.amount = Math.round(f.amount - t.amount * (game.colorVars[tc].sword + 10) / (game.colorVars[fc].sword + 10));
                         t.amount = 0;
                         t.color = 0;
                         t.type = 0;
-                        f.amount = Math.round(f.amount - t.amount * game.colorVars[tc].sword / game.colorVars[fc].sword);
                     } else {
-                        t.amount = 0;
-                        f.amount = 0;
+                        t.amount = 1;
+                        f.amount = 1;
                     }
                 }
                 else if (t.type == 7) {
-                    t.amount = f.amount;
+                    t.amount = f.amount + 10;
                     t.color = f.color;
                     t.type = 1;
                     f.amount = 0;
@@ -286,7 +286,7 @@ function Run(io) {
 
     function playerWinAnction(room) {
         try {
-            Rooms[room].game.gamelog[0][0][0].version = 1;
+            Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.type == 1 ? 1 : 2);
             for (let k in Rooms[room].playedPlayer) {
                 if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true) {
                     Rooms[room].playedPlayer[k].place = 1;
