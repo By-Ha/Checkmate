@@ -569,6 +569,7 @@ function changeRating(uid, rating, nowRating, place) {
 }
 
 function gameRatingCalc(room, data, battle_data) {
+    console.log(data);
     try {
         let bid = stringRandom(64);
         let amount = 0;
