@@ -315,6 +315,12 @@ button.btnv2:hover {
 .obstacle {
   background-image: url("/img/obstacle.png") !important;
 }
+.heart {
+  background-image: url("/img/heart.png") !important;
+}
+.sword {
+  background-image: url("/img/sword.png") !important;
+}
 * {
   padding: 0px;
   margin: 0px;

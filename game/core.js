@@ -13,6 +13,7 @@ function Run(io) {
             this.round = 0;
             this.size;
             this.gamelog = [];
+            this.colorVars = [];
         }
     }
 
@@ -48,42 +49,108 @@ function Run(io) {
     }
 
     function combineBlock(room, f, t, cnt) {
+        let game = Rooms[room].game;
         let gm = Rooms[room].game.gm;
         let User = Rooms[room].player;
         let color2Id = Rooms[room].game.color2Id;
         let size = Rooms[room].game.size;
-        if (t.color == f.color) { //same color means combine
-            t.amount += cnt;
-            f.amount -= cnt;
-        } else { // not same color need to do delete
-            t.amount -= cnt;
-            f.amount -= cnt;
-            if (t.amount < 0) { // t was cleared
-                if (t.type == 1) { // t was player's crown and the player was killed
-                    ue(color2Id[t.color], 'die');
-                    let place = 0;
-                    for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
-                    Rooms[room].playedPlayer[color2Id[t.color]].place = place;
-                    if (color2Id[t.color] && User[color2Id[t.color]])
-                        User[color2Id[t.color]].gaming = false;
-                    var tcolor = t.color;
-                    for (var i = 1; i <= size; ++i) {
-                        for (var j = 1; j <= size; ++j) {
-                            if (gm[i][j].color == tcolor) {
-                                gm[i][j].color = f.color;
-                                if (gm[i][j].type == 1) {
-                                    gm[i][j].type = 3; // to a city
+        if (gm[0][0].type == 1) {
+            if (t.color == f.color) { //same color means combine
+                t.amount += cnt;
+                f.amount -= cnt;
+            } else { // not same color need to do delete
+                t.amount -= cnt;
+                f.amount -= cnt;
+                if (t.amount < 0) { // t was cleared
+                    if (t.type == 1) { // t was player's crown and the player was killed
+                        ue(color2Id[t.color], 'die');
+                        let place = 0;
+                        for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                        Rooms[room].playedPlayer[color2Id[t.color]].place = place;
+                        if (color2Id[t.color] && User[color2Id[t.color]])
+                            User[color2Id[t.color]].gaming = false;
+                        var tcolor = t.color;
+                        for (var i = 1; i <= size; ++i) {
+                            for (var j = 1; j <= size; ++j) {
+                                if (gm[i][j].color == tcolor) {
+                                    gm[i][j].color = f.color;
+                                    if (gm[i][j].type == 1) {
+                                        gm[i][j].type = 3; // to a city
+                                    }
                                 }
                             }
                         }
+                    } else if (t.type == 5) { // trans to city 
+                        t.type = 3;
+                    } else if (t.type != 3) { // trans to road
+                        t.type = 2;
                     }
-                } else if (t.type == 5) { // trans to city 
-                    t.type = 3;
-                } else if (t.type != 3) { // trans to road
-                    t.type = 2;
+                    t.color = f.color;
+                    t.amount = -t.amount;
                 }
-                t.color = f.color;
-                t.amount = -t.amount;
+            }
+        } else if (gm[0][0].type == 2) {
+            try {
+                if (t.type == 1) {
+                    let tc = t.color, fc = f.color;
+                    if (t.amount * (game.colorVars[tc].sword + 10) > f.amount * (game.colorVars[fc].sword + 10)) {
+                        // 'from'玩家 死了
+                        ue(color2Id[f.color], 'die');
+                        let place = 0;
+                        for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                        Rooms[room].playedPlayer[color2Id[f.color]].place = place;
+                        if (color2Id[f.color] && User[color2Id[f.color]])
+                            User[color2Id[f.color]].gaming = false;
+                        f.amount = 0;
+                        f.color = 0;
+                        f.type = 0;
+                        t.amount = Math.round(t.amount - f.amount * game.colorVars[fc].sword / game.colorVars[tc].sword);
+                    } else if (t.amount * (game.colorVars[tc].sword + 10) < f.amount * (game.colorVars[fc].sword + 10)) {
+                        // 'to'玩家 死了
+                        ue(color2Id[t.color], 'die');
+                        let place = 0;
+                        for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                        Rooms[room].playedPlayer[color2Id[t.color]].place = place;
+                        if (color2Id[t.color] && User[color2Id[t.color]])
+                            User[color2Id[t.color]].gaming = false;
+                        t.amount = 0;
+                        t.color = 0;
+                        t.type = 0;
+                        f.amount = Math.round(f.amount - t.amount * game.colorVars[tc].sword / game.colorVars[fc].sword);
+                    } else {
+                        t.amount = 0;
+                        f.amount = 0;
+                    }
+                }
+                else if (t.type == 7) {
+                    t.amount = f.amount;
+                    t.color = f.color;
+                    t.type = 1;
+                    f.amount = 0;
+                    f.color = 0;
+                    f.type = 0;
+                    Rooms[room].game.colorVars[t.color].heart += 1;
+                }
+                else if (t.type == 8) {
+                    t.amount = f.amount;
+                    t.color = f.color;
+                    t.type = 1;
+                    f.amount = 0;
+                    f.color = 0;
+                    f.type = 0;
+                    Rooms[room].game.colorVars[t.color].sword += 1;
+                } else {
+                    t.amount = f.amount;
+                    t.color = f.color;
+                    t.type = 1;
+                    f.amount = 0;
+                    f.color = 0;
+                    f.type = 0;
+                }
+            } catch (e) {
+                console.log(e);
+                console.log(JSON.stringify(Rooms[room].game.colorVars));
+                throw e;
             }
         }
     }
@@ -127,9 +194,23 @@ function Run(io) {
     function updateMap(room) {
         let player = Rooms[room].player;
         let gm = Rooms[room].game.gm;
+        let game = Rooms[room].game;
         let size = Rooms[room].game.size;
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
         Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
+        if (Rooms[room].game.type == 2) {
+            function addPlayerHealth() {
+                for (var i = 1; i <= size; ++i) {
+                    for (var j = 1; j <= size; ++j) {
+                        // 每个星星给玩家提供20血量
+                        if (gm[i][j].type == 1 && gm[i][j].amount < 100 + game.colorVars[gm[i][j].color].heart * 20) {
+                            gm[i][j].amount++;
+                        }
+                    }
+                }
+            }
+            addPlayerHealth();
+        }
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].connect || player[k].view) { // maybe disconnected
                 if (!player[k].gaming) continue;
@@ -157,19 +238,47 @@ function Run(io) {
                 player[k].movement = [];
                 continue;
             }
-            var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
-            var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
-            cnt -= 1; // cannot move all
-            if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
-                while (player[k].movement.length != 0) {
-                    let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
-                    if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
-                    else break;
+            // 以上过滤用户输入
+            if (Rooms[room].game.type == 1) {
+                var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
+                var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
+                cnt -= 1; // cannot move all
+                if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
+                    while (player[k].movement.length != 0) {
+                        let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
+                        if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
+                        else break;
+                    }
+                    continue;
                 }
-                continue;
+                combineBlock(room, f, t, cnt);
+            } else if (Rooms[room].game.type == 2) {
+                var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];
+                if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
+                    while (player[k].movement.length != 0) {
+                        let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
+                        if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
+                        else break;
+                    }
+                    continue;
+                }
+                combineBlock(room, f, t, 0);
             }
-            combineBlock(room, f, t, cnt);
             player[k].movement.shift();
+        }
+        if (Rooms[room].game.type == 2) {
+            function rnd(num) {
+                var t = Math.round(Math.random() * num);
+                return (t == 0) ? num : t
+            }
+            if (Rooms[room].game.round % 20 == 1) {// 生成奖励物品
+                for (let i = 1; i <= Rooms[room].game.size * Rooms[room].game.size / 20; ++i) {
+                    let tx = rnd(Rooms[room].game.size), ty = rnd(Rooms[room].game.size);
+                    if (gm[tx][ty].type == 0) {
+                        gm[tx][ty].type = rnd(2) + 6;
+                    }
+                }
+            }
         }
         bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         bc(room, 'Rank_Update', Rank(room));
@@ -259,8 +368,10 @@ function Run(io) {
             return;
         }
 
-        if ((round % 10) == 0) addAmountRoad();
-        addAmountCity(), addAmountCrown();
+        if (gm[0][0].type == 1) {
+            if ((round % 10) == 0) addAmountRoad();
+            addAmountCity(), addAmountCrown();
+        }
 
         updateMap(room);
     }
@@ -270,7 +381,7 @@ function Run(io) {
     }
 
     function getVotedMap(room) {
-        let votedMap = [null, 0, 0, 0];
+        let votedMap = [null, 0, 0, 0, 0, 0];
         for (var k in Rooms[room].player) {
             votedMap[Rooms[room].player[k].settings.map]++;
         }
@@ -288,6 +399,7 @@ function Run(io) {
         Rooms[room].game = new Room();
         Rooms[room].start = true;
         Rooms[room].playedPlayer = {};
+
         let i = 1;
         for (let k in Rooms[room].player) {
             if (ips[Rooms[room].player[k].ip] != undefined) {
@@ -310,13 +422,15 @@ function Run(io) {
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
             Rooms[room].player[k].color = i;
+            Rooms[room].game.colorVars[i] = { heart: 0, sword: 0 };
             ue(k, 'UpdateColor', i);
             ++i;
         }
+
         Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
-        Rooms[room].game.gamelog[0][0][0].version = 1;
+        Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.gm[0][0].type == 1 ? 1 : 2);
 
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;
         Rooms[room].game.type = Rooms[room].game.gm[0][0].type;
@@ -503,7 +617,7 @@ function Run(io) {
                     }
                     if (dat.map) {
                         let mp = Number(dat.map);
-                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3))
+                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 5))
                             Rooms[playerRoom[uid]].player[uid].settings.map = mp;
                     }
                 }
