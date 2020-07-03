@@ -102,6 +102,7 @@ function Run(io) {
                     game.colorVars[tc].sword += game.colorVars[fc].sword;
                     game.colorVars[tc].heart += game.colorVars[fc].heart;
                     ue(color2Id[f.color], 'die');
+                    ue(color2Id[t.color], 'select_home');
                     let place = 0;
                     for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
                     Rooms[room].playedPlayer[color2Id[f.color]].place = place;
@@ -116,6 +117,7 @@ function Run(io) {
                     game.colorVars[fc].sword += game.colorVars[tc].sword;
                     game.colorVars[fc].heart += game.colorVars[tc].heart;
                     ue(color2Id[t.color], 'die');
+                    ue(color2Id[f.color], 'select_home');
                     let place = 0;
                     for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
                     Rooms[room].playedPlayer[color2Id[t.color]].place = place;
@@ -126,6 +128,7 @@ function Run(io) {
                     t.color = 0;
                     t.type = 0;
                 } else {
+                    ue(color2Id[f.color], 'select_home');
                     t.amount = 1;
                     f.amount = 1;
                 }
