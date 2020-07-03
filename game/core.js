@@ -147,6 +147,15 @@ function Run(io) {
                 f.color = 0;
                 f.type = 0;
                 Rooms[room].game.colorVars[t.color].sword += 1;
+            } else if (t.type == 10) {
+                t.amount = f.amount;
+                t.color = f.color;
+                t.type = 1;
+                f.amount = 0;
+                f.color = 0;
+                f.type = 0;
+                t.amount += 100;
+                t.amount = Math.min(t.amount, 100 + Rooms[room].game.colorVars[t.color].heart * 20);
             } else {
                 t.amount = f.amount;
                 t.color = f.color;
@@ -316,10 +325,17 @@ function Run(io) {
             }
 
             if (Rooms[room].game.round % 20 == 1) {// 生成奖励物品
-                for (let i = 1; i <= Rooms[room].game.size * Rooms[room].game.size / 20; ++i) {
+                for (let i = 1; i <= Rooms[room].game.size * Rooms[room].game.size / 25; ++i) {
                     let tx = rnd(Rooms[room].game.size), ty = rnd(Rooms[room].game.size);
                     if (gm[tx][ty].type == 0) {
-                        gm[tx][ty].type = rnd(2) + 6;
+                        let t = rnd(500);
+                        if (t <= 200) {
+                            gm[tx][ty].type = 7;
+                        } else if (t <= 400) {
+                            gm[tx][ty].type = 8;
+                        } else if (t <= 500) {
+                            gm[tx][ty].type = 10;
+                        }
                     }
                 }
             }

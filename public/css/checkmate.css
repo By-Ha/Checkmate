@@ -324,6 +324,9 @@ button.btnv2:hover {
 .gas {
   background-image: url("/img/gas.png") !important;
 }
+.kit {
+  background-image: url("/img/kit.png") !important;
+}
 * {
   padding: 0px;
   margin: 0px;
