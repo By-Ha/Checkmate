@@ -3,11 +3,11 @@ $(() => {
     let s = io.connect('http://' + window.location.hostname + ':444/', {
         path: '/ws/checkmate'
     }); // 请改变这里的内容,现在不用改了
+    // let s = io.connect(':3001/'); // 请改变这里的内容,现在不用改了
 
     let User;
     let colorNick = [];
     let myColor;
-    let movementUploader;
     let init = false;
     let start = false;
 
@@ -15,7 +15,7 @@ $(() => {
     let exit = false;
     let exitcnt = 0;
     const color = ['grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon'];
-    const tp = [null, 'crown', null, 'city', 'mountain', 'empty-city', 'obstacle']
+    const tp = [null, 'crown', null, 'city', 'mountain', 'empty-city', 'obstacle', 'heart', 'sword', 'gas', 'kit', 'armor', 'wifi']
     let movement = [];
     let selectNode = [0, 0];
     let symbolStatus = [];
@@ -24,13 +24,16 @@ $(() => {
     let round;
     let halfTag = false;
     let scrollSize = 30;
-
+    let waitTime = 120;
 
     function voteStart(i) {
         s.emit('VoteStart', i);
     }
     s.on('connect', function () {
         s.emit('joinRoom', room);
+    });
+    s.on('closeTab', function () {
+        window.location.href = '/';
     });
     s.on('disconnect', function () {
         $("#l").css('visibility', 'unset');
@@ -43,9 +46,27 @@ $(() => {
     s.on('UpdateGM', function (dat) {
         $("#l").css('visibility', 'hidden');
         gm = dat;
+        if (gm[0][0].type == 2) {
+            $("#pvp-self-info").css('display', 'unset');
+        } else {
+            $("#pvp-self-info").css('display', 'none');
+        }
         if (!init) s.emit('AskSize', null);
         if (init) illu();
     });
+    s.on('select_home', function () {
+        if (!gm) return;
+        for (let i = 1; i <= size; ++i) {
+            if (!gm[i]) return;
+            for (let j = 1; j <= size; ++j) {
+                if (!gm[i][j]) return;
+                if (gm[i][j].color == myColor) {
+                    makeSelect(i, j);
+                    return;
+                }
+            }
+        }
+    })
     s.on('UpdateUser', function (dat) {
         User = dat;
         colorNick = [];
@@ -69,7 +90,10 @@ $(() => {
     });
     s.on('Update_Round', (dat) => { round = dat; })
     s.on('GameStart', function () {
-        start = true; exit = true;
+        if ($("#view").attr('data-view') != "true" && myColor != 0) {
+            start = true;
+        }
+        exit = true;
         round = 0; movement = [];
     });
     s.on('Rank_Update', (playerInfo) => {
@@ -82,14 +106,15 @@ $(() => {
         }
         t.innerHTML = str;
     })
-    function Upload_Movement() {
-        if (movement != undefined && movement != 0) {
-            if (movement[0][0] == 0) {
-                s.emit('UploadMovement', movement[0].slice(1));
-                movement[0][0]++;
-            }
+    s.on('colorVars_Update', function (colorVars) {
+        if (colorVars[myColor] != undefined && myColor != 0) {
+            let mVars = colorVars[myColor];
+            $("#pvp-self-info-max-health a").html(100 + mVars.heart * 20);
+            $("#pvp-self-info-attack a").html(10 + mVars.sword);
+            $("#pvp-self-info-armor a").html(0); // 还未加入
         }
-    }
+        $("#pvp-self-info-gas a").html(`Lv.${colorVars[0].gasLevel} ${Math.round(colorVars[0].gasTime)}T`);
+    })
     function patch(dat) {
         $("#l").css('visibility', 'hidden');
         if (!init) s.emit('AskSize', null);
@@ -103,12 +128,17 @@ $(() => {
     }
     function Map_Update(rnd) {
         if (patch_tmp[rnd]) {
-            let upd_road = (rnd % 10 == 0);
-            for (let i = 1; i <= size; ++i) {
-                for (let j = 1; j <= size; ++j) {
-                    if (upd_road && gm[i][j].type == 2) gm[i][j].amount++;
-                    if (gm[i][j].type == 1 || gm[i][j].type == 3) gm[i][j].amount++;
+
+            if (gm[0][0].type == 1) { // 普通模式
+                let upd_road = (rnd % 10 == 0);
+                for (let i = 1; i <= size; ++i) {
+                    for (let j = 1; j <= size; ++j) {
+                        if (upd_road && gm[i][j].type == 2 && gm[i][j].color != 0) gm[i][j].amount++;
+                        if (gm[i][j].type == 1 || gm[i][j].type == 3) gm[i][j].amount++;
+                    }
                 }
+            } else if (gm[0][0].type == 2) { // 吃鸡模式
+                //目前全部由服务器处理
             }
 
             patch(patch_tmp[rnd]);
@@ -125,27 +155,6 @@ $(() => {
             Map_Update(round + 1);
         }
     })
-    s.on('ClearMovement', function () {
-        while (movement.length) {
-            if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) movement = movement.slice(1);
-            else break;
-        }
-    });
-    s.on('DeleteMovement', function () {
-        if (movement.length && movement[0][0]) {
-            movement = movement.slice(1);
-        }
-        while (movement.length) {
-            if (gm[movement[0][1]][movement[0][2]].color != myColor || gm[movement[0][1]][movement[0][2]].amount <= 1) {
-                let t1 = movement[0][1];
-                let t2 = movement[0][2];
-                movement = movement.slice(1);
-                reloadSymbol(t1, t2, true);
-            }
-            else break;
-        }
-        Upload_Movement();
-    });
     s.on('WinAnction', function (dat) {
         if (exit) {
             exitcnt++;
@@ -153,7 +162,7 @@ $(() => {
                 window.location.href = '/';
             }
         } else exitcnt = 0;
-        start = false; init = false;
+        start = false; init = false; myColor = 0;
         gm = []; symbolStatus = []; movement = []; patch_tmp = []; init = false;
         Swal.fire("欢呼", dat + "赢了", "success");
         $("#l").css('visibility', 'unset');
@@ -181,9 +190,19 @@ $(() => {
     });
     s.on('WorldMessage', (msg) => {//
         let t = $("<p></p>").appendTo("#msg-container");
-        t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp" + String(String(msg));
+        t[0].innerHTML = "&nbsp&nbsp&nbsp&nbsp" + String(msg).replace(/[\u0600-\u06FF]/g, "");
         $("#msg-container")[0].scrollTop = 99999999;
     });
+    s.on('view_status', (dat) => {
+        if (dat) {
+            $("#view")[0].innerHTML = '参战';
+            $("#view").attr('data-view', true);
+            start = false;
+        } else {
+            $("#view")[0].innerHTML = '旁观';
+            $("#view").attr('data-view', false);
+        }
+    })
     function changeHalf(half = true) {
         halfTag = half;
         if (halfTag)
@@ -206,22 +225,17 @@ $(() => {
         selectNode[0] = selectNode[1] = 0;
     }
     function clearMomement() {
-        movement = [];
-        showSymbol(false);
+        s.emit('ClearMovement', null);
     }
     function addMovement(x, y) {
         if (document.activeElement.id == "msg-sender") return;
         var t1 = selectNode[0] + x, t2 = selectNode[1] + y;
         if (t1 > size || t1 <= 0 || t2 > size || t2 <= 0) return;
         if (gm[t1][t2] == undefined || gm[t1][t2].type == 4) return;
-        if (!halfTag)
-            movement.push([0, selectNode[0], selectNode[1], t1, t2, 0]);
-        else movement.push([0, selectNode[0], selectNode[1], t1, t2, 1]);
+        if (!halfTag) s.emit('UploadMovement', [selectNode[0], selectNode[1], t1, t2, 0]);
+        else s.emit('UploadMovement', [selectNode[0], selectNode[1], t1, t2, 1]);
         clearSelect();
         makeSelect(t1, t2);
-        if (movement.length == 1) {
-            Upload_Movement();
-        }
     }
     function makeBoard() {
         let m = document.getElementById("m");
@@ -250,15 +264,15 @@ $(() => {
         }
     }
     function judgeShown(i, j) {
-        if (gm[i][j].color == myColor) return true;
-        if (i - 1 >= 1 && gm[i - 1][j].color == myColor) return true;
-        if (j - 1 >= 1 && gm[i][j - 1].color == myColor) return true;
-        if (i + 1 <= size && gm[i + 1][j].color == myColor) return true;
-        if (j + 1 <= size && gm[i][j + 1].color == myColor) return true;
-        if (i + 1 <= size && j + 1 <= size && gm[i + 1][j + 1].color == myColor) return true;
-        if (i + 1 <= size && j - 1 >= 1 && gm[i + 1][j - 1].color == myColor) return true;
-        if (i - 1 >= 1 && j + 1 <= size && gm[i - 1][j + 1].color == myColor) return true;
-        if (i - 1 >= 1 && j - 1 >= 1 && gm[i - 1][j - 1].color == myColor) return true;
+        let visiRound = 1;
+        if (gm[0][0].type == 2) visiRound = 2;
+        for (let t1 = -visiRound; t1 <= visiRound; ++t1) {
+            for (let t2 = -visiRound; t2 <= visiRound; ++t2) {
+                let ii = i + t1, jj = j + t2;
+                if (ii <= 0 || jj <= 0 || ii > size || jj > size) continue;
+                if (gm[ii][jj].color == myColor) return true;
+            }
+        }
         return false;
     }
     function reloadSymbol(i, j) {
@@ -353,7 +367,7 @@ $(() => {
             this.innerHTML = "准备";
         }
     };
-    $(() => {
+    $(() => { // settings functions
         $("#settings-gamespeed-input input").on('input propertychange', () => {
             let speed = $("#settings-gamespeed-input input")[0].value;
             if (speed != 1 && speed != 2 && speed != 3 && speed != 4) return;
@@ -363,17 +377,41 @@ $(() => {
         $("#settings-gameprivate input").on("change", function () {
             s.emit('changeSettings', { private: $("#settings-gameprivate input")[0].checked });
         });
+        $("#settings-gamemap button").on("click", function () {
+            s.emit('changeSettings', { map: this.getAttribute("data") });
+        });
         s.on('UpdateSettings', function (dat) {
             $("#settings-gamespeed-input input")[0].value = dat.speed;
             $("#settings-gamespeed-input-display")[0].innerHTML = dat.speed;
             $("#settings-gameprivate input")[0].checked = dat.private;
+            $("#settings-gamemap button[data=1]").html(`随机地图${dat.map[1]}`);
+            $("#settings-gamemap button[data=2]").html(`迷宫地图${dat.map[2]}`);
+            $("#settings-gamemap button[data=3]").html(`空白地图${dat.map[3]}`);
+            $("#settings-gamemap button[data=4]").html(`端午特别${dat.map[4]}`);
+            $("#settings-gamemap button[data=5]").html(`流浪模式${dat.map[5]}`);
         });
     });
     document.onkeydown = function (event) {
+        waitTime = 120;
         exit = false;
         var e = event || window.event || arguments.callee.caller.arguments[0];
         if (!e) return;
-        if (e.keyCode == 87) { // W
+        if (e.keyCode == 32) { // space
+            if (PRESS_SPACE_TIME == undefined || new Date().getTime() - PRESS_SPACE_TIME >= 500) {
+                if (!gm) return;
+                for (let i = 1; i <= size; ++i) {
+                    if (!gm[i]) return;
+                    for (let j = 1; j <= size; ++j) {
+                        if (!gm[i][j]) return;
+                        if (gm[i][j].color == myColor) {
+                            makeSelect(i, j);
+                            return;
+                        }
+                    }
+                }
+                var PRESS_SPACE_TIME = new Date().getTime();
+            }
+        } else if (e.keyCode == 87) { // W
             addMovement(-1, 0);
             showSymbol(true);
             changeHalf(false);
@@ -469,4 +507,33 @@ $(() => {
             };
         }
     });
+    setInterval(() => {
+        waitTime--;
+        if (waitTime == 60) { toast('info', '请按下任意按键', '否则您将在60s后被踢出房间', 5000); }
+        if (waitTime == 10) { toast('info', '请按下任意按键', '否则您将在10s后被踢出房间', 5000); }
+        if (waitTime < 0) window.location.href = "/";
+    }, 1000);
+    let s2 = window.localStorage;
+    let t = new Date().getTime();
+    if (s2['time'] == undefined || s2['time'] <= t - 1000 * 300 || s2['times'] >= 15) {
+        s2['time'] = t;
+        s2['times'] = 0;
+    }
+    else {
+        s2['times'] = Number(s2['times']) + 1;
+        if (s2['times'] >= 15) window.close();
+    }
+    $("#msg-sender").focus(() => {
+        $("#btn-view-grp").css('display', 'none');
+    })
+    $("#msg-sender").blur(() => {
+        setTimeout(() => { $("#btn-view-grp").css('display', 'unset'); }, 280)
+    })
+    $("#view").click(function () {
+        if (this.getAttribute('data-view') == "true") {
+            s.emit('view', false);
+        } else {
+            s.emit('view', true);
+        }
+    })
 });
