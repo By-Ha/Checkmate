@@ -163,11 +163,12 @@ button.btnv2:hover {
 #r {
   -moz-user-select: none;
   -webkit-user-select: none;
+  text-shadow: 5px 2px 6px #000;
+  pointer-events: none;
   user-select: none;
   position: fixed;
   right: 0px;
   top: 0px;
-  background: rgba(255, 255, 255, 0.3);
   z-index: 10;
 }
 #user-control {
@@ -330,4 +331,50 @@ button.btnv2:hover {
 * {
   padding: 0px;
   margin: 0px;
+}
+#pvp-self-info {
+  justify-content: space-between;
+  pointer-events: none;
+}
+.cm-item {
+  border-radius: 10px;
+  min-height: 50px;
+  max-height: 50px;
+  width: 100%;
+  display: flex;
+}
+#pvp-self-info div {
+  background-size: 45px;
+  background-position: center;
+  background-position-x: 10px;
+  background-repeat: no-repeat;
+  margin-top: 5px;
+}
+#pvp-self-info div a {
+  position: absolute;
+  right: 5px;
+  line-height: 50px;
+  font-size: 50px;
+  text-decoration: none !important;
+  color: white;
+  text-shadow: 5px 2px 6px #000;
+  float: right;
+}
+#pvp-self-info div a:hover {
+  line-height: 50px;
+  font-size: 50px;
+  color: white;
+  text-decoration: none !important;
+}
+#pvp-self-info-max-health {
+  background-image: url(/img/heart.png);
+}
+#pvp-self-info-attack {
+  background-image: url(/img/sword.png);
+}
+#pvp-self-info-armor {
+  background-image: url(/img/armor.png);
+}
+#pvp-self-info-gas {
+  background-image: url(/img/gas.png);
 }

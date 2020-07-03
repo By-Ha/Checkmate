@@ -345,6 +345,7 @@ function Run(io) {
         }
         bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         bc(room, 'Rank_Update', Rank(room));
+        if (game.type == 2) bc(room, 'colorVars_Update', game.colorVars);
     }
 
     function playerWinAnction(room) {
