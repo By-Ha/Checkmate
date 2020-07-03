@@ -294,6 +294,15 @@ function Run(io) {
                     Rooms[room].playedPlayer[k].place = 2;
                 }
             }
+            // 由于排名有点小问题且不会引起rating改变,在这做一下处理
+            let cnt = 2;
+            for (let k in Rooms[room].playedPlayer) {
+                if (Rooms[room].playedPlayer[k].place == 1) {
+                    continue;
+                } else {
+                    Rooms[room].playedPlayer[k].place = cnt++;
+                }
+            }
             db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
             for (let k in Rooms[room].player) {
                 if (Rooms[room].player[k].connect == false) {
