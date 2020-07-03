@@ -32,7 +32,11 @@ function Run(io) {
                 }
             }
         } else {
-            io.sockets.connected[id].emit(name, dat);
+            try {
+                io.sockets.connected[id].emit(name, dat);
+            } catch (e) {
+                console.log(io, id);//.socket.connected
+            }
         }
 
     }
@@ -48,7 +52,7 @@ function Run(io) {
         };
     }
 
-    function combineBlock(room, f, t, cnt) {
+    function combineBlock(room, f, t, cnt, other) {
         let game = Rooms[room].game;
         let gm = Rooms[room].game.gm;
         let User = Rooms[room].player;
@@ -90,67 +94,66 @@ function Run(io) {
                 }
             }
         } else if (gm[0][0].type == 2) {
-            try {
-                if (t.type == 1) {
-                    let tc = t.color, fc = f.color;
-                    if (t.amount * (game.colorVars[tc].sword + 10) > f.amount * (game.colorVars[fc].sword + 10)) {
-                        // 'from'玩家 死了
-                        ue(color2Id[f.color], 'die');
-                        let place = 0;
-                        for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
-                        Rooms[room].playedPlayer[color2Id[f.color]].place = place;
-                        if (color2Id[f.color] && User[color2Id[f.color]])
-                            User[color2Id[f.color]].gaming = false;
-                        t.amount = Math.round(t.amount - f.amount * (game.colorVars[fc].sword + 10) / (game.colorVars[tc].sword + 10));
-                        f.amount = 0;
-                        f.color = 0;
-                        f.type = 0;
-                    } else if (t.amount * (game.colorVars[tc].sword + 10) < f.amount * (game.colorVars[fc].sword + 10)) {
-                        // 'to'玩家 死了
-                        ue(color2Id[t.color], 'die');
-                        let place = 0;
-                        for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
-                        Rooms[room].playedPlayer[color2Id[t.color]].place = place;
-                        if (color2Id[t.color] && User[color2Id[t.color]])
-                            User[color2Id[t.color]].gaming = false;
-                        f.amount = Math.round(f.amount - t.amount * (game.colorVars[tc].sword + 10) / (game.colorVars[fc].sword + 10));
-                        t.amount = 0;
-                        t.color = 0;
-                        t.type = 0;
-                    } else {
-                        t.amount = 1;
-                        f.amount = 1;
-                    }
-                }
-                else if (t.type == 7) {
-                    t.amount = f.amount + 10;
-                    t.color = f.color;
-                    t.type = 1;
+            // 然后进行其他的处理
+            if (t.type == 1) {
+                let tc = t.color, fc = f.color;
+                if (t.amount * (game.colorVars[tc].sword + 10) > f.amount * (game.colorVars[fc].sword + 10)) {
+                    // 'from'玩家 死了
+                    game.colorVars[tc].sword += game.colorVars[fc].sword;
+                    game.colorVars[tc].heart += game.colorVars[fc].heart;
+                    ue(color2Id[f.color], 'die');
+                    let place = 0;
+                    for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                    Rooms[room].playedPlayer[color2Id[f.color]].place = place;
+                    if (color2Id[f.color] && User[color2Id[f.color]])
+                        User[color2Id[f.color]].gaming = false;
+                    t.amount = Math.round(t.amount - f.amount * (game.colorVars[fc].sword + 10) / (game.colorVars[tc].sword + 10));
                     f.amount = 0;
                     f.color = 0;
                     f.type = 0;
-                    Rooms[room].game.colorVars[t.color].heart += 1;
-                }
-                else if (t.type == 8) {
-                    t.amount = f.amount;
-                    t.color = f.color;
-                    t.type = 1;
-                    f.amount = 0;
-                    f.color = 0;
-                    f.type = 0;
-                    Rooms[room].game.colorVars[t.color].sword += 1;
+                } else if (t.amount * (game.colorVars[tc].sword + 10) < f.amount * (game.colorVars[fc].sword + 10)) {
+                    // 'to'玩家 死了
+                    game.colorVars[fc].sword += game.colorVars[tc].sword;
+                    game.colorVars[fc].heart += game.colorVars[tc].heart;
+                    ue(color2Id[t.color], 'die');
+                    let place = 0;
+                    for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                    Rooms[room].playedPlayer[color2Id[t.color]].place = place;
+                    if (color2Id[t.color] && User[color2Id[t.color]])
+                        User[color2Id[t.color]].gaming = false;
+                    f.amount = Math.round(f.amount - t.amount * (game.colorVars[tc].sword + 10) / (game.colorVars[fc].sword + 10));
+                    t.amount = 0;
+                    t.color = 0;
+                    t.type = 0;
                 } else {
-                    t.amount = f.amount;
-                    t.color = f.color;
-                    t.type = 1;
-                    f.amount = 0;
-                    f.color = 0;
-                    f.type = 0;
+                    t.amount = 1;
+                    f.amount = 1;
                 }
-            } catch (e) {
-                console.log(e);
-                console.log(JSON.stringify(Rooms[room].game.colorVars));
-                throw e;
+            }
+            else if (t.type == 7) {
+                t.amount = f.amount + 10;
+                t.color = f.color;
+                t.type = 1;
+                f.amount = 0;
+                f.color = 0;
+                f.type = 0;
+                Rooms[room].game.colorVars[t.color].heart += 1;
+            }
+            else if (t.type == 8) {
+                t.amount = f.amount;
+                t.color = f.color;
+                t.type = 1;
+                f.amount = 0;
+                f.color = 0;
+                f.type = 0;
+                Rooms[room].game.colorVars[t.color].sword += 1;
+            } else {
+                t.amount = f.amount;
+                t.color = f.color;
+                t.type = 1;
+                f.amount = 0;
+                f.color = 0;
+                f.type = 0;
             }
         }
     }
@@ -251,7 +254,7 @@ function Run(io) {
                     }
                     continue;
                 }
-                combineBlock(room, f, t, cnt);
+                combineBlock(room, f, t, cnt, { fx: mv[0], fy: mv[1] });
             } else if (Rooms[room].game.type == 2) {
                 var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];
                 if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
@@ -263,14 +266,55 @@ function Run(io) {
                     continue;
                 }
                 combineBlock(room, f, t, 0);
+                if (Math.min(game.size - mv[0] + 1, mv[0], game.size - mv[1] + 1, mv[1]) <= game.colorVars[0].gasLevel && f.type != 1) {
+                    f.type = 9;
+                }
             }
             player[k].movement.shift();
         }
         if (Rooms[room].game.type == 2) {
+            let color2Id = Rooms[room].game.color2Id;
+            let User = Rooms[room].player;
             function rnd(num) {
                 var t = Math.round(Math.random() * num);
                 return (t == 0) ? num : t
             }
+
+            for (let i = 1; i <= game.size; ++i) {
+                for (let j = 1; j <= game.size; ++j) {
+                    if (Math.min(game.size - i + 1, i, game.size - j + 1, j) <= game.colorVars[0].gasLevel && gm[i][j].type == 1) {
+                        gm[i][j].amount -= game.colorVars[0].gasLevel * 10;
+                        if (gm[i][j].amount <= 0) {
+                            gm[i][j].amount = 0;
+                            gm[i][j].type = 9;
+
+                            ue(color2Id[gm[i][j].color], 'die');
+                            let place = 0;
+                            for (let temp in Rooms[room].playedPlayer) if (Rooms[room].playedPlayer[temp].place == 0) place++;
+                            Rooms[room].playedPlayer[color2Id[gm[i][j].color]].place = place;
+                            if (color2Id[gm[i][j].color] && User[color2Id[gm[i][j].color]])
+                                User[color2Id[gm[i][j].color]].gaming = false;
+                            gm[i][j].color = 0;
+                        }
+                    }
+                }
+            }
+
+            // 毒圈
+            game.colorVars[0].gasTime--;
+
+            if (game.colorVars[0].gasTime <= 0) {
+                game.colorVars[0].gasTime = 50;
+                game.colorVars[0].gasLevel++;
+                for (let i = 1; i <= game.size; ++i) {
+                    for (let j = 1; j <= game.size; ++j) {
+                        if (Math.min(game.size - i + 1, i, game.size - j + 1, j) <= game.colorVars[0].gasLevel && gm[i][j].type != 1) {
+                            gm[i][j].type = 9;
+                        }
+                    }
+                }
+            }
+
             if (Rooms[room].game.round % 20 == 1) {// 生成奖励物品
                 for (let i = 1; i <= Rooms[room].game.size * Rooms[room].game.size / 20; ++i) {
                     let tx = rnd(Rooms[room].game.size), ty = rnd(Rooms[room].game.size);
@@ -286,16 +330,19 @@ function Run(io) {
 
     function playerWinAnction(room) {
         try {
+            console.log('处理前', Rooms[room].playedPlayer);
+            let firstFlag = 0;
             Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.type == 1 ? 1 : 2);
             for (let k in Rooms[room].playedPlayer) {
-                if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true) {
+                if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true && !firstFlag) {
                     Rooms[room].playedPlayer[k].place = 1;
+                    firstFlag = 1;
                 } else if (Rooms[room].playedPlayer[k].place == 0) {
                     Rooms[room].playedPlayer[k].place = 2;
                 }
             }
-            // 由于排名有点小问题且不会引起rating改变,在这做一下处理
-            let cnt = 2;
+            // 由于排名有点小问题且不会引起rating改变,在这做一下处理,而且如果最后俩人死了,给uid最靠前的人一个奖励算了(才不是懒得写)
+            let cnt = firstFlag ? 2 : 1;
             for (let k in Rooms[room].playedPlayer) {
                 if (Rooms[room].playedPlayer[k].place == 1) {
                     continue;
@@ -431,7 +478,7 @@ function Run(io) {
             Rooms[room].player[k].gaming = true;
             Rooms[room].game.color2Id[i] = k;
             Rooms[room].player[k].color = i;
-            Rooms[room].game.colorVars[i] = { heart: 0, sword: 0 };
+            Rooms[room].game.colorVars[i] = { heart: 0, sword: 0, armor: 0 };
             ue(k, 'UpdateColor', i);
             ++i;
         }
@@ -443,6 +490,13 @@ function Run(io) {
 
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;
         Rooms[room].game.type = Rooms[room].game.gm[0][0].type;
+
+        if (Rooms[room].game.type == 2) {
+            Rooms[room].game.colorVars[0] = {
+                gasLevel: 0,
+                gasTime: 50
+            }
+        }
 
         bc(room, 'UpdateSize', Rooms[room].game.size);
         bc(room, 'LoggedUserCount', [0, 0]); // just clear it

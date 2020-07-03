@@ -321,6 +321,9 @@ button.btnv2:hover {
 .sword {
   background-image: url("/img/sword.png") !important;
 }
+.gas {
+  background-image: url("/img/gas.png") !important;
+}
 * {
   padding: 0px;
   margin: 0px;
