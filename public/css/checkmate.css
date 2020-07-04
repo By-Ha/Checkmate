@@ -328,6 +328,9 @@ button.btnv2:hover {
 .kit {
   background-image: url("/img/kit.png") !important;
 }
+.armor {
+  background-image: url("/img/armor.png") !important;
+}
 * {
   padding: 0px;
   margin: 0px;

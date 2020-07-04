@@ -15,7 +15,7 @@ $(() => {
     let exit = false;
     let exitcnt = 0;
     const color = ['grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon'];
-    const tp = [null, 'crown', null, 'city', 'mountain', 'empty-city', 'obstacle', 'heart', 'sword', 'gas', 'kit', 'armor', 'wifi']
+    const tp = [null, 'crown', null, 'city', 'mountain', 'empty-city', 'obstacle', 'heart', 'sword', 'gas', 'kit', 'armor', 'wifi'];
     let movement = [];
     let selectNode = [0, 0];
     let symbolStatus = [];
@@ -38,7 +38,7 @@ $(() => {
     s.on('disconnect', function () {
         $("#l").css('visibility', 'unset');
         Swal.fire("错误", "连接断开", "error");
-    })
+    });
     s.on('LoggedUserCount', function (dat) {
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
@@ -66,7 +66,7 @@ $(() => {
                 }
             }
         }
-    })
+    });
     s.on('UpdateUser', function (dat) {
         User = dat;
         colorNick = [];
@@ -88,7 +88,7 @@ $(() => {
             }
         }
     });
-    s.on('Update_Round', (dat) => { round = dat; })
+    s.on('Update_Round', (dat) => { round = dat; });
     s.on('GameStart', function () {
         if ($("#view").attr('data-view') != "true" && myColor != 0) {
             start = true;
@@ -105,16 +105,16 @@ $(() => {
             str += "<tr><td style='color: " + color[playerInfo[i][2]] + ";'>" + colorNick[playerInfo[i][2]] + "</td><td>" + Number(playerInfo[i][0]) + "</td><td>" + Number(playerInfo[i][1]) + "</td></tr>"
         }
         t.innerHTML = str;
-    })
+    });
     s.on('colorVars_Update', function (colorVars) {
         if (colorVars[myColor] != undefined && myColor != 0) {
             let mVars = colorVars[myColor];
             $("#pvp-self-info-max-health a").html(100 + mVars.heart * 20);
             $("#pvp-self-info-attack a").html(10 + mVars.sword);
-            $("#pvp-self-info-armor a").html(0); // 还未加入
+            $("#pvp-self-info-armor a").html(mVars.armor); // 还未加入
         }
         $("#pvp-self-info-gas a").html(`Lv.${colorVars[0].gasLevel} ${Math.round(colorVars[0].gasTime)}T`);
-    })
+    });
     function patch(dat) {
         $("#l").css('visibility', 'hidden');
         if (!init) s.emit('AskSize', null);
@@ -154,7 +154,7 @@ $(() => {
         if (dat[0] == round + 1) {
             Map_Update(round + 1);
         }
-    })
+    });
     s.on('WinAnction', function (dat) {
         if (exit) {
             exitcnt++;
@@ -202,7 +202,7 @@ $(() => {
             $("#view")[0].innerHTML = '旁观';
             $("#view").attr('data-view', false);
         }
-    })
+    });
     function changeHalf(half = true) {
         halfTag = half;
         if (halfTag)
@@ -525,10 +525,10 @@ $(() => {
     }
     $("#msg-sender").focus(() => {
         $("#btn-view-grp").css('display', 'none');
-    })
+    });
     $("#msg-sender").blur(() => {
         setTimeout(() => { $("#btn-view-grp").css('display', 'unset'); }, 280)
-    })
+    });
     $("#view").click(function () {
         if (this.getAttribute('data-view') == "true") {
             s.emit('view', false);

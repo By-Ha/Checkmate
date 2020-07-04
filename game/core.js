@@ -97,10 +97,14 @@ function Run(io) {
             // 然后进行其他的处理
             if (t.type == 1) {
                 let tc = t.color, fc = f.color;
-                if (t.amount * (game.colorVars[tc].sword + 10) > f.amount * (game.colorVars[fc].sword + 10)) {
+                let fAttack = game.colorVars[fc].sword + 10, tAttack = game.colorVars[tc].sword + 10;
+                let fArmor = game.colorVars[fc].armor, tArmor = game.colorVars[tc].armor;
+                // 不能出现攻击倒贴血的情况.
+                if (t.amount * (Math.max(tAttack - fArmor, 0)) > f.amount * (Math.max(fAttack - tArmor, 0))) {
                     // 'from'玩家 死了
                     game.colorVars[tc].sword += game.colorVars[fc].sword;
                     game.colorVars[tc].heart += game.colorVars[fc].heart;
+                    game.colorVars[tc].armor += game.colorVars[fc].armor;
                     ue(color2Id[f.color], 'die');
                     ue(color2Id[t.color], 'select_home');
                     let place = 0;
@@ -112,10 +116,11 @@ function Run(io) {
                     f.amount = 0;
                     f.color = 0;
                     f.type = 0;
-                } else if (t.amount * (game.colorVars[tc].sword + 10) < f.amount * (game.colorVars[fc].sword + 10)) {
+                } else if (t.amount * (Math.max(tAttack - fArmor, 0)) < f.amount * (Math.max(fAttack - tArmor, 0))) {
                     // 'to'玩家 死了
                     game.colorVars[fc].sword += game.colorVars[tc].sword;
                     game.colorVars[fc].heart += game.colorVars[tc].heart;
+                    game.colorVars[fc].armor += game.colorVars[tc].armor;
                     ue(color2Id[t.color], 'die');
                     ue(color2Id[f.color], 'select_home');
                     let place = 0;
@@ -134,7 +139,7 @@ function Run(io) {
                 }
             }
             else if (t.type == 7) {
-                t.amount = f.amount + 10;
+                t.amount = f.amount;
                 t.color = f.color;
                 t.type = 1;
                 f.amount = 0;
@@ -149,7 +154,7 @@ function Run(io) {
                 f.amount = 0;
                 f.color = 0;
                 f.type = 0;
-                Rooms[room].game.colorVars[t.color].sword += 1;
+                Rooms[room].game.colorVars[t.color].sword += 2;
             } else if (t.type == 10) {
                 t.amount = f.amount;
                 t.color = f.color;
@@ -159,6 +164,14 @@ function Run(io) {
                 f.type = 0;
                 t.amount += 100;
                 t.amount = Math.min(t.amount, 100 + Rooms[room].game.colorVars[t.color].heart * 20);
+            } else if (t.type == 11) {
+                t.amount = f.amount;
+                t.color = f.color;
+                t.type = 1;
+                f.amount = 0;
+                f.color = 0;
+                f.type = 0;
+                Rooms[room].game.colorVars[t.color].armor += 1;
             } else {
                 t.amount = f.amount;
                 t.color = f.color;
@@ -275,6 +288,8 @@ function Run(io) {
                         if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
                         else break;
                     }
+                    if (player[k].movement.length == 0) // 轨迹偏移自动选家
+                        ue(color2Id[player[k].color], 'select_home');
                     continue;
                 }
                 combineBlock(room, f, t, 0);
@@ -328,16 +343,21 @@ function Run(io) {
             }
 
             if (Rooms[room].game.round % 20 == 1) {// 生成奖励物品
-                for (let i = 1; i <= Rooms[room].game.size * Rooms[room].game.size / 25; ++i) {
-                    let tx = rnd(Rooms[room].game.size), ty = rnd(Rooms[room].game.size);
-                    if (gm[tx][ty].type == 0) {
-                        let t = rnd(500);
-                        if (t <= 200) {
-                            gm[tx][ty].type = 7;
-                        } else if (t <= 400) {
-                            gm[tx][ty].type = 8;
-                        } else if (t <= 500) {
-                            gm[tx][ty].type = 10;
+                for (let i = 1; i <= 3 * alivePlayer(room); ++i) {
+                    for (let tryTime = 1; tryTime <= 10; ++tryTime) {// 重复十次尝试生成
+                        let tx = rnd(Rooms[room].game.size), ty = rnd(Rooms[room].game.size);
+                        if (gm[tx][ty].type == 0) {
+                            let t = rnd(700);
+                            if (t <= 200) {
+                                gm[tx][ty].type = 7;
+                            } else if (t <= 400) {
+                                gm[tx][ty].type = 8;
+                            } else if (t <= 500) {
+                                gm[tx][ty].type = 10;
+                            } else if (t <= 700) {
+                                gm[tx][ty].type = 11;
+                            }
+                            break;
                         }
                     }
                 }
@@ -732,15 +752,17 @@ function Run(io) {
             s.on('ClearMovement', function () {
                 try {
                     Rooms[playerRoom[uid]].player[uid].movement = [];
+                    if (Rooms[playerRoom[uid]].game.type == 2) ue(color2Id[Rooms[playerRoom[uid]].player[uid].color], 'select_home');;
                 } catch (e) {
 
                 }
             })
 
             s.on('SendWorldMessage', function (dat) {
-                if (dat == "") {
+                if (dat == "" || dat.length >= 100 || dat.indexOf('\n') != -1) {
                     return;
                 }
+                dat = dat.trim();
                 dat = xss(dat);
                 if (dat.indexOf('sur') != -1 || dat.indexOf('viv') != -1) {
                     try {
