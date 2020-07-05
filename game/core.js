@@ -289,7 +289,7 @@ function Run(io) {
                         else break;
                     }
                     if (player[k].movement.length == 0) // 轨迹偏移自动选家
-                        ue(color2Id[player[k].color], 'select_home');
+                        ue(game.color2Id[player[k].color], 'select_home');
                     continue;
                 }
                 combineBlock(room, f, t, 0);

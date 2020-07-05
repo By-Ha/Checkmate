@@ -113,7 +113,7 @@ $(() => {
             $("#pvp-self-info-attack a").html(10 + mVars.sword);
             $("#pvp-self-info-armor a").html(mVars.armor); // 还未加入
         }
-        $("#pvp-self-info-gas a").html(`Lv.${colorVars[0].gasLevel} ${Math.round(colorVars[0].gasTime)}T`);
+        $("#pvp-self-info-gas a").html(`Lv.${colorVars[0].gasLevel},${Math.round(colorVars[0].gasTime)}T`);
     });
     function patch(dat) {
         $("#l").css('visibility', 'hidden');
