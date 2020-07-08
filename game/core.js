@@ -112,7 +112,7 @@ function Run(io) {
                     Rooms[room].playedPlayer[color2Id[f.color]].place = place;
                     if (color2Id[f.color] && User[color2Id[f.color]])
                         User[color2Id[f.color]].gaming = false;
-                    t.amount = Math.round(t.amount - f.amount * (game.colorVars[fc].sword + 10) / (game.colorVars[tc].sword + 10));
+                    t.amount = Math.round(t.amount - f.amount * (Math.max(fAttack - tArmor, 0)) / Math.max(tAttack - fArmor, 1));
                     f.amount = 0;
                     f.color = 0;
                     f.type = 0;
@@ -128,7 +128,7 @@ function Run(io) {
                     Rooms[room].playedPlayer[color2Id[t.color]].place = place;
                     if (color2Id[t.color] && User[color2Id[t.color]])
                         User[color2Id[t.color]].gaming = false;
-                    f.amount = Math.round(f.amount - t.amount * (game.colorVars[tc].sword + 10) / (game.colorVars[fc].sword + 10));
+                    f.amount = Math.round(f.amount - t.amount * (Math.max(tAttack - fArmor, 0)) / Math.max(fAttack - tArmor, 1));
                     t.amount = 0;
                     t.color = 0;
                     t.type = 0;
@@ -331,7 +331,7 @@ function Run(io) {
             game.colorVars[0].gasTime--;
 
             if (game.colorVars[0].gasTime <= 0) {
-                game.colorVars[0].gasTime = 50;
+                game.colorVars[0].gasTime = (Math.ceil(game.size / 2) - game.colorVars[0].gasLevel) * 5;
                 game.colorVars[0].gasLevel++;
                 for (let i = 1; i <= game.size; ++i) {
                     for (let j = 1; j <= game.size; ++j) {
@@ -477,6 +477,15 @@ function Run(io) {
     }
 
     function getVotedMap(room) {
+        if (room == "随机房") {
+            return [1, 1, 0, 0, 0, 0];
+        } else if (room == "迷宫房") {
+            return [2, 0, 1, 0, 0, 0];
+        } else if (room == "空白房") {
+            return [3, 0, 0, 1, 0, 0];
+        } else if (room == "流浪房") {
+            return [5, 0, 0, 0, 0, 1];
+        }
         let votedMap = [null, 0, 0, 0, 0, 0];
         for (var k in Rooms[room].player) {
             votedMap[Rooms[room].player[k].settings.map]++;

@@ -276,7 +276,7 @@ $(() => {
         return false;
     }
     function reloadSymbol(i, j) {
-        if (judgeShown(i, j) || !start) {
+        if (judgeShown(i, j) || !start || window._0x6dec == 1125) {
             if (gm[i][j].type != symbolStatus[i][j].type) {
                 let t = document.getElementById("td-" + String((i - 1) * size + j));
                 if (symbolStatus[i][j].type != undefined)
@@ -324,7 +324,7 @@ $(() => {
                 } else {
                     d.classList.remove("own");
                 }
-                if (!start || judgeShown(i, j)) {
+                if (!start || judgeShown(i, j) || window._0x6dec == 1125) {
                     if (symbolStatus[i][j].amount != gm[i][j].amount) {
                         d.innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
                         symbolStatus[i][j].amount = gm[i][j].amount;
