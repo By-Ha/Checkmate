@@ -535,6 +535,7 @@ function getRating(uid, callback = () => { }) {
 }
 
 function addBattle(uid, battle_id, dr) {
+    console.log('addBattle', uid, battle_id, dr);
     let SQL = 'INSERT INTO `battle`(`battle_id`, `player`, `rating`, `delta_rating`) VALUES (?, ?, ?, ?)'
     getRating(uid, (err, dat) => {
         if (err) {
@@ -542,7 +543,9 @@ function addBattle(uid, battle_id, dr) {
         }
         else try {
             let SQLDATA = [battle_id, uid, dat, dr];
-            connection.query(SQL, SQLDATA, () => { });
+            connection.query(SQL, SQLDATA, (err, dat) => {
+                if (err) { console.error(err); }
+            });
         } catch (e) {
             console.log('addBattleError:', e);
         }
@@ -555,7 +558,8 @@ function addBattleData(battle_id, data) {
     connection.query(SQL, SQLDATA, () => { });
 }
 
-function changeRating(uid, rating, nowRating, place) {
+function changeRating(uid, rating, nowRating) {
+    console.log('changeRating', rating, nowRating);
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
     if (rating > 0) rating = Math.round(rating * (Math.abs(49.5 - 0.01 * nowRating) + 50.5 - 0.01 * nowRating) / 10);
     else rating = rating * Math.round(0.002 * nowRating + 1);
@@ -572,30 +576,35 @@ function gameRatingCalc(room, data, battle_data) {
     console.log(data);
     try {
         let bid = stringRandom(64);
-        let amount = 0;
-        let p = [];
+        let firstAmount = 0;
+        let firstRating = -1;
+        let firstBounce = 0;
+        let cnt = 0;
         if (Object.keys(data).length == 0) return;
         addBattleData(bid, battle_data);
-        for (let k in data) {
-            getRating(k, (err, dat) => {
+        for (let j in data) {
+            getRating(j, (err, dat) => {
                 if (err) { console.log('gameRatingCalc', err); return; }
                 else {
-                    data[k].rating = Number(dat);
-                    p[Number(data[k].place)] = k;
-                    amount++;
-                    if (amount == Object.keys(data).length) {
-                        let firstRating = data[p[1]].rating;
-                        let firstBounce = 0;
-                        for (let it = 2; it <= Object.keys(data).length; ++it) {
-                            let score = Math.round((data[p[it]].rating - firstRating) / 1000) + 3;
-                            if (score <= 0) score = 1;
-                            if (score > 10) score = 10;
-                            firstBounce += score;
-                            let deltaRating = changeRating(p[it], -score, data[p[it]].rating, it);
-                            addBattle(p[it], bid, deltaRating);
-                        }
-                        let deltaRating = changeRating(p[1], firstBounce, data[p[1]].rating, 1);
-                        addBattle(p[1], bid, deltaRating);
+                    console.log(dat);
+                    data[j].rating = Number(dat);
+                    if (data[j].place == 1) { ++firstAmount; firstRating = Math.max(firstRating, data[j].rating); }
+                }
+                ++cnt;
+                if (cnt == Object.keys(data).length) {
+                    for (let k in data) {
+                        if (data[k].place == 1) continue;
+                        let score = Math.round((data[k].rating - firstRating) / 1000) + 3;
+                        if (score <= 0) score = 1;
+                        if (score > 10) score = 10;
+                        firstBounce += score;
+                        let deltaRating = changeRating(k, -score, data[k].rating);
+                        addBattle(k, bid, deltaRating);
+                    }
+                    for (let k in data) {
+                        if (data[k].place != 1) continue;
+                        let deltaRating = changeRating(k, firstBounce / firstAmount, data[k].rating);
+                        addBattle(k, bid, deltaRating);
                     }
                 }
             })

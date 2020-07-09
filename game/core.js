@@ -370,11 +370,10 @@ function Run(io) {
 
     function playerWinAnction(room) {
         try {
-            console.log('处理前', Rooms[room].playedPlayer);
             let firstFlag = 0;
             Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.type == 1 ? 1 : 2);
             for (let k in Rooms[room].playedPlayer) {
-                if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true && !firstFlag) {
+                if (Rooms[room].player[k] != undefined && Rooms[room].player[k].gaming == true && Rooms[room].playedPlayer[k].place == 0 && !firstFlag) {
                     Rooms[room].playedPlayer[k].place = 1;
                     firstFlag = 1;
                 } else if (Rooms[room].playedPlayer[k].place == 0) {
