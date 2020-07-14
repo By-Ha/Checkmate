@@ -17,6 +17,17 @@ $(() => {
         $(".preloader").addClass("animate__animated animate__fadeIn");
     }
 
+    function getURIvariable(variable)
+    {
+           var query = window.location.search.substring(1);
+           var vars = query.split("&");
+           for (var i=0;i<vars.length;i++) {
+                   var pair = vars[i].split("=");
+                   if(pair[0] == variable){return pair[1];}
+           }
+           return(false);
+    }
+
     function confirm(type, title, content, callback) {
         $.confirm({
             type: type, title: title, content: content, theme: 'supervan', useBootstrap: false, draggable: false, backgroundDismiss: true, autoClose: 'close|10000',
@@ -247,4 +258,51 @@ $(() => {
         } else loadingTag = false;
     })
     showPost(999999999);
+
+    // 此处检测URI中的参数
+    if(getURIvariable('page') == 'battle'){// 问就是直接点击省事,免得重写逻辑
+        $("#left-bar .nav-link.battle").click();
+    }else if(getURIvariable('page') == 'edit'){
+        if(!isNaN(Number(getURIvariable('pid'))) ){
+            hide();
+        get('/admin/edit', { pid: Number(getURIvariable('pid')) }, (err, dat) => {
+            if (err) { toast('error', '获取失败', '请重试或联系管理员'); show(); }
+            else {
+                $(".loading-dot-container").css("display", "none");
+                toast('success', '获取成功', '改成啥好呢?');
+                content = $(".page-wrap")[0].innerHTML;
+                $(".page-wrap")[0].innerHTML = dat;
+                show();
+                let md = window.markdownit();
+                let pre = $(".preview")[0];
+                pre.innerHTML = md.render($(".edit textarea")[0].value);
+                KaTeXReRender();
+                $(".edit textarea").bind('input propertychange', function () {
+                    pre.innerHTML = md.render(this.value);
+                    KaTeXReRender();
+                })
+                $(".edit .back").unbind("click");
+                $(".edit .back").click(() => {
+                    hide();
+                    if (content != "")
+                        $(".page-wrap")[0].innerHTML = content;
+                    else {
+                        window.location.reload();
+                        return;
+                    }
+                    content = "";
+                    show();
+                    postPageAnction();
+                })
+                $(".edit .save").unbind("click");
+                $(".edit .save").click(() => {
+                    post('/api/updatepost', { pid: $(".edit").attr('pid'), content: $(".edit textarea")[0].value }, (err, dat) => {
+                        if (err) toast('error', '保存失败', err);
+                        else { toast('success', '保存成功', '好像还是没什么人看的样子'); content = ""; }
+                    })
+                })
+            }
+        })
+        }
+    }
 })
