@@ -262,3 +262,23 @@ article.preview object {
 .sponsor-amount {
   float: right;
 }
+
+#carousel-ad{
+  height: 200px;
+}
+
+.carousel-item {
+  height: 180px;
+  overflow: hidden;
+  background-size: contain !important;
+  background-position: center !important;
+  cursor: pointer;
+}
+
+.carousel-control-prev{
+  background-image: linear-gradient(to right, rgb(100, 100, 100), transparent);
+}
+
+.carousel-control-next{
+  background-image: linear-gradient(to left, rgb(100, 100, 100), transparent);
+}
