@@ -152,9 +152,9 @@ function addSubmission(uid, dat, callback) {
 }
 
 function getTypePost(type, page, pagesize, callback) {
-    let SQL = `select * from content where type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?;`
+    let SQL = `select * from content where type=? AND hidden=0 order by id desc limit ?,?;`
     let SQLDATA = [type, (page - 1) * pagesize, pagesize];
-    let SQL2 = `UPDATE content SET view=view+1 where id in (SELECT t.id FROM (SELECT * FROM content WHERE type=? AND hidden=0 order by user_id=1 desc,id desc limit ?,?) as t);`
+    let SQL2 = `UPDATE content SET view=view+1 where id in (SELECT t.id FROM (SELECT * FROM content WHERE type=? AND hidden=0 order by id desc limit ?,?) as t);`
     let SQLDATA2 = [type, (page - 1) * pagesize, pagesize];
     connection.query(SQL2, SQLDATA2, (err) => {
         if (err) console.error(err);
