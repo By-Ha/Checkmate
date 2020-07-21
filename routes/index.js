@@ -19,7 +19,8 @@ router.get('/*', function(req, res, next){
     }
     db.getUserInfo(req.session.uid, (err, dat)=>{
         if(err) {next(createError(500)); return;}
-        if(dat.ban_time <= new Date() || dat.ban_type == 0 || req.path == '/logout') {next(); return ;}
+        console.log(dat.ban_time);
+        if(dat.ban_time == '0000-00-00 00:00:00' || dat.ban_time <= new Date() || dat.ban_type == 0 || req.path == '/logout') {next(); return ;}
         else {
             res.render('ban.ejs', {ban_time: dat.ban_time});
             return ;
