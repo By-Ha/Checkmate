@@ -13,7 +13,6 @@ router.post('/', function (req, res) {
   if (req.body.username.match(/[^\x00-\xff]+/g) != null || req.body.username.match(" ") != null) { res.json({ status: 'error', msg: '现在只允许英文字母与符号注册' }); return; }
   db.register(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
     if (err) { res.json({ status: 'error', msg: err }); return; };
-    console.log(dat);
     if (dat[0] == 0) {
       req.session.username = req.body.username;
       req.session.uid = dat[2];
