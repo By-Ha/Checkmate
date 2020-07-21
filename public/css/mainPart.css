@@ -270,7 +270,7 @@ article.preview object {
 .carousel-item {
   height: 180px;
   overflow: hidden;
-  background-size: contain !important;
+  background-size: cover !important;
   background-position: center !important;
   cursor: pointer;
 }
