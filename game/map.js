@@ -428,8 +428,8 @@ function generatePUBGMap(player) {
     }
     let gm = [];
     let size = 0;
-    if (player == 2) size = 10;
-    else size = 20;
+    if (player == 2) size = 11;
+    else size = 21;
     for (let i = 0; i <= size; ++i) {
         gm[i] = [];
         for (let j = 0; j <= size; ++j) {
