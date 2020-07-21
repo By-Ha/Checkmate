@@ -91,8 +91,8 @@ router.get('/user/info', function (req, res) {
     db.getUserInfo(uid, (err, dat) => {
         if (err) { res.json({ status: err, msg: '数据库错误' }); return; }
         else {
-            delete dat.password;
-            res.json({ status: 'success', msg: dat }); return;
+            let dat2 = {id: dat.id, username: dat.username, type: dat.type}
+            res.json({ status: 'success', msg: dat2 }); return;
         }
     })
 })

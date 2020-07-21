@@ -69,21 +69,27 @@ function renderMD(content) {
     return content;
 }
 
-function login(username, password, callback) {
+function login(username, password, ip, callback) {
     password = String(password);
     username = String(username);
     for (var i = 1; i <= 10; ++i)
         password = crypto.createHash('md5').update("114514" + password + 'encryptionKana').digest("hex");
-    var SQL = 'SELECT * FROM `user` WHERE BINARY username=? AND BINARY password=?';
-    var SQLDATA = [username, password];
+    let SQL = 'SELECT * FROM `user` WHERE BINARY username=? AND BINARY password=?';
+    let SQLDATA = [username, password];
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         if (results == 0) { callback(null, [-1, '错误的用户名或密码', { username: "ERRUSER", id: -1 }]); return; }
-        else { callback(null, [0, '成功登录', { username: results[0].username, id: results[0].id }]); return; }
+        else { 
+            callback(null, [0, '成功登录', { username: results[0].username, id: results[0].id }]);
+            let SQL2 = 'UPDATE `user` SET `last_login_ip`=? WHERE username=?';
+            let SQL2DATA = [ip, username];
+            connection.query(SQL2,SQL2DATA, ()=>{});
+            return;
+        }
     });
 }
 
-function register(username, password, callback) {
+function register(username, password, ip, callback) {
     password = String(password);
     username = String(username);
     if (username.indexOf('<') != -1 || username.length < 3 || username.length > 16) {
@@ -102,8 +108,8 @@ function register(username, password, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback('error'); return; }
         if (results == 0) {
-            SQL = "INSERT INTO user (`username`, `password`, `exp`, `rating`) VALUES (?, ?, 0, 0)";
-            SQLDATA = [username, password];
+            SQL = "INSERT INTO user (`username`, `password`, `exp`, `rating`, `last_login_ip`) VALUES (?, ?, 0, 0, ?)";
+            SQLDATA = [username, password, ip];
             connection.query(SQL, SQLDATA, function (error, results) {
                 if (error) { callback('error'); return; }
                 else getUserId(username, function (err, dat) {
@@ -616,10 +622,26 @@ function gameRatingCalc(room, data, battle_data) {
 
 let rating = undefined;
 function getRatingList() {
-    let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 10';
-    connection.query(SQL, [], (err, dat) => { rating = dat; });
+    let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 100';
+    connection.query(SQL, [], (err, dat) => { 
+        let ips = [];
+        let ret = [];
+        for(let i = 0;i < dat.length;++i){
+            console.log(ret);
+            let e = dat[i];
+            if(e.last_login_ip != '0.0.0.0' && ips.indexOf(e.last_login_ip) == -1){
+                ips.push(e.last_login_ip);
+                ret.push(e);
+                if(ret.length >= 10) {
+                    rating = ret; return rating;
+                }
+            }
+        }
+        rating = ret;
+    });
     return rating;
 }
+getRatingList();
 
 function getUserBattle(uid, page, callback) {
     let SQL = "";

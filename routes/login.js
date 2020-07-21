@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
-    db.login(req.body.username, req.body.pwd, function (err, dat) {
+    db.login(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; };
         if (dat[0] == 0) {
             req.session.username = String(req.body.username);
