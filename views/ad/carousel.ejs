@@ -11,7 +11,6 @@
   ads = t;
   ads.sort(function(){ return 0.5 - Math.random() });
 %> 
-<!-- <%= ads %> <% t %>  --> 
 <div id="carousel-ad" class="carousel slide carousel-fade kana-item" data-ride="carousel">
   <ol class="carousel-indicators">
     <% for (let i = 0; i < ads.length; i++) { %>
@@ -21,7 +20,7 @@
   <div class="carousel-inner">
     
       <% for (let i = 0; i < ads.length; i++) { %>
-        <div class="carousel-item <%= i==0?"active":"" %>" onclick="window.open('<%= ads[i].link %>')" style="background: url(<%= ads[i].url %>)">
+        <div class="carousel-item <%= i==0?"active":"" %>" onclick="window.open('<%= ads[i].link %>')" style="background: url(<%= ads[i].url %>) , url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/background.png)">
           <% if(ads[i].text != undefined) { %>
             <div class="carousel-caption d-none d-md-block">
               <h3><%= ads[i].text %> </h3>

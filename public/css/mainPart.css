@@ -268,10 +268,12 @@ article.preview object {
 }
 
 .carousel-item {
+  /* background: ; */
   height: 180px;
   overflow: hidden;
-  background-size: cover !important;
-  background-position: center !important;
+  background-size: contain, contain !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, repeat !important;
   cursor: pointer;
 }
 
