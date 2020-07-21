@@ -390,18 +390,19 @@ function Run(io) {
                 }
             }
             db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
+            let winner = [];
             for (let k in Rooms[room].player) {
                 if (Rooms[room].player[k].connect == false) {
                     delete Rooms[room].player[k];
                     continue;
                 }
-                if (Rooms[room].player[k].gaming == true) {
-                    bc(room, 'WinAnction', Rooms[room].player[k].uname);
+                if (Rooms[room].playedPlayer[k].place == 1) {
+                    winner.push(Rooms[room].player[k].uname);
                     db.addUserExperienceById(k, 20);
                 }
                 Rooms[room].player[k].gaming = false;
-                Rooms[room].player[k].prepare = false;
             }
+            bc(room, 'WinAnction', winner.join(','));
             clearInterval(Rooms[room].interval);
             delete Rooms[room].game;
             Rooms[room].start = false;

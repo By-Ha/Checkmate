@@ -285,15 +285,13 @@ $(() => {
                 symbolStatus[i][j].type = gm[i][j].type;
             }
         } else {
-            if (symbolStatus[i][j].type != 6) {
-                let t = document.getElementById("td-" + String((i - 1) * size + j));
-                if (symbolStatus[i][j].type != undefined)
-                    t.classList.remove(tp[symbolStatus[i][j].type]);
-                symbolStatus[i][j].type = undefined;
-                if (gm[i][j].type >= 3 && gm[i][j].type <= 5) {
-                    t.classList.add(tp[6]);
-                    symbolStatus[i][j].type = 6;
-                }
+            let t = document.getElementById("td-" + String((i - 1) * size + j));
+            if (symbolStatus[i][j].type != undefined)
+                t.classList.remove(tp[symbolStatus[i][j].type]);
+            symbolStatus[i][j].type = undefined;
+            if (gm[i][j].type >= 3 && gm[i][j].type <= 5) {
+                t.classList.add(tp[6]);
+                symbolStatus[i][j].type = 6;
             }
         }
     }
