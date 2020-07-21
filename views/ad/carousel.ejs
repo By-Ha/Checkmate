@@ -1,4 +1,5 @@
 <% let ads = [
+  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg-shh-7.21-7.31.png', link: 'http://wenhao801.com/Mr_Wu.html', text: '% Mr_Wu', expire: new Date(2020, 7, 31, 20, 17)},
   {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg2020.7.21-2020.8.20.jpg', link: 'https://www.luogu.com.cn/blog/jwcubgiy/', text: 'Penguins 的博客', expire: new Date(2020, 8, 21, 18, 30)},
   {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg1.png', link: 'tencent://Message/?Uin=2051261534', expire: new Date(2333, 1, 1, 0, 0)},
 ] 
@@ -8,6 +9,7 @@
     t.push(ads[i]);
   }
   ads = t;
+  ads.sort(function(){ return 0.5 - Math.random() });
 %> 
 <!-- <%= ads %> <% t %>  --> 
 <div id="carousel-ad" class="carousel slide carousel-fade kana-item" data-ride="carousel">
