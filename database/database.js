@@ -242,7 +242,7 @@ function deletePost(pid, uid, callback) {
     getUserInfo(uid, (err, dat) => {
         if (err) { callback("数据库错误", null); return; }
         connection.query(SQL, SQLDATA, function (error, results) {
-            if (results == undefined || results[0] == undefined || uid != results[0].user_id && dat.type <= 0) { callback("Permission Denied", null); return; }
+            if (results == undefined || results[0] == undefined || uid != results[0].user_id && (dat.type <= 0 || dat.type >= 5)) { callback("Permission Denied", null); return; }
             var SQL = `UPDATE content SET hidden=? WHERE id=?;`
             var SQLDATA = [true, pid];
             connection.query(SQL, SQLDATA, function (error, results) {
@@ -627,7 +627,6 @@ function getRatingList() {
         let ips = [];
         let ret = [];
         for(let i = 0;i < dat.length;++i){
-            console.log(ret);
             let e = dat[i];
             if(e.last_login_ip != '0.0.0.0' && ips.indexOf(e.last_login_ip) == -1){
                 ips.push(e.last_login_ip);
@@ -671,6 +670,26 @@ function getReplay(rid, callback) {
 //     connection.query(SQL, [], () => { });
 // }, null, true);
 
+// Ban
+
+function setBan(uid, time, callback){
+    let SQL = 'UPDATE `user` SET `ban_type`=1, `ban_time`=date_add(now(), interval ? second) WHERE id=?';
+    let SQLDATA = [time*3600, uid];
+    connection.query(SQL, SQLDATA, (err, dat)=>{
+        if(err) {callback(err, null);return ;}
+        else {callback(null, dat);return ;}
+    })
+}
+
+function cancelBan(uid, callback){
+    let SQL = 'UPDATE `user` SET `ban_type`=0, `ban_time`=now() WHERE id=?';
+    let SQLDATA = [uid];
+    connection.query(SQL, SQLDATA, (err, dat)=>{
+        if(err) {callback(err, null);return ;}
+        else {callback(null, dat);return ;}
+    })
+}
+
 module.exports = {
     sessionStore,
     login, register,
@@ -682,5 +701,6 @@ module.exports = {
     getComment, postCommentByUsername, getCommentAmount,
     getUserPostAmount, getUserCommentAmount,
     gameRatingCalc, getRatingList, getUserBattle, getReplay,
-    sendPostLike
+    sendPostLike,
+    setBan, cancelBan
 }

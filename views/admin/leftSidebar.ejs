@@ -8,9 +8,6 @@
             <li class="nav-item">
                 <a class="nav-link battle" href="#">战斗</a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="#">管理密钥:<%= rnd_pwd %></a>
-            </li> -->
         </ul>
     </nav>
     <br>
@@ -22,4 +19,17 @@
             <button type="button" class="btn btn-outline-primary" id="post-id-edit">修改</button>
         </div>
     </div>
+    <% if(userInfo.type > 0 && userInfo.type <= 4) { %>
+        <br/>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="用户id" id="ban-user-id-input"
+            onchange="value=value.replace(/[^\d]/g,'')">
+            <input type="text" class="form-control" placeholder="时间(小时)" id="ban-time-input"
+            onchange="value=value.replace(/[^\d|.]/g,'')">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-danger" id="ban-btn">封禁</button>
+                <button type="button" class="btn btn-outline-primary" id="unban-btn">解封</button>
+            </div>
+        </div>
+    <% } %> 
 </aside>

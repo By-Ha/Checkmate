@@ -248,6 +248,27 @@ $(() => {
         })
     })
 
+    $("#ban-btn").click(()=>{
+        confirm('red', '确认封禁?', '', () => {
+            post('/admin/super/ban', { banID: Number($("#ban-user-id-input")[0].value), banType: 'set', banTime: Number($("#ban-time-input")[0].value) }, (err, dat) => {
+                if (err) toast('error', err);
+                else {
+                    toast('success', dat.msg);
+                }
+            })
+        })
+    })
+    $("#unban-btn").click(()=>{
+        confirm('red', '确认解封?', '', () => {
+            post('/admin/super/ban', { banID: Number($("#ban-user-id-input")[0].value), banType: 'unset', banTime: 0 }, (err, dat) => {
+                if (err) toast('error', err);
+                else {
+                    toast('success', dat.msg);
+                }
+            })
+        })
+    })
+
     $(window).scroll(function () {
         if (loadingTag) return;
         loadingTag = true;

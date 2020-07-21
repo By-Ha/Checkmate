@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>等待解封 - Kana!</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container center">
+      <h1 class="center">
+        你的行为触犯社区规范,已被封禁.<br />请等待解封或进群<a style="color: pink">1104620253</a>咨询管理员
+      </h1>
+      <h3>封禁至: <time id="time"><%= ban_time %></time></h3>
+      <h1 class="display-2 center" id="timer">0:00:00:00.00</h1>
+      <div class="btn-group btn-group-lg">
+        <button type="button" class="btn btn-primary logout">登出</button>
+      </div>
+    </div>
+    <style>
+      @font-face {
+        font-family: "webfont";
+        font-display: swap;
+        src: url("//at.alicdn.com/t/webfont_w7q6n7zqvx.eot");
+        /* IE9*/
+        src: url("//at.alicdn.com/t/webfont_w7q6n7zqvx.eot?#iefix")
+            format("embedded-opentype"),
+          /* IE6-IE8 */ url("//at.alicdn.com/t/webfont_w7q6n7zqvx.woff2")
+            format("woff2"),
+          url("//at.alicdn.com/t/webfont_w7q6n7zqvx.woff") format("woff"),
+          /* chrome、firefox */ url("//at.alicdn.com/t/webfont_w7q6n7zqvx.ttf")
+            format("truetype"),
+          /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+            url("//at.alicdn.com/t/webfont_w7q6n7zqvx.svg#Alibaba-PuHuiTi-Regular")
+            format("svg");
+        /* iOS 4.1- */
+      }
+
+      #timer {
+        font-family: "webfont";
+      }
+
+      h1.center {
+        width: 100%;
+        text-align: center;
+      }
+
+      .more {
+        height: 5vh;
+        width: 5vh;
+        position: fixed;
+        right: 0px;
+        top: 0px;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      .btn {
+        transition: all 0.5s linear;
+      }
+
+      .container {
+        position: fixed;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .center {
+        text-align: center;
+      }
+    </style>
+    <script>
+      function formatZero(num, len) {
+        // https://www.cnblogs.com/tonnytong/p/11650158.html
+        if (String(num).length > len) return num;
+        return (Array(len).join(0) + num).slice(-len);
+      }
+      (() => {
+        let timer;
+        var startTime = <%= ban_time.getTime() %>;
+        timer = setInterval(() => {
+            let delta = startTime - new Date().getTime();
+            if(delta <= 0) {window.location.href = window.location.href; clearInterval(timer); return;}
+            let ms = Math.floor(delta / 10) % 100;
+            delta = Math.floor(delta / 1000);
+            let s = delta % 60;
+            delta = Math.floor(delta / 60);
+            let min = delta % 60;
+            delta = Math.floor(delta / 60);
+            let hrs = delta % 24;
+            delta = Math.floor(delta / 24);
+            let days = delta;
+            document.getElementById("timer").innerHTML = 
+            `${days}:${formatZero(hrs,2)}:${formatZero(min,2)}:${formatZero(s, 2)}.${formatZero(ms, 2)}`;
+        }, 10);
+        $(".logout").click(()=>{
+            window.location.href = '/logout';
+        })
+      })();
+    </script>
+  </body>
+</html>

@@ -114,7 +114,6 @@ router.post('/post', function (req, res) {
     if (req.body.type != 0) { res.json({ status: ('error'), msg: '类型错误' }); return; }
     db.getUserInfo(req.session.uid, (err, dat) => {
         if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
-        if (dat.shuoshuoban == true) { res.json({ status: ('error'), msg: '您的说说权限已被封禁' }); return; }
         db.post(req.session.username, req.body.type, req.body.content, function (err, dat) {
             if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
             else { res.json({ status: ('success'), msg: '发送成功' }); return; }
@@ -249,7 +248,7 @@ router.post('/upload/banner', upload.single('banner'), function (req, res) {
 
 router.get('/superadmin/*', function (req, res, next) {
     db.getUserInfo(req.session.uid, (err, dat) => {
-        if (err || !dat || !dat.type || dat.type <= 0 || dat.type >= 4) {
+        if (err || !dat || !dat.type || dat.type <= 0 || dat.type >= 3) {
             next(createError(403));
             return;
         } else if (dat.type > 0 && dat.type < 4) {
