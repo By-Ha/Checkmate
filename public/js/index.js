@@ -65,3 +65,35 @@ $(() => {
         });
     })
 })
+
+function post(url, data, callback) {
+    $.ajax({
+        url: url, data: data, type: "post",
+        error: function (request) { callback(request.msg); },
+        success: function (data) {
+            if (data.status == 'error') callback(data.msg);
+            else callback(null, data);
+        }
+    });
+}
+
+function confirm(type, title, content, callback) {
+    $.confirm({
+        type: type, title: title, content: content, theme: 'supervan', useBootstrap: false, draggable: false, backgroundDismiss: true, autoClose: 'close|10000',
+        buttons: {
+            tryAgain: { text: '确认', btnClass: 'btn-red', action: function () { callback(); return; } }, close: { text: '取消', action: function () { } }
+        }
+    });
+}
+
+function deletePost(pid) {
+    confirm('red', '确认删除?', '', ()=>{
+        post('/api/deletepost', { pid: pid }, (err, dat) => {
+            if (err) toast('error', '删除失败', '请重试或联系管理员');
+            else {
+                toast('success', '删除成功', '地球上又少了一点东西');
+                window.location.href = window.location.href;
+            }
+        })
+    })
+}

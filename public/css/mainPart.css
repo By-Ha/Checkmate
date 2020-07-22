@@ -23,7 +23,17 @@
   top: 56px;
   left: 56px;
 }
-
+#main-part #container article .post-manage{
+  position: absolute;
+  right: 16px;
+  padding: 17px 0 0;
+  color: #222;
+  font-size: 16px;
+  cursor: pointer;
+}
+#main-part #container article .post-manage>i{
+  color: red;
+}
 #main-part #container article .verify-orange {
   background-image: url(/img/verify/verify_orange.svg);
 }

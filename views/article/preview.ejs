@@ -4,6 +4,9 @@
 
 <article class="<%= (art.type==0)?'shuoshuo':'blog' %> kana-item preview" pid="<%= art.id %>">
     <div class="post-info">
+        <% if((userInfo.type > 0 && userInfo.type <= 4) || uid == art.user_id) { %> 
+            <div class="post-manage" onclick="deletePost(<%= art.id %>)"><i class="iconfont icon-delete"></i></div>
+        <% } %> 
         <div class="post-info-author">
             <div>
                 <img class="avatar"

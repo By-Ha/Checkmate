@@ -4,7 +4,7 @@
         <%- include('game/joinRoom') %>
         <%- include('article/write') %>
         <% dat.forEach(element => { %>
-        <%- include('article/preview', {art: element, username: username}); %>
+        <%- include('article/preview', {art: element, username: username, uid: uid, userInfo: userInfo}); %>
         <% }); %>
     </div>
     <div class="kana-item" id="getMore">
