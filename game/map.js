@@ -234,7 +234,7 @@ function generateMazeMap(player) {
 function generateEmptyMap(player) {
     function rnd(num) {
         var t = Math.round(Math.random() * num);
-        return (t == 0) ? num : t
+        return (t == 0) ? num : t;
     }
     function Astar(gm, x, y, tar_x, tar_y) {
         let vis = [];
@@ -284,6 +284,7 @@ function generateEmptyMap(player) {
             gm[t1][t2].color = i;
             gm[t1][t2].amount = 1;
             gm[t1][t2].type = 1;
+
         } else {
             let flag = 0;
             for (let j = 0; j < last.length; ++j) {
@@ -298,6 +299,92 @@ function generateEmptyMap(player) {
                 gm[t1][t2].color = i;
                 gm[t1][t2].amount = 1;
                 gm[t1][t2].type = 1;
+            }
+        }
+        last.push([t1, t2]);
+    }
+    gm[0][0].type = 1;
+    return gm;
+}
+
+function generateQianHaoMap(player) {
+    function rnd(num) {
+        var t = Math.round(Math.random() * num);
+        return (t == 0) ? num : t;
+    }
+    function Astar(gm, x, y, tar_x, tar_y) {
+        let vis = [];
+        let q = [];
+        let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+        for (let i = 1; i <= size; ++i) vis[i] = [];
+        q.push([x, y, 0]);
+        vis[x][y] = 1;
+        while (q.length > 0) {
+            let tx = q[0][0], ty = q[0][1], step = q[0][2];
+            q = q.slice(1);
+            for (let j = 0; j < 4; ++j) {
+                let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
+                vis[tx2][ty2] = 1;
+                q.push([tx2, ty2, step + 1]);
+                if (tx2 == tar_x && ty2 == tar_y)
+                    return step + 1;
+            }
+        }
+        return -1;
+    }
+    let gm = [];
+    let size = 0;
+    size = 20;
+    for (let i = 0; i <= size; ++i) {
+        gm[i] = [];
+        for (let j = 0; j <= size; ++j) {
+            gm[i][j] = { "color": 0, "type": 0, "amount": 0 }; // 空白图
+        }
+    }
+    gm[0][0] = { size: size };
+    let last = [];
+    let rw=[-1,0,1,0,-1,1,-1,1],cl=[0,1,0,-1,-1,1,1,-1];
+    let calcTimes = 0;
+    for (var i = 1; i <= player; ++i) {
+        ++calcTimes;
+        if (calcTimes >= 100) return generateEmptyMap(player);
+        var t1 = rnd(size - 2) + 1,
+            t2 = rnd(size - 2) + 1;
+        // 至少留一个方位有空
+        while (gm[t1][t2].type != 0 || (gm[t1 + 1][t2].type != 0 && gm[t1 - 1][t2].type != 0 && gm[t1][t2 + 1].type != 0 && gm[t1][t2 + 1].type != 0) ) {//  
+            t1 = rnd(size - 2) + 1, t2 = rnd(size - 2) + 1;
+        }
+        if (i == 1) {
+            gm[t1][t2].color = i;
+            gm[t1][t2].amount = 1;
+            gm[t1][t2].type = 1;
+            let outdir=rnd(8)-1;
+            gm[t1+rw[outdir]][t2+cl[outdir]].type = 5;
+            gm[t1][t2].amount = 10;
+            for (var i = 0; i <=7; i++) {
+                if(i!==outdir) gm[t1+rw[outdir]][t2+cl[outdir]].type = 4;
+            }
+        } else {
+            let flag = 0;
+            for (let j = 0; j < last.length; ++j) {
+                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > 6) {
+                    continue;
+                }
+                flag = 1;
+                --i;
+                break;
+            }
+            if (flag == 0) {
+                gm[t1][t2].color = i;
+                gm[t1][t2].amount = 1;
+                gm[t1][t2].type = 1;
+                let outdir=rnd(8)-1;
+                gm[t1+rw[outdir]][t2+cl[outdir]].type = 5;
+                gm[t1][t2].amount = 10;
+                for (var i = 0; i <=7; i++) {
+                    if(i!==outdir) gm[t1+rw[outdir]][t2+cl[outdir]].type = 4;
+                }
             }
         }
         last.push([t1, t2]);
@@ -496,12 +583,13 @@ function generateMap(type, player) {
         return generateDragonBoatFestivalMap(player);
     } else if (type == 5) {
         return generatePUBGMap(player);
+    } else if( type == 6){
+        return generateQianHaoMap(player);
     } else {
         console.log(new Date().getTime() - ti);
         return generateRandomMap(player);
     }
 }
-
 module.exports = {
     generateMap
 }
