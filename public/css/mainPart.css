@@ -287,6 +287,10 @@ article.preview object {
   cursor: pointer;
 }
 
+.carousel-item h3{
+  text-shadow: 5px 5px 5px black;
+}
+
 .carousel-control-prev{
   background-image: linear-gradient(to right, rgb(100, 100, 100), transparent);
 }
