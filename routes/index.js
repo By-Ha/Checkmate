@@ -27,6 +27,22 @@ router.get('/*', function(req, res, next){
     })
 })
 
+router.post('/*', function(req, res, next){
+    if (!req.session.username) {
+        if(req.path != '/login' && req.path != '/register')
+            {res.json({status: 'error', msg: 'Please login or register.'}); return;}
+        else {next(); return;}
+    }
+    db.getUserInfo(req.session.uid, (err, dat)=>{
+        if(err) {next(createError(500)); return;}
+        if(dat.ban_time == '0000-00-00 00:00:00' || dat.ban_time <= new Date() || dat.ban_type == 0 || req.path == '/logout') {next(); return ;}
+        else {
+            res.json({status: 'error', msg: 'You are banned.'});
+            return ;
+        }
+    })
+})
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (req.session.username) {
