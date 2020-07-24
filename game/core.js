@@ -271,7 +271,7 @@ function Run(io) {
                 var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
                 var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
                 cnt -= 1; // cannot move all
-                if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
+                if (f.color != player[k].color || cnt <= 0 || t.type == 4 || (cnt < t.amount && t.type == 5)) { // wrong movement
                     while (player[k].movement.length != 0) {
                         let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
                         if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
