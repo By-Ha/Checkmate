@@ -92,3 +92,6 @@
   display: inline-block;
   animation: turn 1s linear infinite;
 }
+footer{
+  display: none;
+}

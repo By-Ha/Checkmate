@@ -1,3 +1,7 @@
+#main{
+  min-height: calc(100vh - 200px);
+}
+
 #main-part #container article .avatar {
   position: absolute;
   width: 48px;
@@ -287,10 +291,39 @@ article.preview object {
   cursor: pointer;
 }
 
+.carousel-item h3{
+  text-shadow: 5px 5px 5px black;
+}
+
 .carousel-control-prev{
   background-image: linear-gradient(to right, rgb(100, 100, 100), transparent);
 }
 
 .carousel-control-next{
   background-image: linear-gradient(to left, rgb(100, 100, 100), transparent);
+}
+
+#footer{
+  background-color: #e3e5eb;
+  padding: 20px 0;
+  margin: 0 auto;
+}
+#footer .link-box{
+  width: 100%;
+  text-align: center;
+}
+#footer .link-box a{
+  color: grey;
+  text-decoration: none !important;
+}
+#footer .link-box a:hover{
+  color: skyblue;
+}
+#footer .footer-logo{
+  width: 100px;
+  filter: opacity(0.5);
+  padding-left: 20px;
+}
+#footer .logo-box{
+  padding-top: 50px;
 }

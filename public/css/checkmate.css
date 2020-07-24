@@ -381,3 +381,6 @@ button.btnv2:hover {
 #pvp-self-info-gas {
   background-image: url(/img/gas.png);
 }
+#footer{
+  display: none;
+}

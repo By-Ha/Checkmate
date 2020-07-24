@@ -2,7 +2,18 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-// var logger = require('morgan');
+var logger = require('morgan');
+
+logger.token('realip', function (req, res) {
+    return req.headers['x-real-ip'];
+});
+
+logger.token('localDate', function (req) {
+    let date = new Date();
+    return date.toLocaleString()
+})
+
+logger.format('kana', '[:localDate] :realip :status :method :url  ');
 
 var bodyparser = require('body-parser');
 var session = require('express-session');
@@ -10,7 +21,6 @@ var db = require('./database/database');
 var game = require('./game/core');
 var message = require('./message/message');
 var config = require('./config');
-
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
@@ -29,7 +39,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// app.use(logger('short'));
+app.use(logger('kana'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

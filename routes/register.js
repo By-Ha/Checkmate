@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
-  if (req.body.username.match(/[^\x00-\xff]+/g) != null || req.body.username.match(" ") != null) { res.json({ status: 'error', msg: '现在只允许英文字母与符号注册' }); return; }
+  if (req.body.username.match(/[^\x00-\xff]+/g) != null || req.body.username.match(/#|&/g) != null || req.body.username.match(" ") != null) { res.json({ status: 'error', msg: '现在只允许英文字母与部分符号注册' }); return; }
   db.register(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
     if (err) { res.json({ status: 'error', msg: err }); return; };
     if (dat[0] == 0) {
