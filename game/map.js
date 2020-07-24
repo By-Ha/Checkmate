@@ -4,7 +4,25 @@ function generateRandomMap(player) {
         return (t == 0) ? num : t
     }
     function Astar(gm, x, y, tar_x, tar_y) {
-        return Math.abs(x - tar_x) + Math.abs(y - tar_y);
+        let vis = [];
+        let q = [];
+        let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+        for (let i = 1; i <= size; ++i) vis[i] = [];
+        q.push([x, y, 0]);
+        vis[x][y] = 1;
+        while (q.length > 0) {
+            let tx = q[0][0], ty = q[0][1], step = q[0][2];
+            q = q.slice(1);
+            for (let j = 0; j < 4; ++j) {
+                let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
+                vis[tx2][ty2] = 1;
+                q.push([tx2, ty2, step + 1]);
+                if (tx2 == tar_x && ty2 == tar_y)
+                    return step + 1;
+            }
+        }
+        return -1;
     }
     let gm = [];
     let size = 0;
@@ -219,7 +237,25 @@ function generateEmptyMap(player) {
         return (t == 0) ? num : t
     }
     function Astar(gm, x, y, tar_x, tar_y) {
-        return Math.abs(x - tar_x) + Math.abs(y - tar_y);
+        let vis = [];
+        let q = [];
+        let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+        for (let i = 1; i <= size; ++i) vis[i] = [];
+        q.push([x, y, 0]);
+        vis[x][y] = 1;
+        while (q.length > 0) {
+            let tx = q[0][0], ty = q[0][1], step = q[0][2];
+            q = q.slice(1);
+            for (let j = 0; j < 4; ++j) {
+                let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
+                vis[tx2][ty2] = 1;
+                q.push([tx2, ty2, step + 1]);
+                if (tx2 == tar_x && ty2 == tar_y)
+                    return step + 1;
+            }
+        }
+        return -1;
     }
     let gm = [];
     let size = 0;
@@ -276,7 +312,25 @@ function generateDragonBoatFestivalMap(player) {
         return (t == 0) ? num : t
     }
     function Astar(gm, x, y, tar_x, tar_y) {
-        return Math.abs(x - tar_x) + Math.abs(y - tar_y);
+        let vis = [];
+        let q = [];
+        let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+        for (let i = 1; i <= size; ++i) vis[i] = [];
+        q.push([x, y, 0]);
+        vis[x][y] = 1;
+        while (q.length > 0) {
+            let tx = q[0][0], ty = q[0][1], step = q[0][2];
+            q = q.slice(1);
+            for (let j = 0; j < 4; ++j) {
+                let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
+                vis[tx2][ty2] = 1;
+                q.push([tx2, ty2, step + 1]);
+                if (tx2 == tar_x && ty2 == tar_y)
+                    return step + 1;
+            }
+        }
+        return -1;
     }
     let gm = [];
     let size = 0;
@@ -352,7 +406,25 @@ function generatePUBGMap(player) {
         return (t == 0) ? num : t
     }
     function Astar(gm, x, y, tar_x, tar_y) {
-        return Math.abs(x - tar_x) + Math.abs(y - tar_y);
+        let vis = [];
+        let q = [];
+        let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+        for (let i = 1; i <= size; ++i) vis[i] = [];
+        q.push([x, y, 0]);
+        vis[x][y] = 1;
+        while (q.length > 0) {
+            let tx = q[0][0], ty = q[0][1], step = q[0][2];
+            q = q.slice(1);
+            for (let j = 0; j < 4; ++j) {
+                let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type == 4 || vis[tx2][ty2]) continue;
+                vis[tx2][ty2] = 1;
+                q.push([tx2, ty2, step + 1]);
+                if (tx2 == tar_x && ty2 == tar_y)
+                    return step + 1;
+            }
+        }
+        return -1;
     }
     let gm = [];
     let size = 0;
