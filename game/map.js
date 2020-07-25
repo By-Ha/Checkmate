@@ -38,6 +38,17 @@ function generateRandomMap(player) {
     }
     let last = [];
     let calcTimes = 0;
+    let pri = [];
+    for (var i = 1; i <= player; i++)
+        pri[i] = i;
+    for (var i = 1; i <= player * player; i++) //随机交换顺序
+    {
+        var p1 = rnd(player), p2 = rnd(player);
+        var tmp = pri[p1];
+        pri[p1] = pri[p2];
+        pri[p2] = tmp;
+    }
+    console.log(pri);
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generateRandomMap(player);
@@ -49,7 +60,7 @@ function generateRandomMap(player) {
         }
 
         if (i == 1) {
-            gm[t1][t2].color = i;
+            gm[t1][t2].color = pri[i];
             gm[t1][t2].amount = 1;
             gm[t1][t2].type = 1;
         } else {
@@ -63,7 +74,7 @@ function generateRandomMap(player) {
                 break;
             }
             if (flag == 0) {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 1;
                 gm[t1][t2].type = 1;
             }
@@ -106,6 +117,16 @@ function generateMazeMap(player) {
                 ++vtot;
             }
         }
+    }
+    let pri = [];
+    for (var i = 1; i <= player; i++)
+        pri[i] = i;
+    for (var i = 1; i <= player * player; i++) //随机交换顺序
+    {
+        var p1 = rnd(player), p2 = rnd(player);
+        var tmp = pri[p1];
+        pri[p1] = pri[p2];
+        pri[p2] = tmp;
     }
     for (let i = 1; i <= size; ++i) {
         for (let j = 1; j <= size; ++j) {
@@ -175,7 +196,7 @@ function generateMazeMap(player) {
             }
             if (gm[t1][t2].type == 0 && tmpcnt == 1) break;
         }
-        gm[t1][t2].color = i;
+        gm[t1][t2].color = pri[i];
         gm[t1][t2].amount = 1;
         gm[t1][t2].type = 1;
     }
@@ -234,6 +255,16 @@ function generateEmptyMap(player) {
     gm[0][0] = { size: size };
     let last = [];
     let calcTimes = 0;
+    let pri = [];
+    for (var i = 1; i <= player; i++)
+        pri[i] = i;
+    for (var i = 1; i <= player * player; i++) //随机交换顺序
+    {
+        var p1 = rnd(player), p2 = rnd(player);
+        var tmp = pri[p1];
+        pri[p1] = pri[p2];
+        pri[p2] = tmp;
+    }
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generateEmptyMap(player);
@@ -245,7 +276,7 @@ function generateEmptyMap(player) {
         }
 
         if (i == 1) {
-            gm[t1][t2].color = i;
+            gm[t1][t2].color = pri[i];
             gm[t1][t2].amount = 1;
             gm[t1][t2].type = 1;
         } else {
@@ -259,7 +290,7 @@ function generateEmptyMap(player) {
                 break;
             }
             if (flag == 0) {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 1;
                 gm[t1][t2].type = 1;
             }
@@ -291,6 +322,16 @@ function generateDragonBoatFestivalMap(player) {
     gm[0][0] = { size: size };
     let last = [];
     let calcTimes = 0;
+    let pri = [];
+    for (var i = 1; i <= player; i++)
+        pri[i] = i;
+    for (var i = 1; i <= player * player; i++) //随机交换顺序
+    {
+        var p1 = rnd(player), p2 = rnd(player);
+        var tmp = pri[p1];
+        pri[p1] = pri[p2];
+        pri[p2] = tmp;
+    }
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generateDragonBoatFestivalMap(player);
@@ -302,7 +343,7 @@ function generateDragonBoatFestivalMap(player) {
         }
 
         if (i == 1) {
-            gm[t1][t2].color = i;
+            gm[t1][t2].color = pri[i];
             gm[t1][t2].amount = 100;
             gm[t1][t2].type = 1;
         } else {
@@ -316,7 +357,7 @@ function generateDragonBoatFestivalMap(player) {
                 break;
             }
             if (flag == 0) {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 100;
                 gm[t1][t2].type = 1;
             }
@@ -332,11 +373,11 @@ function generateDragonBoatFestivalMap(player) {
                 t2 = rnd(size - 2) + 1;
             }
             if (j == 1) {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 50;
                 gm[t1][t2].type = 3;
             } else {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 5;
                 gm[t1][t2].type = 2;
             }
@@ -376,6 +417,16 @@ function generatePUBGMap(player) {
     }
     let last = [];
     let calcTimes = 0;
+    let pri = [];
+    for (var i = 1; i <= player; i++)
+        pri[i] = i;
+    for (var i = 1; i <= player * player; i++) //随机交换顺序
+    {
+        var p1 = rnd(player), p2 = rnd(player);
+        var tmp = pri[p1];
+        pri[p1] = pri[p2];
+        pri[p2] = tmp;
+    }
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generatePUBGMap(player);
@@ -387,7 +438,7 @@ function generatePUBGMap(player) {
         }
 
         if (i == 1) {
-            gm[t1][t2].color = i;
+            gm[t1][t2].color = pri[i];
             gm[t1][t2].amount = 100;
             gm[t1][t2].type = 1;
         } else {
@@ -401,7 +452,7 @@ function generatePUBGMap(player) {
                 break;
             }
             if (flag == 0) {
-                gm[t1][t2].color = i;
+                gm[t1][t2].color = pri[i];
                 gm[t1][t2].amount = 100;
                 gm[t1][t2].type = 1;
             }
