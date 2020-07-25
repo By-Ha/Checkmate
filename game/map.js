@@ -66,7 +66,6 @@ function generateRandomMap(player) {
         pri[p1] = pri[p2];
         pri[p2] = tmp;
     }
-    console.log(pri);
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generateRandomMap(player);
