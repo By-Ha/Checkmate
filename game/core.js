@@ -523,13 +523,15 @@ function Run(io) {
 
     function getVotedMap(room) {
         if (room == "随机房") {
-            return [1, 1, 0, 0, 0, 0];
+            return [1, 1, 0, 0, 0, 0, 0];
         } else if (room == "迷宫房") {
-            return [2, 0, 1, 0, 0, 0];
+            return [2, 0, 1, 0, 0, 0, 0];
         } else if (room == "空白房") {
-            return [3, 0, 0, 1, 0, 0];
+            return [3, 0, 0, 1, 0, 0, 0];
         } else if (room == "流浪房") {
-            return [5, 0, 0, 0, 0, 1];
+            return [5, 0, 0, 0, 0, 1, 0];
+        } else if (room == "排位房") {
+            return [6, 0, 0, 0, 0, 0, 1];
         }
         let votedMap = [null, 0, 0, 0, 0, 0, 0];
         for (var k in Rooms[room].player) {
