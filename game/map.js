@@ -496,6 +496,10 @@ function generateMap(type, player) {
         return generateDragonBoatFestivalMap(player);
     } else if (type == 5) {
         return generatePUBGMap(player);
+    } else if (type == 6) {
+        let gm = generateRandomMap(player);
+        gm[0][0].type = 3;
+        return gm;
     } else {
         console.log(new Date().getTime() - ti);
         return generateRandomMap(player);

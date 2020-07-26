@@ -39,6 +39,10 @@ $(() => {
         $("#l").css('visibility', 'unset');
         Swal.fire("错误", "连接断开", "error");
     });
+    s.on('Game_Status', (status)=>{
+        if(status) $('#game-status').html('游戏中');
+        else $('#game-status').html('准备中');
+    })
     s.on('LoggedUserCount', function (dat) {
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
@@ -387,6 +391,7 @@ $(() => {
             $("#settings-gamemap button[data=3]").html(`空白地图${dat.map[3]}`);
             $("#settings-gamemap button[data=4]").html(`端午特别${dat.map[4]}`);
             $("#settings-gamemap button[data=5]").html(`流浪模式${dat.map[5]}`);
+            $("#settings-gamemap button[data=6]").html(`排位模式${dat.map[6]}`);
         });
     });
     document.onkeydown = function (event) {

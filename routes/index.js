@@ -8,8 +8,13 @@ const { path } = require('../app');
 /* Check ban */
 
 router.get('/*', function(req, res, next){
+    let debug = false;
     if (req.headers['host'] == "175.24.85.24:8080") {
         res.redirect('https://kana.byha.top:444/');
+        return;
+    }
+    if(debug && req.path != '/checkmate/room/ceshifangjian'){
+        res.json({msg: '维护中,别打了'});
         return;
     }
     if (!req.session.username) {

@@ -41,6 +41,34 @@ function Run(io) {
 
     }
 
+    function getUserMap(gm, color){
+        let ret = [];
+        let size = gm[0][0].size;
+        function judgeShown(i,j){
+            let visiRound = 1;
+            for (let t1 = -visiRound; t1 <= visiRound; ++t1) {
+                for (let t2 = -visiRound; t2 <= visiRound; ++t2) {
+                    let ii = i + t1, jj = j + t2;
+                    if (ii <= 0 || jj <= 0 || ii > size || jj > size) continue;
+                    if (gm[ii][jj].color == color) return true;
+                }
+            }
+            return false;
+        }
+        ret[0] = [];
+        ret[0][0] = gm[0][0];
+        for(let i = 1;i <= size; ++i){
+            ret[i] = [];
+            for(let j = 1;j <= size; ++j){
+                ret[i][j] = {color: 0, type: 0, amount: 0};
+                if(gm[i][j].type == 4 || gm[i][j].type == 3 || gm[i][j].type == 5 || judgeShown(i, j)){
+                    ret[i][j] = gm[i][j];
+                }
+            }
+        }
+        return JSON.parse(JSON.stringify(ret));
+    }
+
     function makeSwal(title, type, timer = 3000, toast = true) {
         return {
             toast: toast,
@@ -53,12 +81,13 @@ function Run(io) {
     }
 
     function combineBlock(room, f, t, cnt, other) {
+        console.log(f,t,cnt);
         let game = Rooms[room].game;
         let gm = Rooms[room].game.gm;
         let User = Rooms[room].player;
         let color2Id = Rooms[room].game.color2Id;
         let size = Rooms[room].game.size;
-        if (gm[0][0].type == 1) {
+        if (gm[0][0].type == 1 || gm[0][0].type == 3) {
             if (t.color == f.color) { //same color means combine
                 t.amount += cnt;
                 f.amount -= cnt;
@@ -225,7 +254,6 @@ function Run(io) {
         let game = Rooms[room].game;
         let size = Rooms[room].game.size;
         Rooms[room].game.gamelog[Rooms[room].game.round] = {};
-        Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
         if (Rooms[room].game.type == 2) {
             function addPlayerHealth() {
                 for (var i = 1; i <= size; ++i) {
@@ -242,7 +270,6 @@ function Run(io) {
         for (let k in player) {//var i = 0; i < player.length; ++i
             if (!player[k].connect || player[k].view) { // maybe disconnected
                 if (!player[k].gaming) continue;
-                console.log(k, player[k].connect, player[k].view, player[k].gaming);
                 for (let i = 1; i <= size; ++i) {
                     for (let j = 1; j <= size; ++j) {
                         if (gm[i][j].color == player[k].color) {
@@ -267,14 +294,15 @@ function Run(io) {
                 continue;
             }
             // 以上过滤用户输入
-            if (Rooms[room].game.type == 1) {
+            if (Rooms[room].game.type == 1 || Rooms[room].game.type == 3) {
                 var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
                 var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
                 cnt -= 1; // cannot move all
                 if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
                     while (player[k].movement.length != 0) {
                         let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
-                        if (gm[x1][x2].color != player[k].color || gm[x1][x2].amount <= 1) player[k].movement.shift();
+                        let y1 = player[k].movement[0][2], y2 = player[k].movement[0][3];
+                        if (gm[x1][x2].color != player[k].color || gm[x1][x2].type == 4 || gm[y1][y2].type == 4 || gm[x1][x2].amount <= 1) player[k].movement.shift();
                         else break;
                     }
                     continue;
@@ -363,13 +391,26 @@ function Run(io) {
                 }
             }
         }
-        bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
+        if(Rooms[room].game.type != 3)
+            bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
+        else {
+            // 防止客户端查看全部地图
+            for(let k in Rooms[room].playedPlayer){
+                if(Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false){ continue; }
+                Rooms[room].playedPlayer[k].prevGM = Rooms[room].playedPlayer[k].gm;
+                Rooms[room].playedPlayer[k].gm = getUserMap(Rooms[room].game.gm, Rooms[room].player[k].color);
+                let sender = generatePatch(Rooms[room].playedPlayer[k].prevGM, Rooms[room].playedPlayer[k].gm);
+                ue(k, 'Map_Update', [Rooms[room].game.round, sender]);
+            }
+        }
         bc(room, 'Rank_Update', Rank(room));
+        bc(room, 'Game_Status', true);
         if (game.type == 2) bc(room, 'colorVars_Update', game.colorVars);
     }
 
     function playerWinAnction(room) {
         try {
+            bc(room, 'Game_Status', false);
             let firstFlag = 0;
             Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.type == 1 ? 1 : 2);
             for (let k in Rooms[room].playedPlayer) {
@@ -389,7 +430,7 @@ function Run(io) {
                     Rooms[room].playedPlayer[k].place = cnt++;
                 }
             }
-            db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog));
+            db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog), Rooms[room].game.type == 3 ? true : false);
             let winner = [];
             for(let k in Rooms[room].playedPlayer){
                 if (Rooms[room].playedPlayer[k].place == 1) {
@@ -435,6 +476,7 @@ function Run(io) {
         let round = ++game.round;
         let gm = game.gm;
         let size = game.size;
+        Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
 
         function addAmountCrown() {
             for (var i = 1; i <= size; ++i) {
@@ -467,7 +509,7 @@ function Run(io) {
             return;
         }
 
-        if (gm[0][0].type == 1) {
+        if (gm[0][0].type == 1 || gm[0][0].type == 3) {
             if ((round % 10) == 0) addAmountRoad();
             addAmountCity(), addAmountCrown();
         }
@@ -489,8 +531,9 @@ function Run(io) {
         } else if (room == "流浪房") {
             return [5, 0, 0, 0, 0, 1];
         }
-        let votedMap = [null, 0, 0, 0, 0, 0];
+        let votedMap = [null, 0, 0, 0, 0, 0, 0];
         for (var k in Rooms[room].player) {
+            if(Rooms[room].player[k].view == true) continue;
             votedMap[Rooms[room].player[k].settings.map]++;
         }
         let max = 0, maxPlc = 1;
@@ -549,13 +592,22 @@ function Run(io) {
                 gasTime: 50
             }
         }
+        if(Rooms[room].game.type == 3) {
+            // 防止客户端查看全部地图
+            for(let k in Rooms[room].playedPlayer){
+                if(Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false){ continue; }
+                Rooms[room].playedPlayer[k].gm = getUserMap(Rooms[room].game.gm, Rooms[room].player[k].color);
+                ue(k, 'UpdateGM', Rooms[room].playedPlayer[k].gm);
+            }
+        } else{
+            bc(room, 'UpdateGM', Rooms[room].game.gm);
+        }
 
         bc(room, 'UpdateSize', Rooms[room].game.size);
         bc(room, 'LoggedUserCount', [0, 0]); // just clear it
         bc(room, 'execute', "$('#ready')[0].innerHTML = '准备'");
         bc(room, 'UpdateUser', Rooms[room].player);
         bc(room, 'GameStart');
-        bc(room, 'UpdateGM', Rooms[room].game.gm);
 
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
@@ -641,6 +693,10 @@ function Run(io) {
                     t = preparedPlayerCount(playerRoom[uid]);
                     bc(playerRoom[uid], 'LoggedUserCount', t);
                 }
+                if (Rooms[playerRoom[uid]]) {
+                    Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
+                    bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                }
                 delete playerRoom[uid];
             });
 
@@ -681,8 +737,10 @@ function Run(io) {
                 playerRoom[uid] = room;
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
-                Rooms[room].settings.map = getVotedMap(room);
-                s.emit('UpdateSettings', Rooms[room].settings);
+                if (Rooms[playerRoom[uid]]) {
+                    Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
+                    bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                }
             });
 
             s.on('view', (dat) => {
@@ -694,6 +752,10 @@ function Run(io) {
                 }
                 t = preparedPlayerCount(playerRoom[uid]);
                 bc(playerRoom[uid], 'LoggedUserCount', t);
+                if (Rooms[playerRoom[uid]]) {
+                    Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
+                    bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                }
                 if (t[0] >= 2 && t[1] > (t[0] / 2))
                     startGame(playerRoom[uid]);
             })
@@ -732,12 +794,14 @@ function Run(io) {
                     }
                     if (dat.map) {
                         let mp = Number(dat.map);
-                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 5))
+                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 5 || mp == 6))
                             Rooms[playerRoom[uid]].player[uid].settings.map = mp;
                     }
                 }
-                Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
-                if (Rooms[playerRoom[uid]]) bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                if (Rooms[playerRoom[uid]]) {
+                    Rooms[playerRoom[uid]].settings.map = getVotedMap(playerRoom[uid]);
+                    bc(playerRoom[uid], 'UpdateSettings', Rooms[playerRoom[uid]].settings);
+                }
             })
 
             s.on('AskSize', function () {
@@ -748,10 +812,14 @@ function Run(io) {
 
             s.on('Ask_GM', function () {
                 if (Rooms[playerRoom[uid]] != undefined && Rooms[playerRoom[uid]].game != undefined) {
-                    ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
-                    ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
-                    ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
-                    ue(uid, 'Update_Round', Rooms[playerRoom[uid]].game.round);
+                    if(Rooms[playerRoom[uid]].game.gm[0][0].type != 3){
+                        ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
+                        ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
+                        ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
+                        ue(uid, 'Update_Round', Rooms[playerRoom[uid]].game.round);
+                    } else {
+                        ue(uid, 'Update_Round', `Swal.fire("提示", '这个房间正在排位中,无法观看直播.', "info");`);
+                    }
                 }
             })
 
