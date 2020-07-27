@@ -81,7 +81,6 @@ function Run(io) {
     }
 
     function combineBlock(room, f, t, cnt, other) {
-        console.log(f,t,cnt);
         let game = Rooms[room].game;
         let gm = Rooms[room].game.gm;
         let User = Rooms[room].player;
@@ -664,10 +663,8 @@ function Run(io) {
 
             s.on('reconnect', function () {
                 if (connectedUsers[uid] == s.id) {
-                    console.log('grant reconnect');
                 } else {
                     s.disconnect();
-                    console.log('denied reconnect');
                 }
             })
 
