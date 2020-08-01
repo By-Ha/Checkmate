@@ -26,12 +26,18 @@ function generateRandomMap(player) {
     }
     let gm = [];
     let size = 0;
+    let tmp = [];
+    let vis = [];
     if (player == 2) size = 10;
     else size = 20;
     for (let i = 0; i <= size; ++i) {
         gm[i] = [];
+        tmp[i] = [];
+        vis[i] = [];
         for (let j = 0; j <= size; ++j) {
             gm[i][j] = { "color": 0, "type": 0, "amount": 0 }; // 空白图
+            tmp[i][j] = 0;
+            vis[i][j] = 0;
         }
     }
     gm[0][0] = { size: size };
@@ -54,6 +60,28 @@ function generateRandomMap(player) {
         gm[t1][t2].type = 5;
         gm[t1][t2].amount = Number(rnd(10)) + 40;
     }
+    let q = [];
+    let d = [[1, -1, 0, 0], [0, 0, 1, -1]];
+    let cnt = 0;
+    for (let i = 1; i <= size; i++)
+        for (let j = 1; j <= size; j++)
+            if (gm[i][j].type == 0 && vis[i][j] == 0) {
+                vis[i][j] = 1;
+                cnt++;
+                q.push([i, j]);
+                tmp[i][j] = cnt;
+                while (q.length > 0) {
+                    let tx = q[0][0], ty = q[0][1];
+                    q = q.slice(1);
+                    for (let j = 0; j < 4; ++j) {
+                        let tx2 = tx + d[0][j], ty2 = ty + d[1][j];
+                        if (tx2 > size || ty2 > size || tx2 <= 0 || ty2 <= 0 || gm[tx2][ty2].type != 0 || vis[tx2][ty2]) continue;
+                        vis[tx2][ty2] = 1;
+                        tmp[tx2][ty2] = cnt;
+                        q.push([tx2, ty2]);
+                    }
+                }
+            }
     let last = [];
     let calcTimes = 0;
     for (var i = 1; i <= player; ++i) {
@@ -73,7 +101,7 @@ function generateRandomMap(player) {
         } else {
             let flag = 0;
             for (let j = 0; j < last.length; ++j) {
-                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > 6) {
+                if (Astar(gm, t1, t2, last[j][0], last[j][1]) > 6 && tmp[t1][t2] == tmp[last[j][0]][last[j][1]]) {
                     continue;
                 }
                 flag = 1;
@@ -85,6 +113,8 @@ function generateRandomMap(player) {
                 gm[t1][t2].amount = 1;
                 gm[t1][t2].type = 1;
             }
+            else
+                continue;
         }
         last.push([t1, t2]);
     }
