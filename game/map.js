@@ -56,19 +56,6 @@ function generateRandomMap(player) {
     }
     let last = [];
     let calcTimes = 0;
-<<<<<<< HEAD
-    let pri = [];
-    for (var i = 1; i <= player; i++)
-        pri[i] = i;
-    for (var i = 1; i <= player * player; i++) //随机交换顺序
-    {
-        var p1 = rnd(player), p2 = rnd(player);
-        var tmp = pri[p1];
-        pri[p1] = pri[p2];
-        pri[p2] = tmp;
-    }
-=======
->>>>>>> parent of 4bd1b7a... 使玩家的生成顺序随机
     for (var i = 1; i <= player; ++i) {
         ++calcTimes;
         if (calcTimes >= 100) return generateRandomMap(player);
