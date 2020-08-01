@@ -564,11 +564,11 @@ function addBattleData(battle_id, data) {
     connection.query(SQL, SQLDATA, () => { });
 }
 
-function changeRating(uid, rating, nowRating) {
-    console.log('changeRating', rating, nowRating);
+function changeRating(uid, rating, nowRating, isRated) {
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
     if (rating > 0) rating = Math.round(rating * (Math.abs(49.5 - 0.01 * nowRating) + 50.5 - 0.01 * nowRating) / 10);
     else rating = rating * Math.round(0.002 * nowRating + 1);
+    if(!isRated) rating = 0;
     let SQLDATA = [rating, uid];
     try {
         connection.query(SQL, SQLDATA, (err, dat) => { });
@@ -578,8 +578,7 @@ function changeRating(uid, rating, nowRating) {
     return rating;
 }
 
-function gameRatingCalc(room, data, battle_data) {
-    console.log(data);
+function gameRatingCalc(room, data, battle_data, isRated) {
     try {
         let bid = stringRandom(64);
         let firstAmount = 0;
@@ -592,7 +591,6 @@ function gameRatingCalc(room, data, battle_data) {
             getRating(j, (err, dat) => {
                 if (err) { console.log('gameRatingCalc', err); return; }
                 else {
-                    console.log(dat);
                     data[j].rating = Number(dat);
                     if (data[j].place == 1) { ++firstAmount; firstRating = Math.max(firstRating, data[j].rating); }
                 }
@@ -604,12 +602,12 @@ function gameRatingCalc(room, data, battle_data) {
                         if (score <= 0) score = 1;
                         if (score > 10) score = 10;
                         firstBounce += score;
-                        let deltaRating = changeRating(k, -score, data[k].rating);
+                        let deltaRating = changeRating(k, -score, data[k].rating, isRated);
                         addBattle(k, bid, deltaRating);
                     }
                     for (let k in data) {
                         if (data[k].place != 1) continue;
-                        let deltaRating = changeRating(k, firstBounce / firstAmount, data[k].rating);
+                        let deltaRating = changeRating(k, firstBounce / firstAmount, data[k].rating, isRated);
                         addBattle(k, bid, deltaRating);
                     }
                 }
