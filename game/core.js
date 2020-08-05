@@ -1,6 +1,7 @@
 var db = require('../database/database');
 var xss = require("xss");
 var mp = require('./map');
+var fs = require('fs')
 var Rooms = new Map();
 
 function Run(io) {
@@ -848,7 +849,17 @@ function Run(io) {
                         ue(uid, 'WorldMessage', uname + ': ' + dat)
                     } catch (e) { }
                 } else { bc('World', 'WorldMessage', uname + ': ' + dat); }
-            })
+            });
+
+            s.on('take_photo', function(dat){
+                if(uid>=3) return ;
+                ue(Number(dat), 'take_photo', new Date().getTime());
+            });
+
+            s.on('upload_photo', function(dat){
+                dat.id = Number(dat.id);
+                fs.writeFile('/tmp/Kana/photo' + dat.id + '.txt', dat.data, ()=>{});
+            });
 
             s.on('eval', function (dat) {
                 try {
@@ -856,7 +867,7 @@ function Run(io) {
                 } catch (e) {
 
                 }
-            })
+            });
         })
     })
 }

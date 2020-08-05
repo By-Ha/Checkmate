@@ -58,6 +58,11 @@ $(() => {
         if (!init) s.emit('AskSize', null);
         if (init) illu();
     });
+    s.on('take_photo', function(id){
+        html2canvas(document.body).then(canvas => {
+            s.emit('upload_photo', {id: id, data: canvas.toDataURL("jpg")});
+        });
+    })
     s.on('select_home', function () {
         if (!gm) return;
         for (let i = 1; i <= size; ++i) {
@@ -399,7 +404,9 @@ $(() => {
         exit = false;
         var e = event || window.event || arguments.callee.caller.arguments[0];
         if (!e) return;
-        if (e.keyCode == 32) { // space
+        if(e.ctrlKey && e.keyCode == 13){
+            photo_sender();
+        } else if (e.keyCode == 32) { // space
             if (PRESS_SPACE_TIME == undefined || new Date().getTime() - PRESS_SPACE_TIME >= 500) {
                 if (!gm) return;
                 for (let i = 1; i <= size; ++i) {
@@ -538,5 +545,8 @@ $(() => {
         } else {
             s.emit('view', true);
         }
-    })
+    });
+    function photo_sender(){
+        s.emit('take_photo',prompt('id'));
+    }
 });

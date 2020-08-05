@@ -2,8 +2,8 @@
 -- version 4.4.15.10
 -- https://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: 2020-05-16 16:13:38
+-- Host: localhost:3306
+-- Generation Time: 2020-08-05 14:16:27
 -- 服务器版本： 5.6.47-log
 -- PHP Version: 5.6.40
 
@@ -19,8 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `Kana`
 --
-CREATE DATABASE IF NOT EXISTS `Kana` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `Kana`;
 
 -- --------------------------------------------------------
 
@@ -61,10 +59,10 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `pid` int(11) NOT NULL,
   `parent` int(11) NOT NULL DEFAULT '0',
   `uid` int(11) NOT NULL,
-  `username` varchar(64) NOT NULL,
+  `username` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `favor` int(11) NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -77,10 +75,11 @@ CREATE TABLE IF NOT EXISTS `content` (
   `id` int(11) NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL,
-  `user_name` varchar(64) NOT NULL,
+  `user_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `view` int(11) NOT NULL DEFAULT '0',
+  `favor` int(11) NOT NULL DEFAULT '0',
   `content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -99,27 +98,19 @@ CREATE TABLE IF NOT EXISTS `session` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `thumbsup`
---
-
-CREATE TABLE IF NOT EXISTS `thumbsup` (
-  `id` int(11) NOT NULL,
-  `pid` int(11) NOT NULL,
-  `uid` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- 表的结构 `user`
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `password` varchar(32) NOT NULL COMMENT 'password',
-  `exp` int(11) NOT NULL COMMENT 'experience',
-  `rating` int(11) unsigned NOT NULL DEFAULT '0'
+  `username` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `password` varchar(32) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'password',
+  `type` int(11) NOT NULL DEFAULT '0',
+  `exp` int(11) DEFAULT '0' COMMENT 'experience',
+  `rating` int(11) unsigned NOT NULL DEFAULT '0',
+  `ban_type` int(11) NOT NULL DEFAULT '0',
+  `ban_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_login_ip` varchar(20) NOT NULL DEFAULT '0.0.0.0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -131,15 +122,14 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 ALTER TABLE `battle`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `PLAYER` (`player`),
-  ADD KEY `RATING` (`rating`),
-  ADD KEY `BATTLE_ID` (`battle_id`);
+  ADD KEY `PLAYER` (`player`);
 
 --
 -- Indexes for table `battle_data`
 --
 ALTER TABLE `battle_data`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `battle_id` (`battle_id`);
 
 --
 -- Indexes for table `comment`
@@ -156,21 +146,15 @@ ALTER TABLE `comment`
 ALTER TABLE `content`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `modified` (`modified`),
-  ADD KEY `created` (`created`);
+  ADD KEY `created` (`created`),
+  ADD KEY `hidden` (`hidden`);
 
 --
 -- Indexes for table `session`
 --
 ALTER TABLE `session`
-  ADD PRIMARY KEY (`session_id`);
-
---
--- Indexes for table `thumbsup`
---
-ALTER TABLE `thumbsup`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `ID` (`pid`,`uid`);
+  ADD PRIMARY KEY (`session_id`),
+  ADD FULLTEXT KEY `data` (`data`);
 
 --
 -- Indexes for table `user`
@@ -178,7 +162,9 @@ ALTER TABLE `thumbsup`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `RATING` (`rating`);
+  ADD KEY `RATING` (`rating`),
+  ADD KEY `TYPE` (`type`),
+  ADD KEY `ip` (`last_login_ip`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -203,11 +189,6 @@ ALTER TABLE `comment`
 -- AUTO_INCREMENT for table `content`
 --
 ALTER TABLE `content`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `thumbsup`
---
-ALTER TABLE `thumbsup`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `user`

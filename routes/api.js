@@ -97,6 +97,17 @@ router.get('/user/info', function (req, res) {
     })
 })
 
+router.get('/user/name2id', function (req, res) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    let uname = req.query.uname;
+    db.getUserId(uname, (err, dat) => {
+        if (err) { res.json({ status: 'error', msg: err }); return; }
+        else {
+            res.json({ status: 'success', msg: dat }); return;
+        }
+    })
+})
+
 // page(index)
 router.post('/page', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
