@@ -523,17 +523,17 @@ function Run(io) {
 
     function getVotedMap(room) {
         if (room == "随机房") {
-            return [1, 1, 0, 0, 0, 0, 0];
+            return [1, 1, 0, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
         } else if (room == "迷宫房") {
-            return [2, 0, 1, 0, 0, 0, 0];
+            return [2, 0, 1, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
         } else if (room == "空白房") {
-            return [3, 0, 0, 1, 0, 0, 0];
+            return [3, 0, 0, 1, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
         } else if (room == "流浪房") {
-            return [5, 0, 0, 0, 0, 1, 0];
+            return [5, 0, 0, 0, 0, 1, 0].concat([0,0,0,0,0,0,0,0,0,0]);
         } else if (room == "排位房") {
-            return [6, 0, 0, 0, 0, 0, 1];
+            return [6, 0, 0, 0, 0, 0, 1].concat([0,0,0,0,0,0,0,0,0,0]);
         }
-        let votedMap = [null, 0, 0, 0, 0, 0, 0];
+        let votedMap = [null, 0, 0, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
         for (var k in Rooms[room].player) {
             if(Rooms[room].player[k].view == true) continue;
             votedMap[Rooms[room].player[k].settings.map]++;
@@ -580,6 +580,7 @@ function Run(io) {
             ++i;
         }
 
+        let mptype = getVotedMap(room)[0];
         Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
@@ -611,9 +612,13 @@ function Run(io) {
         bc(room, 'UpdateUser', Rooms[room].player);
         bc(room, 'GameStart');
 
+        if(mptype == 7) Rooms[room].settings.speed = 8;
+
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
         }, 1000 / Rooms[room].settings.speed);
+
+        if(mptype == 7) Rooms[room].settings.speed = 4;
     }
 
     function preparedPlayerCount(room) {
@@ -794,7 +799,7 @@ function Run(io) {
                     }
                     if (dat.map) {
                         let mp = Number(dat.map);
-                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 5 || mp == 6))
+                        if (Rooms[playerRoom[uid]] && (mp == 1 || mp == 2 || mp == 3 || mp == 5 || mp == 6 || mp == 7))
                             Rooms[playerRoom[uid]].player[uid].settings.map = mp;
                     }
                 }

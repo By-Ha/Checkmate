@@ -500,6 +500,8 @@ function generateMap(type, player) {
         let gm = generateRandomMap(player);
         gm[0][0].type = 3;
         return gm;
+    } else if (type == 7) {
+        return generateRandomMap(player);
     } else {
         console.log(new Date().getTime() - ti);
         return generateRandomMap(player);
