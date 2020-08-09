@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
-  if (req.body.username.match(/[^\x00-\xff]+/g) != null || req.body.username.match(/#|&/g) != null || req.body.username.match(" ") != null) { res.json({ status: 'error', msg: '现在只允许英文字母与部分符号注册' }); return; }
+  if (req.body.username.match(/^[\u4e00-\u9fa5_a-zA-Z0-9]+$/) == null) { res.json({ status: 'error', msg: '用户名违规,只允许中文,英文和_' }); return; }
   db.register(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
     if (err) { res.json({ status: 'error', msg: err }); return; };
     if (dat[0] == 0) {

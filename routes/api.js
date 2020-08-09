@@ -198,6 +198,7 @@ router.post('/deletepost', function (req, res) {
 })
 
 router.post('/post/sendfavor', function (req, res) {
+    res.json({ status: ('error'), msg: '暂停点赞' }); return;
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.id == undefined) { res.json({ status: ('error'), msg: '非法请求' }); return; }
     db.sendPostLike(req.body.id, (err, dat) => {
