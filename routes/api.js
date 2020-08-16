@@ -120,7 +120,7 @@ router.post('/page', function (req, res) {
 // sendpost
 router.post('/post', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 3000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.content.match(/[\u0600-\u06FF]/) != null) { res.json({ status: ('error'), msg: '包含不允许的阿拉伯字符' }); return; }
     if (req.body.type != 0) { res.json({ status: ('error'), msg: '类型错误' }); return; }
     db.getUserInfo(req.session.uid, (err, dat) => {
@@ -134,7 +134,7 @@ router.post('/post', function (req, res) {
 
 router.post('/updatepost', function (req, res) {
     if (req.session.uid == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 3000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.content.match(/[\u0600-\u06FF]/) != null) { res.json({ status: ('error'), msg: '包含不允许的阿拉伯字符' }); return; }
     db.updatePost(req.body.pid, req.session.uid, req.body.content, function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; }
