@@ -191,6 +191,18 @@ function getTypePost(type, page, pagesize, callback) {
     });
 }
 
+function getPostStatus(pid, callback){
+    var SQL = `select * from content where id=? AND hidden=0;`
+    var SQLDATA = [pid];
+    connection.query(SQL, SQLDATA, function (error, results) {
+        let result = results[0];
+        if (error) { callback(error, null); return; }
+        if (result == undefined) { callback('被删除'); return; }
+        callback(null, result);
+        return;
+    });
+}
+
 function getPost(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
@@ -503,13 +515,18 @@ function postCommentByUsername(pid, parent, uname, comment, callback = () => { }
     let SQL = 'INSERT INTO `comment`(`pid`, `parent`, `uid`, `username`, `comment`) \
     VALUES (?, ?, ?, ?, ?)';
     if (comment.length <= 0) { callback("评论长度有误"); return; }
-    getUserId(uname, function (err, dat) {
-        if (err) { callback(err); return; }
-        let SQLDATA = [pid, parent, dat, uname, comment];
-        connection.query(SQL, SQLDATA, function (err, dat) {
-            if (err) { callback(err); return; }
-            else { callback(null, "success"); return; }
-        })
+    getPostStatus(pid, (err, dat)=>{
+        if(err) {callback('说说被删除或尚未发布.'); return ;}
+        else {
+            getUserId(uname, function (err, dat) {
+                if (err) { callback(err); return; }
+                let SQLDATA = [pid, parent, dat, uname, comment];
+                connection.query(SQL, SQLDATA, function (err, dat) {
+                    if (err) { callback(err); return; }
+                    else { callback(null, "success"); return; }
+                })
+            })
+        }
     })
 }
 
