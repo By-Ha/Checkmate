@@ -85,6 +85,10 @@ article .post-info-content object {
   word-break: break-word;
 }
 
+article .post-info-content object img {
+  max-width: 100%;
+}
+
 .post-info-meta {
   -webkit-transition: color 0.3s ease;
   transition: color 0.3s ease;
