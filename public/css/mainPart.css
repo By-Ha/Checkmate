@@ -1,3 +1,23 @@
+body{
+  background-image: url();
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+#sLeft>*, #sRight>*, #footer, nav.navbar, #main>table{
+  opacity: var(--bkg-opa);
+  transition:all 0.5s linear;
+}
+
+#sLeft>*:hover, #sRight>*:hover, #footer:hover, nav.navbar:hover, #main>table:hover{
+  opacity: 1;
+  transition:all 0.5s linear;
+}
+
+#main>table{
+  background: white;
+}
+
 #main{
   min-height: calc(100vh - 200px);
 }

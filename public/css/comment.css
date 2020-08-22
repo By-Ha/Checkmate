@@ -102,3 +102,6 @@
   border-radius: 4px;
   display: inline-block;
 }
+.comment-info > p{
+  word-break: break-word;
+}
