@@ -1,0 +1,117 @@
+<%- include('header'); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.3.0/dist/socket.io.js"
+  integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.min.js"
+    integrity="sha256-KSlsysqp7TXtFo/FHjb1T9b425x3hrvzjMWaJyKbpcI=" crossorigin="anonymous"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.13.2/lib/theme-chalk/index.css"
+  integrity="sha256-bHcFRzLiKH6f01ebzmMYw8hJlYauysooMBDoZEKOrhQ=" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/element-ui@2.13.2/lib/index.js"
+  integrity="sha256-m+uYo63FCIIAqY7qmxzXewAzPvoXoHUTmildiyYWMsc=" crossorigin="anonymous"></script>
+<link rel="stylesheet/less" href="/css/checkmateNew.less" />
+<script src="https://cdn.jsdelivr.net/npm/less@3.12.2/dist/less.min.js"
+  integrity="sha256-Qe1X0NnA3xRN0ctlQt973xvcu5aja+kEDfiwAGoQfqI=" crossorigin="anonymous"></script>
+
+<div id="main" @keydown.w="console.log(1)">
+  <div id="cover" v-show="coverShow">
+    <div id="cover-container">
+      <h1 id="cover-title">Checkmate!</h1>
+
+      <el-button-group class="btn-settings">
+        <el-button type="primary" @click="uploadSettings(1)" icon="el-icon-question">随机{{settings.map[1]}}</el-button>
+        <el-button type="primary" @click="uploadSettings(2)" icon="el-icon-s-grid">迷宫{{settings.map[2]}}</el-button>
+        <el-button type="primary" @click="uploadSettings(3)" icon="el-icon-crop">空白{{settings.map[3]}}</el-button>
+        <el-button type="primary" @click="uploadSettings(5)" icon="el-icon-aim">流浪{{settings.map[5]}}</el-button>
+        <el-button type="primary" @click="uploadSettings(6)" icon="el-icon-trophy">排位{{settings.map[6]}}</el-button>
+        <el-button type="primary" @click="uploadSettings(7)" icon="el-icon-d-arrow-right">八速{{settings.map[7]}}
+        </el-button>
+      </el-button-group>
+      <div>
+        <el-switch v-model="settings.public" @change="uploadSettings" active-color="#13ce66" inactive-color="#ff4949"
+          active-text="公开" inactive-text="私密">
+        </el-switch>
+        <el-slider v-model="settings.speed" @change="uploadSettings" :step="1" show-stops :min="1" :max="4"
+          :format-tooltip="sliderInfo">
+        </el-slider>
+      </div>
+      <el-button :type="ready?'success':'warning'" @click="readyChange"
+        :icon="ready?'el-icon-check':'el-icon-arrow-right'" round>{{readyUserInfo}}</el-button>
+    </div>
+  </div>
+  <div id="game" v-show="!coverShow">
+    <table id="gameBoard">
+      <tr v-for="i in game.size">
+        <td v-for="j in game.size" @click="select(i, j)" :class="getColor(i,j)+' '+getType(i,j)">{{getAmount(i,j)}}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<style id="font-size-control">
+  #gameBoard td {
+    width: 30px;
+    max-width: 30px;
+    min-width: 30px;
+    height: 30px;
+    max-height: 30px;
+    min-height: 30px;
+  }
+
+</style>
+<script>
+  var room = '<%- room %>';
+  $(document).ready(() => {
+    var box = document.getElementById('gameBoard');
+    document.onmousedown = function (e) {
+      var tx = $(box).css('margin-left'); tx = Number(tx.substr(0, tx.length - 2));
+      var ty = $(box).css('margin-top'); ty = Number(ty.substr(0, ty.length - 2));
+      var disx = e.pageX;
+      var disy = e.pageY;
+      document.onmousemove = function (e) {
+        box.style.marginLeft = e.pageX - disx + tx + 'px';
+        box.style.marginTop = e.pageY - disy + ty + 'px';
+      };
+      document.onmouseup = function () {
+        document.onmousemove = document.onmouseup = null;
+      };
+    }
+  });
+  $(document).ready(() => {
+    let scrollSize = 30;
+    //兼容性写法，该函数也是网上别人写的，不过找不到出处了，蛮好的，所有我也没有必要修改了
+    //判断鼠标滚轮滚动方向
+    if (window.addEventListener)//FF,火狐浏览器会识别该方法
+      window.addEventListener('DOMMouseScroll', wheel, false);
+    window.onmousewheel = document.onmousewheel = wheel;//W3C
+    //统一处理滚轮滚动事件
+    function wheel(event) {
+      var delta = 0;
+      if (!event) event = window.event;
+      if (event.wheelDelta) {//IE、chrome浏览器使用的是wheelDelta，并且值为“正负120”
+        delta = event.wheelDelta / 120;
+        if (window.opera) delta = -delta;//因为IE、chrome等向下滚动是负值，FF是正值，为了处理一致性，在此取反处理
+      } else if (event.detail) {//FF浏览器使用的是detail,其值为“正负3”
+        delta = -event.detail / 3;
+      }
+      if (delta)
+        handle(delta);
+    }
+    //上下滚动时的具体处理函数
+    function handle(delta) {
+      if (delta < 0) scrollSize /= 1.2; //向下滚动
+      else scrollSize *= 1.2; //向上滚动
+      if (scrollSize <= 20) { scrollSize *= 1.2; return; }
+      else if (scrollSize >= 500) { scrollSize /= 1.2; return; }
+      var str = "#gameBoard td{width: " + String(scrollSize) + "px;max-width: " + String(scrollSize) + "px;min-width: " + String(scrollSize) + "px;height: " + String(scrollSize) + "px;max-height: " + String(scrollSize) + "px;min-height: " + String(scrollSize) + "px;}";
+      $("#font-size-control")[0].innerHTML = str;
+      var t1 = Number($("#gameBoard").css('margin-left').substr(0, $("#gameBoard").css('margin-left').length - 2));
+      var t2 = Number($("#gameBoard").css('margin-top').substr(0, $("#gameBoard").css('margin-top').length - 2));
+      if (delta < 0) t1 /= 1.2, t2 /= 1.2;
+      $("#gameBoard").css('margin-left', t1 + "px");
+      $("#gameBoard").css('margin-top', t2 + "px");
+    }
+  });
+</script>
+<script src="/js/game/new.js"></script>
+<%- include('footer'); -%>

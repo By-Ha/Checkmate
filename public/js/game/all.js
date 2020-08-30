@@ -26,16 +26,16 @@ $(() => {
     let scrollSize = 30;
     let waitTime = 120;
 
-    function voteStart(i) {
+    function voteStart(i) {//
         s.emit('VoteStart', i);
     }
-    s.on('connect', function () {
+    s.on('connect', function () {//
         s.emit('joinRoom', room);
     });
-    s.on('closeTab', function () {
+    s.on('closeTab', function () {//
         window.location.href = '/';
     });
-    s.on('disconnect', function () {
+    s.on('disconnect', function () {//
         $("#l").css('visibility', 'unset');
         Swal.fire("错误", "连接断开", "error");
     });
@@ -43,11 +43,11 @@ $(() => {
         if(status) $('#game-status').html('游戏中');
         else $('#game-status').html('准备中');
     })
-    s.on('LoggedUserCount', function (dat) {
+    s.on('LoggedUserCount', function (dat) {//
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
     });
-    s.on('UpdateGM', function (dat) {
+    s.on('UpdateGM', function (dat) {//
         $("#l").css('visibility', 'hidden');
         gm = dat;
         if (gm[0][0].type == 2) {
@@ -76,17 +76,17 @@ $(() => {
             }
         }
     });
-    s.on('UpdateUser', function (dat) {
+    s.on('UpdateUser', function (dat) {//
         User = dat;
         colorNick = [];
         for (var k in User) {
             colorNick[User[k].color] = User[k].uname;
         }
     });
-    s.on('UpdateColor', function (dat) {
+    s.on('UpdateColor', function (dat) {//
         myColor = dat;
     });
-    s.on('UpdateSize', function (dat) {
+    s.on('UpdateSize', function (dat) {//
         init = true;
         size = dat;
         makeBoard();
@@ -97,8 +97,8 @@ $(() => {
             }
         }
     });
-    s.on('Update_Round', (dat) => { round = dat; });
-    s.on('GameStart', function () {
+    s.on('Update_Round', (dat) => { round = dat; });//
+    s.on('GameStart', function () {//
         if ($("#view").attr('data-view') != "true" && myColor != 0) {
             start = true;
         }
@@ -135,7 +135,7 @@ $(() => {
         }
         illu();
     }
-    function Map_Update(rnd) {
+    function Map_Update(rnd) {//
         if (patch_tmp[rnd]) {
 
             if (gm[0][0].type == 1) { // 普通模式
@@ -155,7 +155,7 @@ $(() => {
             Map_Update(rnd + 1);
         }
     }
-    s.on('Map_Update', (dat) => {
+    s.on('Map_Update', (dat) => {//
         if (dat[0] >= 2 && init == false) {
             s.emit('Ask_GM');
         }
@@ -164,7 +164,7 @@ $(() => {
             Map_Update(round + 1);
         }
     });
-    s.on('WinAnction', function (dat) {
+    s.on('WinAnction', function (dat) {//
         if (exit) {
             exitcnt++;
             if (exitcnt >= 2) {

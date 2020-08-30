@@ -9,6 +9,7 @@ let cos = require('../cos/cos');
 let sharp = require('sharp');
 let msg = require('../message/message').messageEmitter;
 let cp = require('child_process');
+let svgCaptcha = require('svg-captcha');
 
 var upload = multer({
     dest: '/tmp/Kana/upload',
@@ -284,6 +285,15 @@ router.post('/superadmin/restart', function (req, res) {
     res.json({ status: 'success', msg: "重启中..." });
     cp.exec('sudo pm2 restart 0');
 })
+
+router.get('/captcha', function (req, res) {
+	let captcha = svgCaptcha.create();
+	req.session.captcha = captcha.text;
+	
+	res.type('svg');
+    res.status(200).send(captcha.data);
+    console.log(req.session)
+});
 
 router.post('/template', function (req, res) {
     res.json({

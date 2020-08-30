@@ -15,6 +15,16 @@ router.get('/room/:rid', function (req, res, next) {
     }
 });
 
+router.get('/roomnew/:rid', function (req, res, next) {
+    if (req.session.username != undefined) {
+        res.render('checkmateNew', { title: 'Checkmate', username: req.session.username, uid: req.session.uid, room: req.params.rid });
+        return;
+    } else {
+        res.redirect('/login');
+        return;
+    }
+});
+
 router.get('/room', function (req, res, next) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     res.render('checkmateHall', { username: req.session.username, uid: req.session.uid, r: game.Rooms });

@@ -1,0 +1,147 @@
+@font-face {
+  font-family: 'checkmate-title';
+  font-display: swap;
+  src: url('//at.alicdn.com/t/webfont_wjyxc7o31kf.eot'); /* IE9*/
+  src: url('//at.alicdn.com/t/webfont_wjyxc7o31kf.eot?#iefix')
+      format('embedded-opentype'),
+    /* IE6-IE8 */ url('//at.alicdn.com/t/webfont_wjyxc7o31kf.woff2')
+      format('woff2'),
+    url('//at.alicdn.com/t/webfont_wjyxc7o31kf.woff') format('woff'),
+    /* chrome、firefox */ url('//at.alicdn.com/t/webfont_wjyxc7o31kf.ttf')
+      format('truetype'),
+    /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+      url('//at.alicdn.com/t/webfont_wjyxc7o31kf.svg#杨任东竹石体-Bold')
+      format('svg'); /* iOS 4.1- */
+}
+* {
+  outline: none !important;
+}
+#footer {
+  display: none;
+}
+#cover {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  #cover-container {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    #cover-title {
+      font-family: 'checkmate-title' !important;
+      font-size: 96px;
+      overflow: hidden;
+      color: white;
+      width: 100%;
+      text-align: center;
+      text-shadow: 3px 3px skyblue;
+    }
+  }
+}
+#game {
+  overflow: hidden;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+  #gameBoard {
+    user-select: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    td {
+      text-align: center;
+      border: 1px solid black;
+      background: rgb(179, 179, 179);
+      white-space: nowrap;
+      overflow: hidden;
+      background-size: contain !important;
+    }
+    * {
+      padding: 0 !important;
+    }
+    span {
+      height: 100%;
+    }
+    .own{
+      cursor: pointer;
+    }
+    .unshown {
+      background-color: rgb(99, 99, 99);
+      border: 1px solid black;
+    }
+    .select{
+      filter: grayscale(50%);
+      background-color: rgb(44, 44, 44);
+    }
+    .blue {
+      background-color: blue !important;
+      color: white;
+    }
+    .red {
+      background-color: red !important;
+      color: white;
+    }
+    .green {
+      background-color: rgb(0, 180, 0) !important;
+      color: white;
+    }
+    .orange {
+      background-color: orange !important;
+      color: white;
+    }
+    .pink {
+      background-color: pink !important;
+      color: black;
+    }
+    .purple {
+      background-color: purple !important;
+      color: white;
+    }
+    .chocolate {
+      background-color: chocolate !important;
+      color: white;
+    }
+    .maroon {
+      background-color: maroon !important;
+      color: white;
+    }
+    .crown {
+      background-image: url("/img/crown.png") !important;
+    }
+    .city {
+      background-image: url("/img/city.png") !important;
+    }
+    .mountain {
+      background-image: url("/img/mountain.png") !important;
+      background-color: gray !important;
+    }
+    .empty-city {
+      background-image: url("/img/city.png") !important;
+      background-color: gray !important;
+      color: white;
+    }
+    .obstacle {
+      background-image: url("/img/obstacle.png") !important;
+    }
+    .heart {
+      background-image: url("/img/heart.png") !important;
+    }
+    .sword {
+      background-image: url("/img/sword.png") !important;
+    }
+    .gas {
+      background-image: url("/img/gas.png") !important;
+    }
+    .kit {
+      background-image: url("/img/kit.png") !important;
+    }
+    .armor {
+      background-image: url("/img/armor.png") !important;
+    }
+  }
+}

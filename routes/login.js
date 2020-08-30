@@ -9,8 +9,11 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
+    if(req.body.cap == undefined || req.body.cap.toLowerCase() != req.session.captcha.toLowerCase()){
+        res.json({ status: ('error'), msg: '验证码错误' }); return;
+    }
     db.login(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
-        if (err) { res.json({ status: ('error'), msg: err }); return; };
+        if (err) { res.json({ status: ('error'), msg: err }); return; }
         if (dat[0] == 0) {
             req.session.username = String(req.body.username);
             req.session.uid = String(dat[2].id);

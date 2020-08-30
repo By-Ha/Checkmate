@@ -18,7 +18,7 @@ router.get('/*', function(req, res, next){
         return;
     }
     if (!req.session.username) {
-        if(req.path != '/login' && req.path != '/register')
+        if(req.path != '/login' && req.path != '/register' && req.path != '/api/captcha')
             {res.redirect('/login'); return;}
         else {next(); return;}
     }
