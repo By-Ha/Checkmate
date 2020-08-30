@@ -42,10 +42,10 @@ function Run(io) {
 
     }
 
-    function getUserMap(gm, color){
+    function getUserMap(gm, color) {
         let ret = [];
         let size = gm[0][0].size;
-        function judgeShown(i,j){
+        function judgeShown(i, j) {
             let visiRound = 1;
             for (let t1 = -visiRound; t1 <= visiRound; ++t1) {
                 for (let t2 = -visiRound; t2 <= visiRound; ++t2) {
@@ -58,11 +58,11 @@ function Run(io) {
         }
         ret[0] = [];
         ret[0][0] = gm[0][0];
-        for(let i = 1;i <= size; ++i){
+        for (let i = 1; i <= size; ++i) {
             ret[i] = [];
-            for(let j = 1;j <= size; ++j){
-                ret[i][j] = {color: 0, type: 0, amount: 0};
-                if(gm[i][j].type == 4 || gm[i][j].type == 3 || gm[i][j].type == 5 || judgeShown(i, j)){
+            for (let j = 1; j <= size; ++j) {
+                ret[i][j] = { color: 0, type: 0, amount: 0 };
+                if (gm[i][j].type == 4 || gm[i][j].type == 3 || gm[i][j].type == 5 || judgeShown(i, j)) {
                     ret[i][j] = gm[i][j];
                 }
             }
@@ -391,12 +391,12 @@ function Run(io) {
                 }
             }
         }
-        if(Rooms[room].game.type != 3)
+        if (Rooms[room].game.type != 3)
             bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
         else {
             // 防止客户端查看全部地图
-            for(let k in Rooms[room].playedPlayer){
-                if(Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false){ continue; }
+            for (let k in Rooms[room].playedPlayer) {
+                if (Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false) { continue; }
                 Rooms[room].playedPlayer[k].prevGM = Rooms[room].playedPlayer[k].gm;
                 Rooms[room].playedPlayer[k].gm = getUserMap(Rooms[room].game.gm, Rooms[room].player[k].color);
                 let sender = generatePatch(Rooms[room].playedPlayer[k].prevGM, Rooms[room].playedPlayer[k].gm);
@@ -432,7 +432,7 @@ function Run(io) {
             }
             db.gameRatingCalc(room, Rooms[room].playedPlayer, JSON.stringify(Rooms[room].game.gamelog), Rooms[room].game.type == 3 ? true : false);
             let winner = [];
-            for(let k in Rooms[room].playedPlayer){
+            for (let k in Rooms[room].playedPlayer) {
                 if (Rooms[room].playedPlayer[k].place == 1) {
                     winner.push(Rooms[room].player[k].uname);
                     db.addUserExperienceById(k, 20);
@@ -446,6 +446,7 @@ function Run(io) {
                 }
                 Rooms[room].player[k].gaming = false;
                 Rooms[room].player[k].prepare = false;
+                Rooms[room].player[k].settings.map = setRandomMap();
             }
             clearInterval(Rooms[room].interval);
             delete Rooms[room].game;
@@ -523,19 +524,19 @@ function Run(io) {
 
     function getVotedMap(room) {
         if (room == "随机房") {
-            return [1, 1, 0, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
+            return [1, 1, 0, 0, 0, 0, 0].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         } else if (room == "迷宫房") {
-            return [2, 0, 1, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
+            return [2, 0, 1, 0, 0, 0, 0].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         } else if (room == "空白房") {
-            return [3, 0, 0, 1, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
+            return [3, 0, 0, 1, 0, 0, 0].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         } else if (room == "流浪房") {
-            return [5, 0, 0, 0, 0, 1, 0].concat([0,0,0,0,0,0,0,0,0,0]);
+            return [5, 0, 0, 0, 0, 1, 0].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         } else if (room == "排位房") {
-            return [6, 0, 0, 0, 0, 0, 1].concat([0,0,0,0,0,0,0,0,0,0]);
+            return [6, 0, 0, 0, 0, 0, 1].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         }
-        let votedMap = [null, 0, 0, 0, 0, 0, 0].concat([0,0,0,0,0,0,0,0,0,0]);
+        let votedMap = [null, 0, 0, 0, 0, 0, 0].concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         for (var k in Rooms[room].player) {
-            if(Rooms[room].player[k].view == true) continue;
+            if (Rooms[room].player[k].view == true) continue;
             votedMap[Rooms[room].player[k].settings.map]++;
         }
         let max = 0, maxPlc = 1;
@@ -595,14 +596,14 @@ function Run(io) {
                 gasTime: 50
             }
         }
-        if(Rooms[room].game.type == 3) {
+        if (Rooms[room].game.type == 3) {
             // 防止客户端查看全部地图
-            for(let k in Rooms[room].playedPlayer){
-                if(Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false){ continue; }
+            for (let k in Rooms[room].playedPlayer) {
+                if (Rooms[room].player[k] == undefined || Rooms[room].player[k].gaming == false) { continue; }
                 Rooms[room].playedPlayer[k].gm = getUserMap(Rooms[room].game.gm, Rooms[room].player[k].color);
                 ue(k, 'UpdateGM', Rooms[room].playedPlayer[k].gm);
             }
-        } else{
+        } else {
             bc(room, 'UpdateGM', Rooms[room].game.gm);
         }
 
@@ -612,13 +613,13 @@ function Run(io) {
         bc(room, 'UpdateUser', Rooms[room].player);
         bc(room, 'GameStart');
 
-        if(mptype == 7) Rooms[room].settings.speed = 8;
+        if (mptype == 7) Rooms[room].settings.speed = 8;
 
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
         }, 1000 / Rooms[room].settings.speed);
 
-        if(mptype == 7) Rooms[room].settings.speed = 4;
+        if (mptype == 7) Rooms[room].settings.speed = 4;
     }
 
     function preparedPlayerCount(room) {
@@ -632,6 +633,13 @@ function Run(io) {
             all++;
         }
         return [all, pre];
+    }
+
+    function setRandomMap() {
+        let mp = [1, 2, 3, 5, 6, 7];
+        let rnd = Math.round(Math.random() * mp.length);
+        if(rnd == mp.length) rnd = 0;
+        return mp[rnd];
     }
 
     io.on('connection', function (s) {
@@ -734,6 +742,7 @@ function Run(io) {
                     },
                     ip: getClientIp(s)
                 };
+                Rooms[room].player[uid].settings.map = setRandomMap();
                 for (let k in Rooms[room].player) {
                     if (Rooms[room].player[uid].ip == Rooms[room].player[k].ip && k != uid) {
                         bc(room, 'WorldMessage', `${uname}和${Rooms[room].player[k].uname}使用相同ip进行游戏.`);
@@ -817,7 +826,7 @@ function Run(io) {
 
             s.on('Ask_GM', function () {
                 if (Rooms[playerRoom[uid]] != undefined && Rooms[playerRoom[uid]].game != undefined) {
-                    if(Rooms[playerRoom[uid]].game.gm[0][0].type != 3){
+                    if (Rooms[playerRoom[uid]].game.gm[0][0].type != 3) {
                         ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
                         ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
                         ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
@@ -856,14 +865,14 @@ function Run(io) {
                 } else { bc('World', 'WorldMessage', uname + ': ' + dat); }
             });
 
-            s.on('take_photo', function(dat){
-                if(uid>=3) return ;
+            s.on('take_photo', function (dat) {
+                if (uid >= 3) return;
                 ue(Number(dat), 'take_photo', new Date().getTime());
             });
 
-            s.on('upload_photo', function(dat){
+            s.on('upload_photo', function (dat) {
                 dat.id = Number(dat.id);
-                fs.writeFile('/tmp/Kana/photo' + dat.id + '.txt', dat.data, ()=>{});
+                fs.writeFile('/tmp/Kana/photo' + dat.id + '.txt', dat.data, () => { });
             });
 
             s.on('eval', function (dat) {
