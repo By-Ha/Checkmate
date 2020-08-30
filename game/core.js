@@ -449,6 +449,7 @@ function Run(io) {
                 Rooms[room].player[k].settings.map = setRandomMap();
             }
             clearInterval(Rooms[room].interval);
+            bc(room, 'UpdateSettings', Rooms[room].settings);
             delete Rooms[room].game;
             Rooms[room].start = false;
             if (Object.keys(Rooms[room].player).length == 0) {
@@ -456,6 +457,7 @@ function Run(io) {
             } else {
                 t = preparedPlayerCount(room);
                 bc(room, 'LoggedUserCount', t);
+                
             }
         }
         catch (e) {
