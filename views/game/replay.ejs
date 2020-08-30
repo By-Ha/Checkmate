@@ -5,7 +5,9 @@
 <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.3.0/dist/socket.io.js"
     integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js"></script>
 <link rel="stylesheet" href="/css/checkmate.css">
+<link rel="stylesheet" href="/css/checkmateReplay.css">
 
 <div id="cover">
 </div>
@@ -13,7 +15,13 @@
     <table id="click-listener">
     </table>
     <canvas id="main-canvas" height="1000" width="1000"></canvas>
+    <div class="btn-container">
+        <button class="btn-gd-primary btn-round save"><i class="iconfont icon-download"></i></button>
+        <button class="btn-gd-primary btn-round open"><i class="iconfont icon-file"></i></button>
+    </div>
+    <input type="file" style="display: none" id="fileInput" />
     <div style="visibility: hidden;">
+        <!-- 预加载,最好别有人问我这个是干啥的 -->
         <img src="/img/crown.png"><img src="/img/city.png"><img src="/img/mountain.png"><img src="/img/obstacle.png">
     </div>
 </div>

@@ -1,6 +1,5 @@
 "use strict";
 $(() => {
-
     let size = 20;
     const color = ['grey', 'blue', 'red', 'green', 'orange', 'pink', 'purple', 'chocolate', 'maroon'];
     const tp = ['', 'crown', '', 'city', 'mountain', 'city', 'obstacle'];
@@ -23,6 +22,7 @@ $(() => {
         ctx.lineWidth = 1;
 
         for (let i = 0; i <= size; ++i) {
+            ctx.beginPath();
             let h = (c_size / size) * i;
             ctx.moveTo(h, 0);
             ctx.lineTo(h, c_size);
@@ -199,7 +199,7 @@ $(() => {
         // return;
     }
 
-    setInterval(next, 250);
+    var interval = setInterval(next, 250);
 
     $(document).ready(() => {
         // 改用canvas暂时取消
@@ -233,11 +233,40 @@ $(() => {
             var t1 = Number($("#m").css('margin-left').substr(0, $("#m").css('margin-left').length - 2));
             var t2 = Number($("#m").css('margin-top').substr(0, $("#m").css('margin-top').length - 2));
             if (delta < 0) t1 /= 1.2, t2 /= 1.2;
-            // else t1*=1.2,t2*=1.2;
             $(m).css('margin-left', t1 + "px");
             $(m).css('margin-top', t2 + "px");
         }
     });
+
+    $("#main > div.btn-container > button.btn-gd-primary.btn-round.save").click(() => {
+        let ele = document.createElement('a');
+        ele.download = window.location.pathname.substr(18) + '.CMRPL';
+        ele.style.display = "none";
+        let blob = new Blob([pako.gzip(dat, { to: 'blob', level: 9 })]);
+        ele.href = URL.createObjectURL(blob);
+        document.body.appendChild(ele);
+        ele.click();
+        document.body.removeChild(ele);
+    })
+
+    $("#main > div.btn-container > button.btn-gd-primary.btn-round.open").click(() => {
+        document.getElementById("fileInput").click();
+    })
+
+    $('#fileInput').change(function () {
+        if (this.files[0].size == 0) { toast('error', '没有选择文件'); return; }
+        let reader = new FileReader();
+        clearInterval(interval)
+        reader.readAsArrayBuffer(this.files[0])
+        reader.onload = function () {
+            getData(pako.inflate(new Uint8Array(this.result), { to: 'string' }));
+            if (gameData[0][0][0].version != undefined && gameData[0][0][0].version > 1) {
+                alert('回放版本过高,暂不支持.您看到的画面可能错乱而并不能反应真实的回放.');
+                // return;
+            }
+            interval = setInterval(next, 250);
+        }
+    })
 
     $(document).ready(() => {
         return;

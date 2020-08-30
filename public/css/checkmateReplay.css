@@ -1,0 +1,34 @@
+.btn-container {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  outline: 0 !important;
+}
+.btn-round {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+.btn-container {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+}
+.btn-gd-primary {
+  color: #fff;
+  border: none;
+  background: #448bff linear-gradient(45deg, #448bff, #44e9ff);
+  padding-top: 6px;
+  padding-bottom: 6px;
+  transition: all 0.2s ease;
+  -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.btn-gd-primary:hover {
+  color: #f4f4f4;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+*:focus {
+  outline: 0 !important;
+}
