@@ -457,7 +457,7 @@ function Run(io) {
             } else {
                 t = preparedPlayerCount(room);
                 bc(room, 'LoggedUserCount', t);
-                
+
             }
         }
         catch (e) {
@@ -569,6 +569,17 @@ function Run(io) {
                 bc(room, 'WorldMessage', ips[k].join() + "使用相同ip游戏");
             }
         }
+        let playerCount = 0;
+        for (var k in Rooms[room].player) {
+            if (playerCount >= 8) break;
+            if (Rooms[room].player[k].view == true) continue;
+            ++playerCount;
+        }
+
+        function shuffle(r){for(var t=r.length,n=0;n<t;n++){var a=t-1,e=Math.random()*(a+1)>>0,f=r[a];r[a]=r[e],r[e]=f}return r}
+        let colorTable = Array.from({ length: playerCount }, (v, k) => k + 1);
+        shuffle(colorTable)
+
         for (var k in Rooms[room].player) {
             if (i > 8) break;
             if (Rooms[room].player[k].view == true) continue;
@@ -576,10 +587,10 @@ function Run(io) {
             Rooms[room].playedPlayer[k].place = 0;
             Rooms[room].player[k].prepare = false;
             Rooms[room].player[k].gaming = true;
-            Rooms[room].game.color2Id[i] = k;
-            Rooms[room].player[k].color = i;
-            Rooms[room].game.colorVars[i] = { heart: 0, sword: 0, armor: 0 };
-            ue(k, 'UpdateColor', i);
+            Rooms[room].game.color2Id[colorTable[i - 1]] = k;
+            Rooms[room].player[k].color = colorTable[i - 1];
+            Rooms[room].game.colorVars[colorTable[i - 1]] = { heart: 0, sword: 0, armor: 0 };
+            ue(k, 'UpdateColor', colorTable[i - 1]);
             ++i;
         }
 
@@ -640,7 +651,7 @@ function Run(io) {
     function setRandomMap() {
         let mp = [1, 2, 3, 5, 6, 7];
         let rnd = Math.round(Math.random() * mp.length);
-        if(rnd == mp.length) rnd = 0;
+        if (rnd == mp.length) rnd = 0;
         return mp[rnd];
     }
 
