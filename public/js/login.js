@@ -21,6 +21,7 @@ $(function () {
                 }
                 else {
                     toast('error', '登录失败', res.msg);
+                    $("#cap").html('<input type="text" name="cap" placeholder="验证码" /><object style="background: white; width: 100%" data="https://kana.byha.top:444/api/captcha" type="image/svg+xml"></object>')
                     $("#submitButton").attr('disabled', false);
                     $("#submitButton").removeClass('iconfont icon-jiazai');
                 }

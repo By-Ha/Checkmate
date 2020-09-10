@@ -9,7 +9,8 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
-    if(req.body.cap == undefined || req.body.cap.toLowerCase() != req.session.captcha.toLowerCase()){
+    if(req.body.cap == undefined || req.body.cap == '' || req.body.cap.toLowerCase() != req.session.captcha.toLowerCase()){
+        req.session.captcha = '';
         res.json({ status: ('error'), msg: '验证码错误' }); return;
     }
     db.login(req.body.username, req.body.pwd, req.headers['x-real-ip'], function (err, dat) {
