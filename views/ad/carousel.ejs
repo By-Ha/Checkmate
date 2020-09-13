@@ -1,8 +1,7 @@
 <% 
 let ads = [
-  {url: '', link: 'http://oier.freela.ml', text: 'xiaozengX', expire: new Date('2020-8-14 21:00').getTime()},
-  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg2020.7.21-2020.8.20.jpg', link: 'https://www.luogu.com.cn/blog/jwcubgiy/', text: 'Penguins 的博客', expire: new Date('2020-8-21 18:30').getTime()},
-  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg1.png', link: 'tencent://Message/?Uin=2051261534', expire: new Date('2333-3-3 3:33').getTime()},
+{url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/gg1.png', link: 'tencent://Message/?Uin=2051261534', expire: new Date('2333-3-3 3:33').getTime()},
+  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/0913.jpg', link: 'https://blog.byha.top:444/', text: '白蛤的博客', expire: new Date('2020-9-30 00:00').getTime()},
 ] 
   let t = [];
   for(let i = 0;i<ads.length;++i){
@@ -21,7 +20,7 @@ let ads = [
   <div class="carousel-inner">
     
       <% for (let i = 0; i < ads.length; i++) { %>
-        <div class="carousel-item <%= i==0?"active":"" %>" onclick="window.open('<%= ads[i].link %>')" style="background: url(<%= ads[i].url %>) , url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/background.png)">
+        <div class="carousel-item <%= i==0?"active":"" %>" onclick="window.open('<%= ads[i].link %>')" style="background: url(<%= ads[i].url + '!h200' %>) , url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/background.png)">
           <% if(ads[i].text != undefined) { %>
             <div class="carousel-caption d-none d-md-block">
               <h3><%= ads[i].text %> </h3>
