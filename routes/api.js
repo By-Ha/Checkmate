@@ -121,12 +121,12 @@ router.post('/page', function (req, res) {
 // sendpost
 router.post('/post', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.content == undefined || req.body.content.trim().length == 0 || req.body.content.trim().length >= 20000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.content.match(/[\u0600-\u06FF]/) != null) { res.json({ status: ('error'), msg: '包含不允许的阿拉伯字符' }); return; }
     if (req.body.type != 0) { res.json({ status: ('error'), msg: '类型错误' }); return; }
     db.getUserInfo(req.session.uid, (err, dat) => {
         if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
-        db.post(req.session.username, req.body.type, req.body.content, function (err, dat) {
+        db.post(req.session.username, req.body.type, req.body.content.trim(), function (err, dat) {
             if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
             else { res.json({ status: ('success'), msg: '发送成功' }); return; }
         })
@@ -135,9 +135,9 @@ router.post('/post', function (req, res) {
 
 router.post('/updatepost', function (req, res) {
     if (req.session.uid == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    if (req.body.content == undefined || req.body.content.length <= 2 || req.body.content.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.content == undefined || req.body.content.trim().length == 0 || req.body.content.trim().length >= 20000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.content.match(/[\u0600-\u06FF]/) != null) { res.json({ status: ('error'), msg: '包含不允许的阿拉伯字符' }); return; }
-    db.updatePost(req.body.pid, req.session.uid, req.body.content, function (err, dat) {
+    db.updatePost(req.body.pid, req.session.uid, req.body.content.trim(), function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); return; }
         else { res.json({ status: ('success'), msg: '修改成功' }); return; }
     })
@@ -155,9 +155,9 @@ router.get('/comment', function (req, res) {
 
 router.post('/comment', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
-    if (req.body.comment == undefined || req.body.comment.length <= 2 || req.body.comment.length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
+    if (req.body.comment == undefined || req.body.comment.trim().length == 0 || req.body.comment.trim().length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }
-    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment, function (err, dat) {
+    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment.trim(), function (err, dat) {
         if (err) { res.json({ status: ('error'), msg: err }); console.error(err); return; }
         else {
             res.json({ status: ('success'), msg: '发送成功' });
