@@ -2,6 +2,8 @@ database/database_data.js
 cos/cos_data.js
 config.json
 test.js
+.user.ini
+.htaccess
 
 # Logs
 logs
