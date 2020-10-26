@@ -35,7 +35,7 @@ router.get('/replay/:rid', function (req, res, next) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
     db.getReplay(req.params.rid, (err, dat) => {
         if (dat == 0) { next(createError(404)); return; }
-        else { res.render('game/replay', { game_data: dat[0].battle_data }); return; }
+        else { res.render('game/replay', { game_data: dat }); return; }
     })
 })
 

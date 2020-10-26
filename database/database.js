@@ -3,6 +3,7 @@ var fs = require('fs');
 var crypto = require('crypto');
 var session = require('express-session');
 var xss = require('xss');
+var pako = require('pako');
 var CronJob = require('cron').CronJob;
 var MySQLStore = require('express-mysql-session')(session);
 var MarkdownIt = require('markdown-it'),
@@ -79,11 +80,11 @@ function login(username, password, ip, callback) {
     connection.query(SQL, SQLDATA, function (error, results) {
         if (error) { callback(error); return; }
         if (results == 0) { callback(null, [-1, '错误的用户名或密码', { username: "ERRUSER", id: -1 }]); return; }
-        else { 
+        else {
             callback(null, [0, '成功登录', { username: results[0].username, id: results[0].id }]);
             let SQL2 = 'UPDATE `user` SET `last_login_ip`=? WHERE username=?';
             let SQL2DATA = [ip, username];
-            connection.query(SQL2,SQL2DATA, ()=>{});
+            connection.query(SQL2, SQL2DATA, () => { });
             return;
         }
     });
@@ -191,7 +192,7 @@ function getTypePost(type, page, pagesize, callback) {
     });
 }
 
-function getPostStatus(pid, callback){
+function getPostStatus(pid, callback) {
     var SQL = `select * from content where id=? AND hidden=0;`
     var SQLDATA = [pid];
     connection.query(SQL, SQLDATA, function (error, results) {
@@ -515,8 +516,8 @@ function postCommentByUsername(pid, parent, uname, comment, callback = () => { }
     let SQL = 'INSERT INTO `comment`(`pid`, `parent`, `uid`, `username`, `comment`) \
     VALUES (?, ?, ?, ?, ?)';
     if (comment.length <= 0) { callback("评论长度有误"); return; }
-    getPostStatus(pid, (err, dat)=>{
-        if(err) {callback('说说被删除或尚未发布.'); return ;}
+    getPostStatus(pid, (err, dat) => {
+        if (err) { callback('说说被删除或尚未发布.'); return; }
         else {
             getUserId(uname, function (err, dat) {
                 if (err) { callback(err); return; }
@@ -577,15 +578,18 @@ function addBattle(uid, battle_id, dr) {
 
 function addBattleData(battle_id, data) {
     let SQL = 'INSERT INTO `battle_data`(`battle_id`, `battle_data`) VALUES (?, ?)'
-    let SQLDATA = [battle_id, data];
-    connection.query(SQL, SQLDATA, () => { });
+    let deflate = new pako.Deflate({ level: 9 });
+    deflate.push(data, true);
+    var buf = Buffer.from(deflate.result)
+    let SQLDATA = [battle_id, buf];
+    connection.query(SQL, SQLDATA, (err) => { console.log(err); });
 }
 
 function changeRating(uid, rating, nowRating, isRated) {
     let SQL = 'UPDATE `user` SET `rating`=`rating`+? WHERE `id`=?;'
     if (rating > 0) rating = Math.round(rating * (Math.abs(49.5 - 0.01 * nowRating) + 50.5 - 0.01 * nowRating) / 10);
     else rating = rating * Math.round(0.002 * nowRating + 1);
-    if(!isRated) rating = 0;
+    if (!isRated) rating = 0;
     let SQLDATA = [rating, uid];
     try {
         connection.query(SQL, SQLDATA, (err, dat) => { });
@@ -638,15 +642,15 @@ function gameRatingCalc(room, data, battle_data, isRated) {
 let rating = undefined;
 function getRatingList() {
     let SQL = 'SELECT * FROM `user` ORDER BY `rating` DESC, `exp` DESC LIMIT 100';
-    connection.query(SQL, [], (err, dat) => { 
+    connection.query(SQL, [], (err, dat) => {
         let ips = [];
         let ret = [];
-        for(let i = 0;i < dat.length;++i){
+        for (let i = 0; i < dat.length; ++i) {
             let e = dat[i];
-            if(e.last_login_ip != '0.0.0.0' && ips.indexOf(e.last_login_ip) == -1){
+            if (e.last_login_ip != '0.0.0.0' && ips.indexOf(e.last_login_ip) == -1) {
                 ips.push(e.last_login_ip);
                 ret.push(e);
-                if(ret.length >= 10) {
+                if (ret.length >= 10) {
                     rating = ret; return rating;
                 }
             }
@@ -674,7 +678,7 @@ function getReplay(rid, callback) {
     let SQLDATA = [rid];
     connection.query(SQL, SQLDATA, (err, dat) => {
         if (err) { callback(err); return; }
-        else { callback(null, dat); return; }
+        else { console.log( pako.inflate(new Uint8Array(dat[0].battle_data), {to: 'string'})); callback(null, pako.inflate(new Uint8Array(dat[0].battle_data), {to: 'string'})); return; }
     })
 }
 
@@ -687,21 +691,21 @@ function getReplay(rid, callback) {
 
 // Ban
 
-function setBan(uid, time, callback){
+function setBan(uid, time, callback) {
     let SQL = 'UPDATE `user` SET `ban_type`=1, `ban_time`=date_add(now(), interval ? second) WHERE id=?';
-    let SQLDATA = [time*3600, uid];
-    connection.query(SQL, SQLDATA, (err, dat)=>{
-        if(err) {callback(err, null);return ;}
-        else {callback(null, dat);return ;}
+    let SQLDATA = [time * 3600, uid];
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) { callback(err, null); return; }
+        else { callback(null, dat); return; }
     })
 }
 
-function cancelBan(uid, callback){
+function cancelBan(uid, callback) {
     let SQL = 'UPDATE `user` SET `ban_type`=0, `ban_time`=now() WHERE id=?';
     let SQLDATA = [uid];
-    connection.query(SQL, SQLDATA, (err, dat)=>{
-        if(err) {callback(err, null);return ;}
-        else {callback(null, dat);return ;}
+    connection.query(SQL, SQLDATA, (err, dat) => {
+        if (err) { callback(err, null); return; }
+        else { callback(null, dat); return; }
     })
 }
 

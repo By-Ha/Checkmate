@@ -576,7 +576,7 @@ function Run(io) {
             ++playerCount;
         }
 
-        function shuffle(r){for(var t=r.length,n=0;n<t;n++){var a=t-1,e=Math.random()*(a+1)>>0,f=r[a];r[a]=r[e],r[e]=f}return r}
+        function shuffle(r) { for (var t = r.length, n = 0; n < t; n++) { var a = t - 1, e = Math.random() * (a + 1) >> 0, f = r[a]; r[a] = r[e], r[e] = f } return r }
         let colorTable = Array.from({ length: playerCount }, (v, k) => k + 1);
         shuffle(colorTable)
 
@@ -598,6 +598,8 @@ function Run(io) {
         Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
+        for (let k in Rooms[room].game.gamelog[0][0][0].player)
+            Rooms[room].game.gamelog[0][0][0].player[k] = { uname: Rooms[room].game.gamelog[0][0][0].player[k].uname, color: Rooms[room].game.gamelog[0][0][0].player[k].color };
         Rooms[room].game.gamelog[0][0][0].version = (Rooms[room].game.gm[0][0].type == 1 ? 1 : 2);
 
         Rooms[room].game.size = Rooms[room].game.gm[0][0].size;
@@ -832,7 +834,7 @@ function Run(io) {
             })
 
             s.on('AskSize', function () {
-                if (Rooms[playerRoom[uid]].game != undefined)
+                if (Rooms[playerRoom[uid]] != undefined && Rooms[playerRoom[uid]].game != undefined)
                     ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
                 ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
             })
