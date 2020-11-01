@@ -19,6 +19,142 @@
             </span>
             <% if(userInfo2.id == uid) { %>
             <button class="userinfo-edit btn btn-outline-primary" type="button">编辑</button>
+            <div id="v-bili">
+                <el-button @click="drawer = true" type="primary" style="float: right;">
+                    认证B站
+                </el-button>
+                <el-drawer title="B站认证" :visible.sync="drawer" @open="handleOpen" :before-close="handleClose"
+                    size="50%">
+                    <el-form v-loading="loading" :model="uid" ref="uid" label-width="100px" class="demo-ruleForm"
+                        v-if="!authed">
+                        <el-form-item label="UID" prop="uid" :rules="[
+                            { required: true, message: 'UID不能为空'},
+                            { type: 'number', message: 'UID必须为数字值'}
+                          ]">
+                            <el-input type="uid" v-model.number="uid.uid" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="认证码">
+                            <el-input type="vCode" placeholder="认证码" v-model="vCode" v-if="vCodeShow" :disabled="true">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-alert title="复制后填写到B站个人简介中等待数据更新后方可认证" type="info" :closable="false">
+                            </el-alert>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="submitForm('uid')">提交</el-button>
+                            <el-button @click="resetForm('uid')">重置</el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-popover placement="top" width="160" v-model="del_visible" v-if="authed">
+                        <p>真的要删除认证么</p>
+                        <div style="text-align: right; margin: 0">
+                            <el-button size="mini" type="text" @click="del_visible = false">取消</el-button>
+                            <el-button type="danger" size="mini" @click="del_account">确定</el-button>
+                        </div>
+                        <el-button slot="reference" type="danger">删除认证</el-button>
+                    </el-popover>
+                </el-drawer>
+            </div>
+            <style>
+                .el-drawer__body {
+                    padding: 20px;
+                }
+            </style>
+            <script>
+                var app = new Vue({
+                    el: "#v-bili",
+                    data: {
+                        drawer: false,
+                        loading: true,
+                        vCode: '加载中',
+                        vCodeShow: false,
+                        uid: {
+                            uid: ''
+                        },
+                        authed: false,
+                        del_visible: false
+                    },
+                    methods: {
+                        handleClose(done) {
+                            this.$confirm('确认关闭？')
+                                .then(_ => {
+                                    done();
+                                })
+                                .catch(_ => { });
+                        },
+                        handleOpen() {
+                            $.get("/api/verify/bili/vcode", (dat) => {
+                                if (dat.status == "error") {
+                                    this.vCode = '加载失败';
+                                }
+                                if (dat.msg == '您已经完成认证') {
+                                    this.$message({
+                                        message: '您已经完成认证',
+                                        type: 'success',
+                                    });
+                                    this.authed = true;
+                                }
+                                this.vCode = dat.msg;
+                                this.loading = false;
+                                this.vCodeShow = true;
+                            })
+                        },
+                        resetForm() {
+                            this.uid.uid = ''
+                        },
+                        submitForm(formName) {
+                            this.$refs[formName].validate((valid) => {
+                                if (valid) {
+                                    $.post("/api/verify/bili/auth", { bili_uid: this.uid.uid }, (dat) => {
+                                        if (dat.status == 'error') {
+                                            this.$notify.error({
+                                                title: '错误',
+                                                message: '认证失败' + (dat.msg != undefined ? dat.msg : '')
+                                            });
+                                        }
+                                        else if (dat.status == 'success') {
+                                            this.$notify({
+                                                title: '成功',
+                                                message: '认证成功',
+                                                type: 'success'
+                                            });
+                                            this.drawer = false;
+                                        }
+                                    })
+                                } else {
+                                    this.$notify.error({
+                                        title: '错误',
+                                        message: '未填写正确'
+                                    });
+                                    return false;
+                                }
+                            });
+                        },
+                        del_account() {
+                            this.del_visible = false
+                            $.post('/api/verify/bili/delAuth', {}, (dat) => {
+                                if (dat.status == 'error') {
+                                    this.$notify.error({
+                                        title: '错误',
+                                        message: '删除失败'
+                                    });
+                                    return false;
+                                } else {
+                                    this.$notify({
+                                        title: '成功',
+                                        message: '删除成功',
+                                        type: 'success'
+                                    });
+                                    this.drawer = false;
+                                }
+                            })
+                        }
+                    },
+                    mounted: function () {
+                    }
+                })
+            </script>
             <% } %>
         </div>
         <div class="userpost-container">

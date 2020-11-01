@@ -677,8 +677,14 @@ function getReplay(rid, callback) {
     let SQL = 'SELECT * FROM `battle_data` WHERE battle_id=?;';
     let SQLDATA = [rid];
     connection.query(SQL, SQLDATA, (err, dat) => {
-        if (err) { callback(err); return; }
-        else { console.log( pako.inflate(new Uint8Array(dat[0].battle_data), {to: 'string'})); callback(null, pako.inflate(new Uint8Array(dat[0].battle_data), {to: 'string'})); return; }
+        if (err || !dat[0] ) { callback(err); return; }
+        else { callback(null, pako.inflate(new Uint8Array(dat[0].battle_data), { to: 'string' })); return; }
+    })
+}
+
+function runSQL(sql, data, callback) {
+    connection.query(sql, data, (err, dat) => {
+        callback(err, dat);
     })
 }
 
@@ -721,5 +727,6 @@ module.exports = {
     getUserPostAmount, getUserCommentAmount,
     gameRatingCalc, getRatingList, getUserBattle, getReplay,
     sendPostLike,
-    setBan, cancelBan
+    setBan, cancelBan,
+    runSQL
 }

@@ -101,6 +101,25 @@ body{
   left: 5px;
 }
 
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv6{
+  color: rgb(255,0,0);
+}
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv5{
+  color: rgb(255,108,0);
+}
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv4{
+  color: rgb(255,179,124);
+}
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv3{
+  color: rgb(146,209,229);
+}
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv2{
+  color: rgb(149,221,178);
+}
+#container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv1, #container div.post-info-author > div.post-info-author-username i.iconfont.icon-bili.lv0{
+  color: rgb(191,191,191);
+}
+
 article .post-info-content object {
   word-break: break-word;
 }

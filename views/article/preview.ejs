@@ -23,6 +23,10 @@
             <div class="post-info-author-username">
                 <a rel="author" href="/user/<%= art.user_id %>"><%= art.user_name %></a>
                 <i class="iconfont icon-level-<%= art.level %>"></i>
+                <% if(art.userinfo.bili_uid) {%>
+                    <% let t = JSON.parse(art.userinfo.bili_info) %>
+                    <a title="<%- t.info.name %>的B站空间" href="//space.bilibili.com/<%- t.info.mid %>" target="_blank"><i class="iconfont icon-bili lv<%- t.info.level %>"></i></a>
+                <% } %>
             </div>
         </div>
         <div class="post-info-meta">

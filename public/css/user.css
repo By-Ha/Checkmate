@@ -2,6 +2,10 @@
   min-height: 280px;
 }
 
+*{
+  outline: 0 !important;
+}
+
 .userinfo .userinfo-bg {
   background-position: 50% !important;
   background-repeat: no-repeat !important;

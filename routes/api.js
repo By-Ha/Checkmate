@@ -92,8 +92,11 @@ router.get('/user/info', function (req, res) {
     db.getUserInfo(uid, (err, dat) => {
         if (err) { res.json({ status: err, msg: '数据库错误' }); return; }
         else {
-            let dat2 = {id: dat.id, username: dat.username, type: dat.type}
-            res.json({ status: 'success', msg: dat2 }); return;
+            let dat2;
+            if (dat.bili_uid == 0) { dat2 = { id: dat.id, username: dat.username, type: dat.type, bili_uid: 0, bili_info: "" }; }
+            else { dat2 = { id: dat.id, username: dat.username, type: dat.type, bili_uid: dat.bili_uid, bili_info: dat.bili_info }; }
+            res.json({ status: 'success', msg: dat2 });
+            return;
         }
     })
 })
@@ -287,13 +290,120 @@ router.post('/superadmin/restart', function (req, res) {
 })
 
 router.get('/captcha', function (req, res) {
-	let captcha = svgCaptcha.create();
-	req.session.captcha = captcha.text;
-	
-	res.type('svg');
+    let captcha = svgCaptcha.create();
+    req.session.captcha = captcha.text;
+
+    res.type('svg');
     res.status(200).send(captcha.data);
-    console.log(req.session)
 });
+
+// /*
+router.get('/verify/bili/vcode', function (req, res) {
+    if (req.session.uid == undefined) {
+        res.json({ status: 'error' });
+        return;
+    }
+    let biliVCode;
+    db.runSQL('select bili_uid, bili_info from user where id=?', [req.session.uid], (err, dat) => {
+        if (err || !dat) {
+            res.json({ status: 'error' });
+            return;
+        }
+        if (dat[0].bili_uid != 0) {
+            res.json({ status: 'error', msg: '您已经完成认证' });
+            return;
+        }
+        if (dat[0].bili_info == undefined || dat[0].bili_info == "" || JSON.parse(dat[0].bili_info).verified == true) {
+            let vCodeNumber = parseInt(10000000 * Math.random()) + 114514;
+            let vCode = `EE0000的第${vCodeNumber}个膜拜者`;
+            db.runSQL('update user set bili_info=? where id=?', [JSON.stringify({ verified: false, biliVCode: vCode }), req.session.uid], (err) => {
+                if (err) {
+                    res.json({ status: 'error' });
+                    return;
+                }
+            })
+            biliVCode = vCode;
+        } else {
+            biliVCode = JSON.parse(dat[0].bili_info).biliVCode;
+        }
+        res.json({ status: 'success', msg: biliVCode, info: '使用方法:把B站个人简介改成这里的内容,然后等更新' });
+    });
+});
+
+router.post('/verify/bili/delAuth', function (req, res) {
+    if (req.session.uid == undefined) {
+        res.json({ status: 'error' });
+        return;
+    }
+    db.runSQL('update user set bili_info="", bili_uid=0 where id=?', [req.session.uid], (err) => {
+        if(err) {
+            console.log(err);
+            res.json({ status: 'error' });
+            return ;
+        }
+        else {
+            res.json({ status: 'success' });
+            return;
+        }
+    })
+})
+
+router.post('/verify/bili/auth', function (req, res) {
+    if (req.session.uid == undefined || isNaN(req.body.bili_uid)) {
+        res.json({ status: 'error' });
+        return;
+    }
+    db.runSQL('select id,bili_uid from user where bili_uid=?', [req.body.bili_uid], (err, dat) => {
+        if (err || dat[0] != undefined) {
+            res.json({ status: 'error', msg: '该账号已认证' });
+            return;
+        }
+        db.runSQL('select bili_uid, bili_info from user where id=?', [req.session.uid], (err, dat) => {
+            if (err || !dat) {
+                res.json({ status: 'error' });
+                return;
+            }
+            if (dat[0].bili_uid != 0) {
+                res.json({ status: 'error', msg: '您已经完成认证' });
+                return;
+            }
+            let https = require("https");
+            let url = `https://api.bilibili.com/x/space/acc/info?mid=${req.body.bili_uid}&jsonp=jsonp`;
+            https.get(url, function (_res) {
+                var html = '';
+                // 绑定data事件 回调函数 累加html片段
+                _res.on('data', function (data) {
+                    html += data;
+                });
+
+                _res.on('end', function () {
+                    let info = JSON.parse(html).data;
+                    let sign = info.sign;
+                    if (sign != JSON.parse(dat[0].bili_info).biliVCode) {
+                        res.json({ status: 'error', msg: 'vCode 不匹配' });
+                        return;
+                    }
+                    else {
+                        db.runSQL('update user set bili_info=?, bili_uid=? where id=?', [JSON.stringify({ verified: true, info: info }), req.body.bili_uid, req.session.uid], (err) => {
+                            if (err) {
+                                res.json({ status: 'error', msg: '数据库错误' });
+                                return;
+                            }
+                            res.json({ status: 'success', msg: '认证成功' });
+                            return;
+                        })
+                    }
+                });
+            }).on('error', function () {
+                res.json({ status: 'error', msg: 'Server network error' });
+                return;
+            });
+        });
+
+    })
+});
+
+// */
 
 router.post('/template', function (req, res) {
     res.json({

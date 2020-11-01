@@ -4,6 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+process.on('uncaughtException',function(err){console.error(err);}) //监听未捕获的异常
+
+process.on('unhandledRejection',function(err,promise){console.error(err, promise);})
+
+
 logger.token('realip', function (req, res) {
     return req.headers['x-real-ip'];
 });
