@@ -129,6 +129,7 @@ router.post('/post', function (req, res) {
     if (req.body.type != 0) { res.json({ status: ('error'), msg: '类型错误' }); return; }
     db.getUserInfo(req.session.uid, (err, dat) => {
         if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
+        if (dat.bili_uid == 0 || !dat.bili_info || dat.bili_info == "" || JSON.parse(dat.bili_info).info.level < 2) { res.json({ status: ('error'), msg: '发布说说必须认证等级不小于2级的B站账号😀,认证请在个人主页中查找' }); return; }
         db.post(req.session.username, req.body.type, req.body.content.trim(), function (err, dat) {
             if (err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
             else { res.json({ status: ('success'), msg: '发送成功' }); return; }
