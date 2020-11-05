@@ -41,6 +41,12 @@ $(() => {
         $(".pagination .page-link").click(function () {
             if (!isNaN(Number(this.innerHTML))) {
                 get(Number(this.innerHTML));
+            }else {
+                if (!isNaN($(".page-item.active .page-link")[0].innerHTML)){
+                    let page = Number($(".page-item.active .page-link")[0].innerHTML) + (this.innerHTML=="Previous" ? -1 : 1);
+                    if(page<=0) return ;
+                    get(page);
+                }
             }
         })
     }
@@ -52,6 +58,7 @@ $(() => {
             data: { pid: $(".comment-container").attr('pid'), page: page, parent: parent },
             dataType: "json",
             success: function (res) {
+                if(res.status == "error") return;
                 $(".comment-container .comment")[0].innerHTML = "";
                 res.dat.forEach(dat => {
                     dat.created = new Date(dat.created);
@@ -99,7 +106,7 @@ $(() => {
                     $(".comment-textarea")[0].value = "";
                     toast('success', '发送成功');
                     updatePages();
-                } else toast('error', '发送失败');
+                } else toast('error', '发送失败', res.msg);
             }
         });
     }
