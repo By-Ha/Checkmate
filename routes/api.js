@@ -161,23 +161,19 @@ router.post('/comment', function (req, res) {
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.comment == undefined || req.body.comment.trim().length == 0 || req.body.comment.trim().length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }
-    db.getUserInfo(req.session.uid, (_err, _dat)=>{
-        if (_err) { res.json({ status: ('error'), msg: '数据库错误' }); return; }
-        if ((_dat.exp <= 5000 || ((dat.bili_uid == 0 || !dat.bili_info || dat.bili_info == "" || JSON.parse(dat.bili_info).info.level < 1))) && _dat.type <= 0) { res.json({ status: ('error'), msg: '经验值大于5000或认证>=2级别B站账号才能发言哦!' }); return; }
-        db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment.trim(), function (err, dat) {
-            if (err) { res.json({ status: ('error'), msg: err }); console.error(err); return; }
-            else {
-                res.json({ status: ('success'), msg: '发送成功' });
-                db.getPost(req.body.pid, (err, dat) => {
-                    if (err) return;
-                    else {
-                        msg.emit('comment', dat, req.body.comment);
-                        return;
-                    }
-                })
-    
-            }
-        })
+    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment.trim(), function (err, dat) {
+        if (err) { res.json({ status: ('error'), msg: err }); console.error(err); return; }
+        else {
+            res.json({ status: ('success'), msg: '发送成功' });
+            db.getPost(req.body.pid, (err, dat) => {
+                if (err) return;
+                else {
+                    msg.emit('comment', dat, req.body.comment);
+                    return;
+                }
+            })
+
+        }
     })
 })
 
