@@ -15,4 +15,9 @@
         <time title="<%= dateFtt("yyyy-MM-dd hh:mm:ss", dat.created); %>"><%= delta(dat.created); %></time>
     </div>
     <div class="post-info-content"><a><object><%- dat.content %></object></a></div>
+    <div class="post-toolbar">
+        <span class="post-comment-num"><a href="/post/<%= dat.id %>"><i
+                    class="iconfont icon-view"></i><%= (dat.view>=1000000?(Math.round(dat.view/10000)/100)+"M":(dat.view>=1000)?Math.round(dat.view/10)/100+"K":(dat.view)) %></a></span>
+        <!-- <span class="post-like-num"><a><i class="iconfont icon-like"></i><%= dat.favor %></a></span> -->
+    </div>
 </div>
