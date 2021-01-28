@@ -112,7 +112,7 @@ function register(username, password, ip, callback) {
             SQL = "INSERT INTO user (`username`, `password`, `exp`, `rating`, `last_login_ip`) VALUES (?, ?, 0, 0, ?)";
             SQLDATA = [username, password, ip];
             connection.query(SQL, SQLDATA, function (error, results) {
-                if (error) { callback('error'); return; }
+                if (error) { callback(error); return; }
                 else getUserId(username, function (err, dat) {
                     if (err) { callback(err); return; }
                     callback(null, [0, "注册成功", dat]);
@@ -677,7 +677,7 @@ function getReplay(rid, callback) {
     let SQL = 'SELECT * FROM `battle_data` WHERE battle_id=?;';
     let SQLDATA = [rid];
     connection.query(SQL, SQLDATA, (err, dat) => {
-        if (err || !dat[0] ) { callback(err); return; }
+        if (err || !dat[0]) { callback(err); return; }
         else { callback(null, pako.inflate(new Uint8Array(dat[0].battle_data), { to: 'string' })); return; }
     })
 }
