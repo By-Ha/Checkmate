@@ -10,6 +10,7 @@ let sharp = require('sharp');
 let msg = require('../message/message').messageEmitter;
 let cp = require('child_process');
 let svgCaptcha = require('svg-captcha');
+let config = require('../config.json')
 
 var upload = multer({
     dest: '/tmp/Kana/upload',
@@ -157,23 +158,76 @@ router.get('/comment', function (req, res) {
     })
 })
 
+// Depends on tencentcloud-sdk-nodejs version 4.0.3 or higher
+const tencentcloud = require("tencentcloud-sdk-nodejs");
+
+const TmsClient = tencentcloud.tms.v20201229.Client;
+
+const clientConfig = {
+    credential: {
+        secretId: config.sid,
+        secretKey: config.skey,
+    },
+    region: "ap-guangzhou",
+    profile: {
+        httpProfile: {
+            endpoint: "tms.tencentcloudapi.com",
+        },
+    },
+};
+
+function judge(context, callback) {
+    let t = 1;
+    console.log(++t)
+    if (new Date().getTime() >= 1614384000000) { callback(true); return; }
+    let _times = Number(fs.readFileSync('./time.txt'));
+    if (_times >= 9000) { callback(true); return; }
+    fs.writeFileSync('./time.txt', _times + 1);
+    console.log(_times + 1)
+    const client = new TmsClient(clientConfig);
+    const params = {
+        "Content": new Buffer.from(context).toString('base64')
+    };
+
+    client.TextModeration(params).then(
+        (data) => {
+            if (data.Suggestion == "Block") {
+                callback(false);
+            } else {
+                callback(true);
+            }
+        },
+        (err) => {
+            console.error("error", err);
+        }
+    );
+}
+
 router.post('/comment', function (req, res) {
+    if (req.session.blockTime >= new Date().getTime()) { res.json({ status: ('error'), msg: '您的评论目前被封禁至' + new Date(Number(req.session.blockTime)).toUTCString() }); return; }
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.comment == undefined || req.body.comment.trim().length == 0 || req.body.comment.trim().length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }
-    db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment.trim(), function (err, dat) {
-        if (err) { res.json({ status: ('error'), msg: err }); console.error(err); return; }
-        else {
-            res.json({ status: ('success'), msg: '发送成功' });
-            db.getPost(req.body.pid, (err, dat) => {
-                if (err) return;
-                else {
-                    msg.emit('comment', dat, req.body.comment);
-                    return;
-                }
-            })
-
+    judge(req.body.comment.trim(), (allow) => {
+        if (!allow) {
+            req.session.blockTime = new Date().getTime() + 1000 * 3600 * 24;
+            res.json({ status: ('error'), msg: '您的评论目前被封禁至' + new Date(Number(req.session.blockTime)).toUTCString() });
+            return;
         }
+        db.postCommentByUsername(req.body.pid, req.body.parent, req.session.username, req.body.comment.trim(), function (err, dat) {
+            if (err) { res.json({ status: ('error'), msg: err }); console.error(err); return; }
+            else {
+                res.json({ status: ('success'), msg: '发送成功' });
+                db.getPost(req.body.pid, (err, dat) => {
+                    if (err) return;
+                    else {
+                        msg.emit('comment', dat, req.body.comment);
+                        return;
+                    }
+                })
+
+            }
+        })
     })
 })
 
