@@ -99,7 +99,7 @@ $(() => {
     });
     s.on('Update_Round', (dat) => { round = dat; });//
     s.on('GameStart', function () {//
-        if ($("#view").attr('data-view') != "true" && myColor != 0) {
+        if ($("#view").attr('data-viewer') != "true" && myColor != 0) {
             start = true;
         }
         exit = true;
@@ -205,11 +205,11 @@ $(() => {
     s.on('view_status', (dat) => {
         if (dat) {
             $("#view")[0].innerHTML = '参战';
-            $("#view").attr('data-view', true);
+            $("#view").attr('data-viewer', true);
             start = false;
         } else {
             $("#view")[0].innerHTML = '旁观';
-            $("#view").attr('data-view', false);
+            $("#view").attr('data-viewer', false);
         }
     });
     function changeHalf(half = true) {
@@ -541,7 +541,7 @@ $(() => {
         setTimeout(() => { $("#btn-view-grp").css('display', 'unset'); }, 280)
     });
     $("#view").click(function () {
-        if (this.getAttribute('data-view') == "true") {
+        if (this.getAttribute('data-viewer') == "true") {
             s.emit('view', false);
         } else {
             s.emit('view', true);

@@ -205,6 +205,8 @@ function judge(context, callback) {
 
 router.post('/comment', function (req, res) {
     if (req.session.blockTime >= new Date().getTime()) { res.json({ status: ('error'), msg: '您的评论目前被封禁至' + new Date(Number(req.session.blockTime)).toUTCString() }); return; }
+    if (req.session.lastComment >= new Date().getTime() - 60 * 1000) { res.json({ status: ('error'), msg: '歇一会儿再发言' }); return; }
+    req.session.lastComment = new Date().getTime();
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.comment == undefined || req.body.comment.trim().length == 0 || req.body.comment.trim().length >= 1000) { res.json({ status: ('error'), msg: '内容长度不符合规范' }); return; }
     if (req.body.pid == undefined || req.body.parent == undefined) { res.json({ status: ('error'), msg: '请求非法' }); return; }

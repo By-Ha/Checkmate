@@ -658,7 +658,8 @@ function Run(io) {
     }
 
     io.on('connection', function (s) {
-        let uid, uname;
+        let uid, uname, allow = 0;
+        let allowreset = setInterval(() => { allow = 1 }, 1000 * 5);
         if (!s.handshake.signedCookies.client_session) {
             s.emit('execute', `Swal.fire("看到此消息请尝试重新登录,如果无法解决请联系管理员", 'ERRCODE: PRE_SOCKET_LOGIN_UNEXPECTED_NULL', "error")`);
             s.disconnect();
@@ -699,6 +700,7 @@ function Run(io) {
 
             // 退出
             s.on('disconnect', function () {
+                clearInterval(allowreset);
                 delete connectedUsers[uid];
                 if (Rooms[playerRoom[uid]] == undefined) return;
                 if (Rooms[playerRoom[uid]].player[uid].gaming) {
@@ -871,8 +873,15 @@ function Run(io) {
                 if (dat == "" || dat.length >= 100 || dat.indexOf('\n') != -1) {
                     return;
                 }
+                if(allow == 0 && uname != 'Bot(2.0)'){
+                    try {
+                        ue(uid, 'WorldMessage', '歇一会儿再发言')
+                    } catch (e) { }
+                    return;
+                }
                 dat = dat.trim();
                 dat = xss(dat);
+                allow = 0;
                 if (dat.indexOf('sur') != -1 || dat.indexOf('viv') != -1) {
                     try {
                         ue(uid, 'WorldMessage', uname + ': ' + dat)
