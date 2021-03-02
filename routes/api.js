@@ -232,6 +232,28 @@ router.post('/comment', function (req, res) {
         })
     })
 })
+let redeeming = false;
+router.post('/redeem', function (req, res) {
+    redeeming = true;
+    try {
+        db.runSQL('SELECT * FROM `redeem` WHERE redeem=?;', [req.body.redeem], (err, dat) => {
+            if (dat.length == 0 || dat[0].exchange_user != null) { redeeming = false; res.json({ status: 'error', msg: '兑换码无效或被使用' }); return; }
+            if (dat[0].redeem_type == 0) {
+                db.addUserExperienceById(req.session.uid, 5000);
+            }
+            if (dat[0].redeem_type == 1) {
+                db.addUserExperienceById(req.session.uid, 10000);
+            }
+            db.runSQL('UPDATE `redeem` SET `exchange_user`=? WHERE redeem=?;', [req.session.uid, req.body.redeem], () => {
+                redeeming = false;
+                return res.json({ status: 'success', msg: '兑换成功' })
+            })
+        })
+    } catch (e) {
+        redeeming = false;
+    }
+
+})
 
 router.get('/commentAmount', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }

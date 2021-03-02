@@ -3,6 +3,7 @@ let createError = require('http-errors');
 var router = express.Router();
 var db = require('../database/database');
 var cos = require('../cos/cos');
+const uuid = require('uuid')
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -18,5 +19,16 @@ router.get('/', function (req, res, next) {
         })
     }
 });
+
+router.get('/addRedeem5k', function(req,res){
+    // let ret = ''
+    // for(let i = 1; i<=3;++i){
+    //     let _uuid = uuid.v4();
+    //     db.runSQL('INSERT INTO `redeem`(`redeem`, `redeem_type`) VALUES (?, 0)', [_uuid], ()=>{});
+    //     ret += _uuid
+    //     ret += '\n'
+    // }
+    // res.send(ret)
+})
 
 module.exports = router;

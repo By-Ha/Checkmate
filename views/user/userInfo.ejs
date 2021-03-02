@@ -23,6 +23,9 @@
                 <el-button @click="drawer = true" type="primary" style="float: right;">
                     认证B站
                 </el-button>
+                    <el-button @click="open" type="primary" style="float: right;">
+                        兑换奖励
+                    </el-button>
                 <el-drawer title="B站认证" :visible.sync="drawer" @open="handleOpen" :before-close="handleClose"
                     size="50%">
                     <el-form v-loading="loading" :model="uid" ref="uid" label-width="100px" class="demo-ruleForm"
@@ -60,6 +63,10 @@
                 .el-drawer__body {
                     padding: 20px;
                 }
+
+                    .el-button {
+                        margin-right: 10px;
+                    }
             </style>
             <script>
                 var app = new Vue({
@@ -149,6 +156,24 @@
                                     this.drawer = false;
                                 }
                             })
+                        },
+                        open() {
+                            this.$prompt('请输入兑换码', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                inputPattern: /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/,
+                                inputErrorMessage: '兑换码格式不正确'
+                            }).then(({ value }) => {
+                                $.post('/api/redeem/', {redeem: value}, (dat)=>{
+                                    if(dat.status == 'success'){
+                                        this.$message.success(dat.msg);
+                                    } else{
+                                        this.$message.error(dat.msg);
+
+                                    }
+                                })
+                            }).catch(() => {
+                            });
                         }
                     },
                     mounted: function () {
