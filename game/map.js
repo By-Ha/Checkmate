@@ -501,7 +501,9 @@ function generateMap(type, player) {
         gm[0][0].type = 3;
         return gm;
     } else if (type == 7) {
-        return generateRandomMap(player);
+        let gm = generateRandomMap(player);
+        gm[0][0].type = 4;
+        return gm;
     } else {
         console.log(new Date().getTime() - ti);
         return generateRandomMap(player);

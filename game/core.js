@@ -87,7 +87,7 @@ function Run(io) {
         let User = Rooms[room].player;
         let color2Id = Rooms[room].game.color2Id;
         let size = Rooms[room].game.size;
-        if (gm[0][0].type == 1 || gm[0][0].type == 3) {
+        if (gm[0][0].type == 1 || gm[0][0].type == 3 || gm[0][0].type == 4) {
             if (t.color == f.color) { //same color means combine
                 t.amount += cnt;
                 f.amount -= cnt;
@@ -294,10 +294,11 @@ function Run(io) {
                 continue;
             }
             // 以上过滤用户输入
-            if (Rooms[room].game.type == 1 || Rooms[room].game.type == 3) {
+            if (Rooms[room].game.type == 1 || Rooms[room].game.type == 3 || Rooms[room].game.type == 4) {
                 var f = gm[mv[0]][mv[1]], t = gm[mv[2]][mv[3]];// from and to
                 var cnt = ((mv[4] == 1) ? (Math.ceil((f.amount + 0.5) / 2)) : f.amount);// the amount that need to move
                 cnt -= 1; // cannot move all
+                // console.log(f.color == player[k].color)
                 if (f.color != player[k].color || cnt <= 0 || t.type == 4) { // wrong movement
                     while (player[k].movement.length != 0) {
                         let x1 = player[k].movement[0][0], x2 = player[k].movement[0][1];
@@ -391,8 +392,20 @@ function Run(io) {
                 }
             }
         }
-        if (Rooms[room].game.type != 3)
+        if(Rooms[room].game.type == 4){
+            let ngm = JSON.parse(JSON.stringify(gm))
+            for (let i = 1; i <= game.size; ++i) {
+                for (let j = 1; j <= game.size; ++j) {
+                    if(ngm[i][j].color != 0) {
+                        ngm[i][j].color = 1;
+                    }
+                }
+            }
+            bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, ngm)]);
+        }
+        else if (Rooms[room].game.type != 3) {
             bc(room, 'Map_Update', [Rooms[room].game.round, generatePatch(Rooms[room].game.lastGM, Rooms[room].game.gm)]);
+        }
         else {
             // 防止客户端查看全部地图
             for (let k in Rooms[room].playedPlayer) {
@@ -479,7 +492,18 @@ function Run(io) {
         let round = ++game.round;
         let gm = game.gm;
         let size = game.size;
-        Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
+        if(game.type != 4) Rooms[room].game.lastGM = JSON.parse(JSON.stringify(gm));
+        else {
+            let ngm = JSON.parse(JSON.stringify(gm))
+            for (let i = 1; i <= game.size; ++i) {
+                for (let j = 1; j <= game.size; ++j) {
+                    if(ngm[i][j].color != 0) {
+                        ngm[i][j].color = 1;
+                    }
+                }
+            }
+            Rooms[room].game.lastGM = JSON.parse(JSON.stringify(ngm));
+        }
 
         function addAmountCrown() {
             for (var i = 1; i <= size; ++i) {
@@ -512,7 +536,7 @@ function Run(io) {
             return;
         }
 
-        if (gm[0][0].type == 1 || gm[0][0].type == 3) {
+        if (gm[0][0].type == 1 || gm[0][0].type == 3 || gm[0][0].type == 4) {
             if ((round % 10) == 0) addAmountRoad();
             addAmountCity(), addAmountCrown();
         }
@@ -579,6 +603,7 @@ function Run(io) {
         function shuffle(r) { for (var t = r.length, n = 0; n < t; n++) { var a = t - 1, e = Math.random() * (a + 1) >> 0, f = r[a]; r[a] = r[e], r[e] = f } return r }
         let colorTable = Array.from({ length: playerCount }, (v, k) => k + 1);
         shuffle(colorTable)
+        let mptype = getVotedMap(room)[0];
 
         for (var k in Rooms[room].player) {
             if (i > 8) break;
@@ -590,12 +615,12 @@ function Run(io) {
             Rooms[room].game.color2Id[colorTable[i - 1]] = k;
             Rooms[room].player[k].color = colorTable[i - 1];
             Rooms[room].game.colorVars[colorTable[i - 1]] = { heart: 0, sword: 0, armor: 0 };
-            ue(k, 'UpdateColor', colorTable[i - 1]);
+            if(mptype != 7) ue(k, 'UpdateColor', colorTable[i - 1]);
+            else ue(k, 'UpdateColor', 1);
             ++i;
         }
 
-        let mptype = getVotedMap(room)[0];
-        Rooms[room].game.gm = mp.generateMap(getVotedMap(room)[0], --i);
+        Rooms[room].game.gm = mp.generateMap(mptype, --i);
         Rooms[room].game.gamelog[0] = JSON.parse(JSON.stringify(Rooms[room].game.gm));
         Rooms[room].game.gamelog[0][0][0].player = JSON.parse(JSON.stringify(Rooms[room].player));
         for (let k in Rooms[room].game.gamelog[0][0][0].player)
@@ -628,13 +653,13 @@ function Run(io) {
         bc(room, 'UpdateUser', Rooms[room].player);
         bc(room, 'GameStart');
 
-        if (mptype == 7) Rooms[room].settings.speed = 8;
+        // if (mptype == 7) Rooms[room].settings.speed = 8;
 
         Rooms[room].interval = setInterval(() => {
             nextRound(room);
         }, 1000 / Rooms[room].settings.speed);
 
-        if (mptype == 7) Rooms[room].settings.speed = 4;
+        // if (mptype == 7) Rooms[room].settings.speed = 4;
     }
 
     function preparedPlayerCount(room) {
@@ -846,7 +871,19 @@ function Run(io) {
                     if (Rooms[playerRoom[uid]].game.gm[0][0].type != 3) {
                         ue(uid, 'UpdateUser', Rooms[playerRoom[uid]].player);
                         ue(uid, 'UpdateSize', Rooms[playerRoom[uid]].game.size);
-                        ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
+                        if(Rooms[playerRoom[uid]].game.type == 4){
+                            let ngm = JSON.parse(JSON.stringify(Rooms[playerRoom[uid]].game.gm))
+                            for (let i = 1; i <= Rooms[playerRoom[uid]].game.size; ++i) {
+                                for (let j = 1; j <= Rooms[playerRoom[uid]].game.size; ++j) {
+                                    if(ngm[i][j].color != 0) {
+                                        ngm[i][j].color = 1;
+                                    }
+                                }
+                            }
+                            ue(uid, 'UpdateGM', ngm);
+                        } else {
+                            ue(uid, 'UpdateGM', Rooms[playerRoom[uid]].game.gm);
+                        }
                         ue(uid, 'Update_Round', Rooms[playerRoom[uid]].game.round);
                     } else {
                         ue(uid, 'Update_Round', `Swal.fire("提示", '这个房间正在排位中,无法观看直播.', "info");`);

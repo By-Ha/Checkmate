@@ -397,7 +397,7 @@ $(() => {
             $("#settings-gamemap button[data=4]").html(`端午特别${dat.map[4]}`);
             $("#settings-gamemap button[data=5]").html(`流浪模式${dat.map[5]}`);
             $("#settings-gamemap button[data=6]").html(`排位模式${dat.map[6]}`);
-            $("#settings-gamemap button[data=7]").html(`BRA 倍速${dat.map[7]}`);
+            $("#settings-gamemap button[data=7]").html(`抓虾模式${dat.map[7]}`);
         });
     });
     document.onkeydown = function (event) {
