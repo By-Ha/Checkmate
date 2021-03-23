@@ -36,6 +36,8 @@ router.get('/*', function (req, res, next) {
     //     db.setBan(req.session.uid, 0.02);
     // }
 
+    req.session.touch();
+
     if (debug && req.path != '/checkmate/room/ceshifangjian123') {
         res.json({ msg: '维护中,别打了' });
         return;

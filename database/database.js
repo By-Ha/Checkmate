@@ -24,7 +24,7 @@ function handleError() {
     connection = eval(require('../config').db_data);
 
     sessionStore = new MySQLStore({
-        expiration: 86400000,
+        expiration: 864000000,
         createDatabaseTable: true,  //是否创建表
         schema: {
             tableName: 'session',   //表名

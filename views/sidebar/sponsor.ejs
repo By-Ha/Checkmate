@@ -13,12 +13,13 @@
 
 <div class="kana-item colorbox">
     <h5 style="text-align: center;">感谢投喂</h5>
-    <% let sponsors=[{name: 'kevin070828' ,amount: 13}, {name: 'Mooos_MoShengwww' , amount: 20}, {name: 'jwcub' , amount: 5},
-        {name: 'Antagon1sm' , amount: 10}, {name: 'Antagonism', amount: 2.01}, {name: '小瑄' , amount: 2}, {name: 'b6e0' , amount: 1}] %>
+    <% let sponsors=[{name: 'kana_user_1242' , amount: 5}, {name: 'CrispyCommand' , amount: 5}, {name: 'kevin070828'
+        ,amount: 23}, {name: 'Mooos_MoShengwww' , amount: 20}, {name: 'jwcub' , amount: 5}, {name: 'Antagon1sm' ,
+        amount: 10}, {name: 'Antagonism' , amount: 2.01}, {name: '小瑄' , amount: 2}, {name: 'b6e0' , amount: 1}] %>
         <% sponsors.sort((a,b)=>{return b.amount-a.amount}) %>
-        <% sponsors.forEach(e => { %>
-            <div class="colorbox-content kana-item">
-                <%= e.name %> <a class="sponsor-amount">￥<%= e.amount.toFixed(2) %></a>
-            </div>
-        <% }); %>
+            <% sponsors.forEach(e=> { %>
+                <div class="colorbox-content kana-item">
+                    <%= e.name %> <a class="sponsor-amount">￥<%= e.amount.toFixed(2) %></a>
+                </div>
+                <% }); %>
 </div>
