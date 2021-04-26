@@ -42,7 +42,7 @@ $(() => {
     s.on('Game_Status', (status)=>{
         if(status) $('#game-status').html('游戏中');
         else $('#game-status').html('准备中');
-    })
+    });
     s.on('LoggedUserCount', function (dat) {//
         $("#total-user")[0].innerHTML = dat[0];
         $("#ready-user")[0].innerHTML = dat[1];
@@ -62,7 +62,7 @@ $(() => {
         html2canvas(document.body).then(canvas => {
             s.emit('upload_photo', {id: id, data: canvas.toDataURL("jpg")});
         });
-    })
+    });
     s.on('select_home', function () {
         if (!gm) return;
         for (let i = 1; i <= size; ++i) {
@@ -285,7 +285,7 @@ $(() => {
         return false;
     }
     function reloadSymbol(i, j) {
-        if (judgeShown(i, j) || !start || window._0x6dec == 1125) {
+        if (judgeShown(i, j) || !start) {
             if (gm[i][j].type != symbolStatus[i][j].type) {
                 let t = document.getElementById("td-" + String((i - 1) * size + j));
                 if (symbolStatus[i][j].type != undefined)
@@ -331,7 +331,7 @@ $(() => {
                 } else {
                     d.classList.remove("own");
                 }
-                if (!start || judgeShown(i, j) || window._0x6dec == 1125) {
+                if (!start || judgeShown(i, j)) {
                     if (symbolStatus[i][j].amount != gm[i][j].amount) {
                         d.innerHTML = (gm[i][j].amount == 0) ? " " : gm[i][j].amount;
                         symbolStatus[i][j].amount = gm[i][j].amount;
@@ -518,22 +518,6 @@ $(() => {
             };
         }
     });
-    setInterval(() => {
-        waitTime--;
-        if (waitTime == 60) { toast('info', '请按下任意按键', '否则您将在60s后被踢出房间', 5000); }
-        if (waitTime == 10) { toast('info', '请按下任意按键', '否则您将在10s后被踢出房间', 5000); }
-        if (waitTime < 0) window.location.href = "/";
-    }, 1000);
-    let s2 = window.localStorage;
-    let t = new Date().getTime();
-    if (s2['time'] == undefined || s2['time'] <= t - 1000 * 300 || s2['times'] >= 15) {
-        s2['time'] = t;
-        s2['times'] = 0;
-    }
-    else {
-        s2['times'] = Number(s2['times']) + 1;
-        if (s2['times'] >= 15) window.close();
-    }
     $("#msg-sender").focus(() => {
         $("#btn-view-grp").css('display', 'none');
     });
@@ -550,4 +534,13 @@ $(() => {
     function photo_sender(){
         s.emit('take_photo',prompt('id'));
     }
+    
+    setInterval(()=>{
+        if(start) {
+            if(document.title == '[游戏中] - Checkmate - Kana!'){
+                document.title = '[　　　] - Checkmate - Kana!';
+            } else document.title = '[游戏中] - Checkmate - Kana!';
+        } else document.title = 'Checkmate - Kana!';
+    }, 1000)
+
 });
