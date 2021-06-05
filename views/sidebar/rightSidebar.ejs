@@ -6,7 +6,7 @@
         <% rating.forEach(e=>{ %>
         <a href="/user/<%= e.id %>" class="rank-link">
             <div class="kana-item rank-box">
-                <img src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= e.id %>.webp!50x50"
+                <img src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= e.id %>.webp"
                     height="50px" width="50px" class="avatar">
                 <div class="info">#<%= r %>,<%= e.rating %>:<%= e.username %></div>
                 <% ++r; %>

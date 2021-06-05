@@ -466,6 +466,14 @@ function post(username, type, content, callback = () => { }) {
     })
 }
 
+function getRecentComment(callback = () => { }) {
+    // let SQL = 'SELECT * FROM `comment` WHERE 1 ORDER BY id DESC LIMIT 0,10';
+    // connection.query(SQL, [], function(err,dat){
+    //     if(err) {callback(err); return ;}
+    //     callback(null, JSON.parse(JSON.stringify(dat)));
+    // })
+}
+
 function getComment(pid, parent, page, callback = () => { }) {
     let pagesize = 10;
     let SQL = 'SELECT * FROM `comment` WHERE pid=? AND parent=? order by id desc limit ?,?;';

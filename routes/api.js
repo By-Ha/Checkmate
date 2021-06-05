@@ -496,7 +496,7 @@ router.post('/template', function (req, res) {
     <article class="<%= (art.type==0)?'shuoshuo':'blog' %> kana-item" pid="<%= art.id %>">
         <div class="post-info">
             <div class="post-info-author">
-                <img class="avatar" src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= art.user_id %>.webp!50x50" height="48px" width="48px">
+                <img class="avatar" src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= art.user_id %>.webp" height="48px" width="48px">
                 <div class="post-info-author-username">
                     <a rel="author" href="/user/username/<%= art.user_name %>"><%= art.user_name %></a>
                     <i class="iconfont"></i>

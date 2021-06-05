@@ -21,7 +21,7 @@ let ads = [
 
     <% for (let i = 0; i < ads.length; i++) { %>
     <div class="carousel-item <%= i==0?"active":"" %>" onclick="window.open('<%= ads[i].link %>')"
-      style="background: url(<%= ads[i].url + '!h200' %>) , url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/background.png)">
+      style="background: url(<%= ads[i].url + '' %>) , url(https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/background.png)">
       <% if(ads[i].text != undefined) { %>
       <div class="carousel-caption d-none d-md-block">
         <h3><%= ads[i].text %> </h3>
