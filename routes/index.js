@@ -43,7 +43,7 @@ router.get('/*', function (req, res, next) {
         return;
     }
     if (!req.session.username) {
-        if (req.path != '/login' && req.path != '/register' && req.path != '/api/captcha') { res.redirect('/login'); return; }
+        if (req.path != '/login' && req.path != '/register' && req.path != '/api/captcha' && req.path != '/api/get' && req.path != '/api/set') { res.redirect('/login'); return; }
         else { next(); return; }
     }
     db.getUserInfo(req.session.uid, (err, dat) => {
@@ -111,6 +111,20 @@ router.get('/page/:pid', function (req, res, next) {
             })
         }
     });
+})
+
+router.get('/gk', function (req, res, next) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    res.render('gk');
+})
+
+router.post('/gk', function (req, res, next) {
+    if (req.session.username == undefined) { res.redirect('/login'); return; }
+    const data = [Number(req.session.uid), req.session.username, new Date().getTime()]
+    db.runSQL('INSERT INTO `gk`(`uid`, `uname`, `time`) VALUES (?, ?, ?)', data,()=>{
+        global.gkio.sockets.emit('gk_add', data)
+    })
+    res.send('0');
 })
 
 module.exports = router;

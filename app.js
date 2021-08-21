@@ -80,6 +80,18 @@ var messageio = require('socket.io')(server, {
 });
 message.Run(messageio);
 
+var gkio = require('socket.io')(server, {
+    path: '/ws/gk'
+});
+global.gkio = gkio;
+gkio.on('connection', (s)=>{
+    s.on('gk', () => {
+        db.runSQL('SELECT COUNT(id) FROM gk', [], (err, dat)=>{
+            s.emit('gk', dat[0]['COUNT(id)'])
+        })
+    })
+})
+
 /* socket.io */
 
 io.use(function (socket, next) {

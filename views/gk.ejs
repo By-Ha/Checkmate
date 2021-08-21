@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="/css/page.css">
+
+<div id="main">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/mainPart.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.3.0/dist/socket.io.js"
+    integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+    <div id="main-part">
+        <div id="container">
+            <article>
+                <h1>全站已为高考助力<span id="gk">?</span>次</h1>
+                <button onclick="$.post('/gk')">助力</button>
+                <script>
+                $(() => {
+                    var d = []
+                    let s = io.connect('https://' + window.location.hostname + ':444/', {
+                        path: '/ws/gk'
+                    });
+                    s.emit('gk');
+                    s.on('gk', (dat)=>{
+                        document.getElementById('gk').innerHTML = dat
+                    })
+                    s.on('gk_add', (dat)=>{
+                        document.getElementById('gk').innerHTML = Number(document.getElementById('gk').innerHTML) + 1
+                        dat.shift()
+                        dat[1] = new Date(dat[1]).toLocaleTimeString()
+                        d.unshift(dat)
+                        if(d.length > 10) d.pop()
+                        console.log(d)
+                        document.getElementById('detail').innerHTML = (d.join('<br>'))
+                    })
+                })
+                </script>
+                <p id='detail'></p>
+            </article>
+        </div>
+    </div>
+</div>

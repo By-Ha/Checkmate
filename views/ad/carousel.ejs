@@ -1,7 +1,11 @@
 <% 
 let ads = [
-  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/0913.jpg', link: 'tencent://Message/?Uin=2051261534', text: '广告位招租', expire: new Date('2333-3-3 3:33').getTime()},
-  {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/0913.jpg', link: 'https://kana.byha.top:444/post/14828', text: '未认证水贴区', expire: new Date('2333-3-3 3:33').getTime()},
+
+{url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/OierBBS.png', link: 'https://oierbbs.fun', text: '', expire: new Date('2021-8-23 3:33').getTime()},
+{url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/Cloud.png', link: 'https://oierbbs.fun/d/127-oierbbs-cloud', text: '', expire: new Date('2021-8-23 3:33').getTime()},
+  // {url: 'https://static-1252071452.cos.ap-shanghai.myqcloud.com/img/2021/06/06/20210606230317.jpeg', link: '/gk', text: '', expire: new Date('2333-7-20 3:33').getTime()},
+  // {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/0913.jpg', link: 'tencent://Message/?Uin=2051261534', text: '广告位招租', expire: new Date('2333-3-3 3:33').getTime()},
+  // {url: 'https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/carousel/0913.jpg', link: 'https://kana.byha.top:444/post/14828', text: '未认证水贴区', expire: new Date('2333-3-3 3:33').getTime()},
 ] 
   let t = [];
   for(let i = 0;i<ads.length;++i){
@@ -9,7 +13,7 @@ let ads = [
     else t.push(ads[i]);
   }
   ads = t;
-  ads.sort(function(){ return 0.5 - Math.random() });
+  // ads.sort(function(){ return 0.5 - Math.random() });
 %>
 <div id="carousel-ad" class="carousel slide carousel-fade kana-item" data-ride="carousel">
   <ol class="carousel-indicators">
