@@ -3,10 +3,10 @@
     <div id="container">
         <div class="kana-item userinfo" uid="<%= userInfo2.id %>">
             <div class="userinfo-bg"
-                style="background: url('https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/banner/<%= userInfo2.id %>.webp!752x180');">
+                style="background: url('https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/banner/<%= userInfo2.id %>.webp');">
             </div>
             <img class="userinfo-avatar"
-                src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= userInfo2.id %>.webp!100x100">
+                src="https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/<%= userInfo2.id %>.webp">
             <span class="userinfo-complex">
                 <a class="userinfo-name">@<%= userInfo2.username %></a>
                 <% var level = ((userInfo2.exp>=28800)?6:((userInfo2.exp>=10800)?5:((userInfo2.exp>=4500)?4:((userInfo2.exp>=1500)?3:((userInfo2.exp>=200?2:((userInfo2.exp>=100)?1:0))))))); %>
