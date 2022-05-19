@@ -1,0 +1,47 @@
+<div class="kana-item">
+  <div class="sponsor">
+    <div class="payment-hover" style="display: none;">
+      <i class="iconfont icon-close" onclick="closePayment()"></i>
+    </div>
+    <script>
+    </script>
+    <p style="color: grey;">请作者吃顿饭</p>
+    <a class="kana-item" href="https://afdian.net/@by_ha" target="_blank">爱发电</a>
+  </div>
+  <br>
+</div>
+
+<div class="kana-item colorbox">
+  <h5 style="text-align: center;">最新评论</h5>
+  <div id="recentComment" class="recentComment">
+    <a v-for="comment in comments" :key="comment.id" :href="'/post/'+comment.pid" class="rank-link">
+      <div class="kana-item rank-box">
+        <div>
+          <img :src="`https://kana-1252071452.cos.ap-shanghai.myqcloud.com/img/user/avatar/${comment.uid}.webp`"
+            height="50px" width="50px" class="avatar">
+          <div class="info">{{comment.username}}</div>
+        </div>
+        <div class="comment" style="margin-top: 10px;">
+          {{comment.comment}}
+        </div>
+        <div class="time" style="font-size: 10px;">
+          {{new Date(comment.created).toLocaleDateString() + ' ' + new Date(comment.created).toLocaleTimeString() }}
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+<script>
+  const commentApp = new Vue({
+    el: "#recentComment",
+    data: {
+      comments: [],
+    },
+    mounted: function () {
+      $.get('/api/recentComment', (data) => {
+        console.log(data.dat);
+        this.comments = data.dat;
+      });
+    }
+  })
+</script>

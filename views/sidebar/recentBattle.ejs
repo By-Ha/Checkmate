@@ -1,0 +1,29 @@
+<div class="kana-item colorbox">
+  <h5 style="text-align: center;">最新对战</h5>
+  <div id="recentBattle" class="recentBattle">
+    <a v-for="battle in battles" :key="battle.id" :href="'/checkmate/replay/'+battle.battle_id" class="rank-link">
+      <div class="kana-item rank-box">
+        <div class="comment" style="margin-top: 10px;">
+          第{{battle.id}}场对战
+        </div>
+        <div class="time" style="font-size: 10px;">
+          {{new Date(battle.time).toLocaleDateString() + ' ' + new Date(battle.time).toLocaleTimeString() }}
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+<script>
+  const battleApp = new Vue({
+    el: "#recentBattle",
+    data: {
+      battles: [],
+    },
+    mounted: function () {
+      $.get('/api/recentBattle', (data) => {
+        console.log(data.dat);
+        this.battles = data.dat;
+      });
+    }
+  })
+</script>

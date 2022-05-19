@@ -206,7 +206,7 @@ function judge(context, callback) {
 let last_comment_time = [];
 
 router.post('/comment', function (req, res) {
-    if(last_comment_time[req.session.uid] >= new Date().getTime() - 60 * 1000) { res.json({ status: ('error'), msg: '歇一会儿再发言' }); return; }
+    if (last_comment_time[req.session.uid] >= new Date().getTime() - 60 * 1000) { res.json({ status: ('error'), msg: '歇一会儿再发言' }); return; }
     last_comment_time[req.session.uid] = new Date().getTime();
     if (req.session.blockTime >= new Date().getTime()) { res.json({ status: ('error'), msg: '您的评论目前被封禁至' + new Date(Number(req.session.blockTime)).toUTCString() }); return; }
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
@@ -254,8 +254,25 @@ router.post('/redeem', function (req, res) {
     } catch (e) {
         redeeming = false;
     }
+});
 
-})
+router.get('/recentComment', (req, res) => {
+    db.runSQL('SELECT * FROM `comment` WHERE 1 ORDER BY id DESC LIMIT 0,10', [], (err, dat) => {
+        if (err) { res.json({ status: 'error', msg: '数据库错误' }); return; }
+        else {
+            res.json({ status: 'success', dat: dat });
+        }
+    });
+});
+
+router.get('/recentBattle', (req, res) => {
+    db.runSQL('SELECT `id`, `time`, `battle_id` FROM `battle_data` WHERE 1 ORDER BY id DESC LIMIT 0, 10', [], (err, dat) => {
+        if (err) { res.json({ status: 'error', msg: '数据库错误' }); return; }
+        else {
+            res.json({ status: 'success', dat: dat });
+        }
+    });
+});
 
 router.get('/commentAmount', function (req, res) {
     if (req.session.username == undefined) { res.redirect('/login'); return; }
@@ -283,7 +300,7 @@ router.post('/deletepost', function (req, res) {
 })
 
 router.post('/post/sendfavor', function (req, res) {
-    res.json({ status: ('error'), msg: '暂停点赞' }); return;
+    // res.json({ status: ('error'), msg: '暂停点赞' }); return;
     if (req.session.username == undefined) { res.json({ status: ('error'), msg: '请先登录' }); return; }
     if (req.body.id == undefined) { res.json({ status: ('error'), msg: '非法请求' }); return; }
     db.sendPostLike(req.body.id, (err, dat) => {

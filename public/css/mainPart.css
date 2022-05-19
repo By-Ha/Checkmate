@@ -301,6 +301,101 @@ article.preview object {
   background-color: #fef4ff;
 }
 
+#sRight .recentBattle .avatar {
+  border-radius: 50%;
+  float: left;
+}
+#sRight .recentBattle .info {
+  margin-left: 60px;
+  line-height: 50px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: black;
+}
+#sRight .recentBattle a:hover {
+  text-decoration: none;
+}
+#sRight .recentBattle .rank-box {
+  background-image: repeating-linear-gradient(
+    45deg,
+    hsla(0, 0%, 100%, 0.3),
+    hsla(0, 0%, 100%, 0.3) 15px,
+    transparent,
+    transparent 30px
+  );
+  display: inline-block;
+  width: 100%;
+}
+
+#sRight .recentBattle .rank-link:nth-child(5n + 1) .rank-box {
+  background-color: #fff8e1;
+}
+#sRight .recentBattle .rank-link:nth-child(5n + 2) .rank-box {
+  background-color: #fff0e6;
+}
+#sRight .recentBattle .rank-link:nth-child(5n + 3) .rank-box {
+  background-color: #f7fdde;
+}
+#sRight .recentBattle .rank-link:nth-child(5n + 4) .rank-box {
+  background-color: #f4f6fe;
+}
+#sRight .recentBattle .rank-link:nth-child(5n + 5) .rank-box {
+  background-color: #fef4ff;
+}
+
+#sLeft .recentComment .avatar {
+  border-radius: 50%;
+  float: left;
+}
+#sLeft .recentComment .info {
+  margin-left: 60px;
+  line-height: 50px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: black;
+}
+#sLeft .recentComment .comment {
+  text-indent: 10px;
+  color: black;
+  word-break: break-all;
+  max-height: 100px;
+  overflow-y: hidden;
+}
+#sLeft .recentComment .time {
+  color: black;
+  opacity: .8;
+}
+#sLeft .recentComment a:hover {
+  text-decoration: none;
+}
+#sLeft .recentComment .rank-box {
+  background-image: repeating-linear-gradient(
+    45deg,
+    hsla(0, 0%, 100%, 0.3),
+    hsla(0, 0%, 100%, 0.3) 15px,
+    transparent,
+    transparent 30px
+  );
+  display: inline-block;
+  width: 100%;
+}
+
+#sLeft .recentComment .rank-link:nth-child(5n + 1) .rank-box {
+  background-color: #fff8e1;
+}
+#sLeft .recentComment .rank-link:nth-child(5n + 2) .rank-box {
+  background-color: #fff0e6;
+}
+#sLeft .recentComment .rank-link:nth-child(5n + 3) .rank-box {
+  background-color: #f7fdde;
+}
+#sLeft .recentComment .rank-link:nth-child(5n + 4) .rank-box {
+  background-color: #f4f6fe;
+}
+#sLeft .recentComment .rank-link:nth-child(5n + 5) .rank-box {
+  background-color: #fef4ff;
+}
+
 .colorbox .colorbox-content:nth-child(5n + 1) {
   background-color: #fff8e1;
 }
